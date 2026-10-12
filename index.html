@@ -88,6 +88,77 @@
 <article class="project" data-category="tools" data-search="github repositories source code code"><div class="project-top"><div class="picon">⌘</div><span class="status">مركز الكود</span></div><h3>GitHub Workspace</h3><p>الوصول إلى مستودعات الشيفرة المصدرية للمشاريع.</p><div class="project-foot"><span>GitHub</span><a class="open" href="https://github.com/m5moshbk?tab=repositories" target="_blank" rel="noreferrer">عرض المستودعات ↗</a></div></article>
 <article class="project" data-category="tools" data-search="render services deployments hosting logs"><div class="project-top"><div class="picon">⌁</div><span class="status">مركز الاستضافة</span></div><h3>Render Workspace</h3><p>إدارة الخدمات والنشر والسجلات من لوحة الاستضافة.</p><div class="project-foot"><span>Render</span><a class="open" href="https://dashboard.render.com/" target="_blank" rel="noreferrer">فتح لوحة التحكم ↗</a></div></article>
 </div><p id="empty" class="note hidden">لا توجد مشاريع مطابقة. جرّب كلمة بحث أخرى.</p></section>
+<style>
+/* Owner operator console — browser-local controls, no hidden system access */
+.operator-panel{margin:24px 0 16px;border:1px solid #61e4df40;border-radius:20px;padding:clamp(16px,2.4vw,26px);background:linear-gradient(135deg,#111b2df0,#121326f0);box-shadow:0 22px 65px #0003;position:relative;overflow:hidden}
+.operator-panel:after{content:"";position:absolute;width:260px;height:260px;border-radius:50%;background:#61e4df08;filter:blur(12px);top:-150px;left:-90px;pointer-events:none}
+.operator-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;position:relative}
+.operator-title{margin:7px 0;font-size:clamp(21px,3vw,30px)}
+.operator-sub{margin:0;color:var(--muted);font-size:13px;line-height:1.8;max-width:680px}
+.operator-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:14px;margin-top:18px}
+.operator-box{border:1px solid #ffffff14;background:#080e19a8;border-radius:15px;padding:15px;min-width:0}
+.operator-box h3{font-size:14px;margin:0 0 12px}
+.operator-label{display:block;color:#aebbd0;font-size:12px;margin:12px 0 7px}
+.operator-select,.operator-input,.operator-textarea{width:100%;background:#0b1220;color:var(--text);border:1px solid var(--line);border-radius:11px;padding:11px 12px;font:inherit;font-size:13px;outline:none}
+.operator-textarea{min-height:84px;resize:vertical;line-height:1.7}
+.operator-select:focus,.operator-input:focus,.operator-textarea:focus{border-color:var(--cyan);box-shadow:0 0 0 3px #61e4df12}
+.operator-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.operator-btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:40px;border-radius:11px;border:1px solid #ffffff22;padding:10px 12px;background:#ffffff08;color:var(--text);font:inherit;font-size:12px;font-weight:750;cursor:pointer;transition:transform .18s,border-color .18s,background .18s}
+.operator-btn:hover{transform:translateY(-2px);border-color:#61e4df77;background:#61e4df0c}
+.operator-btn.primary{background:linear-gradient(110deg,var(--cyan),#a4f4e4);color:#071119;border:0}
+.operator-btn.warn{border-color:#f4c87566;color:#f4d79c}
+.operator-status{display:flex;gap:9px;align-items:flex-start;margin-top:12px;padding:10px 11px;background:#61e4df09;border:1px solid #61e4df20;border-radius:11px;font-size:12px;line-height:1.7;color:#c4d3e9}
+.operator-status .pulse-dot{flex:none;margin-top:5px}
+.operator-list{display:grid;gap:8px;margin-top:12px}
+.operator-task{display:flex;gap:10px;align-items:flex-start;padding:10px;border:1px solid #ffffff12;border-radius:10px;background:#ffffff04;font-size:12px;line-height:1.7}
+.operator-task input{margin-top:4px;accent-color:var(--cyan);width:16px;height:16px;flex:none}
+.operator-task.done span{text-decoration:line-through;color:#73839d}
+.operator-log{max-height:180px;overflow:auto;margin-top:10px;border-top:1px solid #ffffff12;padding-top:8px}
+.operator-log-row{padding:7px 0;font-size:11px;color:#aab8ce;line-height:1.6;border-bottom:1px solid #ffffff0a;overflow-wrap:anywhere}
+.operator-micro{font-size:11px;color:#8797b1;line-height:1.8;margin:10px 0 0}
+.operator-confirm{display:flex;gap:8px;align-items:flex-start;margin-top:12px;font-size:12px;color:#d6e1f4;line-height:1.7}
+.operator-confirm input{margin-top:4px;accent-color:var(--cyan);flex:none}
+.operator-counter{display:inline-flex;border:1px solid #61e4df35;color:var(--cyan);border-radius:999px;padding:5px 9px;font-size:11px;white-space:nowrap}
+@media(max-width:800px){.operator-grid{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){.operator-btn{transition:none}.operator-btn:hover{transform:none}}
+</style>
+<section class="operator-panel" id="operatorPanel" aria-labelledby="operatorTitle">
+ <div class="operator-head">
+  <div><span class="eyebrow"><span class="pulse-dot"></span> OWNER WORKSPACE · CONTROL / BUILD / VERIFY</span><h2 class="operator-title" id="operatorTitle">بيئة المالك التنفيذية</h2><p class="operator-sub">مركز عملي لاختيار المشروع، فتح بيئته، تجهيز مهمة تطوير، متابعة قائمة تحقق، وتسجيل خطوات العمل في هذا المتصفح. إجراءات النشر وتغيير الخوادم لا تُنفّذ من هذه الواجهة الثابتة.</p></div>
+  <span class="operator-counter" id="operatorMode">وضع آمن · محلي</span>
+ </div>
+ <div class="operator-grid">
+  <section class="operator-box" aria-label="اختيار المشروع وتنفيذ الاختصارات">
+   <h3>01 / المشروع والأدوات</h3>
+   <label class="operator-label" for="operatorProject">المشروع المستهدف</label>
+   <select class="operator-select" id="operatorProject"><option value="">جارٍ تحميل المشاريع…</option></select>
+   <div class="operator-actions">
+    <button class="operator-btn primary" id="operatorOpen" type="button">فتح المشروع ↗</button>
+    <button class="operator-btn" id="operatorPreview" type="button">معاينة داخل Nexus</button>
+    <button class="operator-btn" id="operatorRepo" type="button">فتح GitHub ↗</button>
+    <button class="operator-btn" id="operatorHosting" type="button">لوحة Render ↗</button>
+   </div>
+   <label class="operator-label" for="operatorTaskType">نوع المهمة</label>
+   <select class="operator-select" id="operatorTaskType">
+    <option value="audit">مراجعة وفحص</option><option value="bug">إصلاح عطل</option><option value="ui">تطوير الواجهة والتوافق</option><option value="security">الحماية والصلاحيات</option><option value="data">قاعدة البيانات والتكامل</option><option value="release">التحضير للإصدار والنشر</option>
+   </select>
+   <label class="operator-label" for="operatorTaskNote">وصف المهمة ونتيجة النجاح المطلوبة</label>
+   <textarea class="operator-textarea" id="operatorTaskNote" placeholder="مثال: اختبار تسجيل الدخول على الجوال، ثم توثيق النتيجة قبل النشر."></textarea>
+   <div class="operator-actions"><button class="operator-btn primary" id="operatorCreateTask" type="button">تجهيز خطة المهمة</button><button class="operator-btn" id="operatorCopyTask" type="button">نسخ ملخص المهمة</button></div>
+   <div class="operator-status" id="operatorStatus" role="status" aria-live="polite"><span class="pulse-dot"></span><span>جاهز. اختر مشروعًا لتفعيل أدواته.</span></div>
+   <p class="operator-micro">تفتح الاختصارات المواقع الرسمية في تبويب منفصل. لن يتم إدخال كلمات مرور أو مفاتيح API هنا.</p>
+  </section>
+  <section class="operator-box" aria-label="قائمة تحقق وسجل تدقيق محلي">
+   <h3>02 / خطة التنفيذ وسجل التدقيق</h3>
+   <div class="operator-status"><span>✓</span><span>قاعدة التشغيل: افحص ← نفّذ بأقل صلاحية ← اختبر ← وثّق ← انشر بعد الموافقة.</span></div>
+   <div class="operator-list" id="operatorChecklist"><div class="operator-task"><span>أنشئ خطة مهمة لعرض قائمة التحقق الخاصة بها.</span></div></div>
+   <div class="operator-actions"><button class="operator-btn" id="operatorExport" type="button">تصدير سجل العمل</button><button class="operator-btn" id="operatorLogNow" type="button">تسجيل نقطة مراجعة</button><button class="operator-btn warn" id="operatorClearChecklist" type="button">إعادة ضبط القائمة</button></div>
+   <label class="operator-confirm"><input type="checkbox" id="operatorConfirm"><span>أؤكد أن أي تغيير على الإنتاج أو البيانات أو الدفع يجب أن يُراجع ويُعتمد صراحةً قبل تنفيذه. هذا التأكيد لا يمنح الواجهة صلاحيات خادم.</span></label>
+   <div class="operator-log" id="operatorLog" aria-label="آخر أحداث سجل العمل"><div class="operator-log-row">سجل المتصفح محلي لهذا الجهاز والمتصفح، وليس سجل خادم مركزيًا.</div></div>
+   <p class="operator-micro">السجل والقائمة محفوظان في مساحة تخزين المتصفح إن كانت متاحة. لا تستخدم هذا السجل بديلًا عن سجلات GitHub أو Render.</p>
+  </section>
+ </div>
+</section>
 <section class="panel" style="margin:26px 0 14px;border-color:#61e4df35;background:linear-gradient(120deg,#101a2aee,#151426dd)">
  <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap">
   <div><span class="eyebrow">OPERATIONS SNAPSHOT · 13 OCT 2026</span><h2 style="margin:8px 0 6px;font-size:21px">لقطة تشغيلية للمنظومة</h2><p class="note" style="margin:0">جرد إعدادات النشر في Render — لا يُعد فحصًا حيًا لصحة كل وظيفة.</p></div>
@@ -163,6 +234,45 @@ if(manifesto&&!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
  let thoughtIndex=0;
  setInterval(()=>{thoughtIndex=(thoughtIndex+1)%thoughts.length;manifesto.style.animation='none';void manifesto.offsetWidth;manifesto.textContent=thoughts[thoughtIndex];manifesto.style.animation='manifestoIn .5s ease both'},4200);
 }
+
+
+/* Browser-local owner operator controls. Server-side mutations intentionally require authenticated APIs. */
+(()=>{
+ const byId=id=>document.getElementById(id);
+ const projectSelect=byId('operatorProject'),status=byId('operatorStatus'),checklist=byId('operatorChecklist'),logBox=byId('operatorLog');
+ const STORAGE_KEY='m5mosh-nexus-operator-v1';
+ const plans={
+  audit:['حدد نطاق الاختبار والبيئة','راجع آخر commit وسجل النشر','اختبر المسار الأساسي وحالات الخطأ','وثّق النتيجة والأدلة دون أسرار','اعتمد الخطوة التالية'],
+  bug:['أعد إنتاج العطل وسجّل الخطوات','حدد الملف والسبب الجذري','أنشئ إصلاحًا محدود النطاق','اختبر الحالة الأصلية وحالات مجاورة','راجع التغيير قبل الدمج والنشر'],
+  ui:['اختبر الجوال والشاشات الكبيرة','راجع RTL والتركيز بلوحة المفاتيح','اختبر حالات التحميل والخطأ والفراغ','احترم تقليل الحركة وإمكانية الوصول','راجع التغيير على معاينة قبل الإصدار'],
+  security:['حدد الأصول والصلاحيات المطلوبة','تحقق من المصادقة والتحقق من الدور','افحص عدم كشف الأسرار والسجلات الحساسة','اختبر حدود الإدخال ومعدل الطلبات','وثّق المخاطر ولا توسّع الصلاحيات بلا سبب'],
+  data:['تحقق من إعداد الاتصال دون طباعة السر','راجع المخطط والترحيلات والنسخ الاحتياطي','اختبر القراءة والكتابة في بيئة آمنة','اختبر انقطاع الاتصال والتعافي','وثّق نتائج الاتساق وخطة الرجوع'],
+  release:['تأكد من اكتمال الاختبارات والمراجعة','تحقق من متغيرات البيئة المطلوبة','راجع التغييرات ومخاطر الرجوع','اطلب الموافقة قبل أي تغيير إنتاجي','راقب حالة النشر والسجلات بعد الإصدار']
+ };
+ const labels={audit:'مراجعة وفحص',bug:'إصلاح عطل',ui:'تطوير الواجهة والتوافق',security:'الحماية والصلاحيات',data:'قاعدة البيانات والتكامل',release:'التحضير للإصدار والنشر'};
+ let state={events:[],checks:[],currentTask:null};
+ try{const saved=JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');state={...state,...saved};}catch(_){}
+ function persist(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));}catch(_){setStatus('تعذر حفظ سجل المتصفح؛ يمكنك تصدير السجل عند الحاجة.');}}
+ function setStatus(message){status.lastElementChild.textContent=message;}
+ function addEvent(action,detail){state.events.unshift({at:new Date().toISOString(),project:selected()?.name||'غير محدد',action,detail});state.events=state.events.slice(0,80);persist();renderLog();}
+ function selected(){const card=document.querySelector('.project[data-operator-id="'+CSS.escape(projectSelect.value)+'"]');if(!card)return null;const link=card.querySelector('.project-foot a.open');return {id:projectSelect.value,name:card.querySelector('h3')?.textContent?.trim()||'مشروع',url:link?.href||'',card};}
+ function renderLog(){logBox.innerHTML='';if(!state.events.length){const row=document.createElement('div');row.className='operator-log-row';row.textContent='لا توجد أحداث مسجلة بعد.';logBox.appendChild(row);return;}state.events.slice(0,12).forEach(ev=>{const row=document.createElement('div');row.className='operator-log-row';row.textContent=new Date(ev.at).toLocaleString('ar-SA')+' · '+ev.project+' · '+ev.action+(ev.detail?' — '+ev.detail:'');logBox.appendChild(row);});}
+ function renderChecks(){checklist.innerHTML='';if(!state.checks.length){const row=document.createElement('div');row.className='operator-task';const span=document.createElement('span');span.textContent='أنشئ خطة مهمة لعرض قائمة التحقق الخاصة بها.';row.appendChild(span);checklist.appendChild(row);return;}state.checks.forEach((item,i)=>{const label=document.createElement('label');label.className='operator-task'+(item.done?' done':'');const input=document.createElement('input');input.type='checkbox';input.checked=!!item.done;input.addEventListener('change',()=>{state.checks[i].done=input.checked;label.classList.toggle('done',input.checked);persist();addEvent(input.checked?'إكمال خطوة':'إعادة فتح خطوة',item.text);});const span=document.createElement('span');span.textContent=item.text;label.append(input,span);checklist.appendChild(label);});}
+ function populate(){projectSelect.innerHTML='';const cards=[...document.querySelectorAll('.project')];cards.forEach((card,i)=>{const link=card.querySelector('.project-foot a.open');if(!link)return;const id='project-'+i;card.dataset.operatorId=id;const option=document.createElement('option');option.value=id;option.textContent=card.querySelector('h3')?.textContent?.trim()||'مشروع '+(i+1);projectSelect.appendChild(option);});if(!projectSelect.options.length){projectSelect.add(new Option('لا توجد مشاريع مرتبطة',''));}if(state.events.length)renderLog();renderChecks();setStatus('تم تجهيز أدوات المتصفح. هذه اختصارات ومهام محلية وليست صلاحية مباشرة على الخوادم.');}
+ function openExternal(url){if(!url){setStatus('لا يوجد رابط مسجل لهذا المشروع.');return;}window.open(url,'_blank','noopener,noreferrer');}
+ byId('operatorOpen').addEventListener('click',()=>{const p=selected();if(!p)return setStatus('اختر مشروعًا أولًا.');addEvent('فتح المشروع',p.url);openExternal(p.url);setStatus('تم طلب فتح رابط المشروع في تبويب جديد.');});
+ byId('operatorPreview').addEventListener('click',()=>{const p=selected();if(!p)return setStatus('اختر مشروعًا أولًا.');const preview=p.card.querySelector('.preview-btn');if(preview){addEvent('فتح المعاينة داخل Nexus',p.name);preview.click();setStatus('تم فتح نافذة المعاينة؛ قد يمنع الموقع الخارجي التضمين.');}else{setStatus('لا تتوفر معاينة مضمّنة لهذا العنصر؛ استخدم فتح المشروع.');}});
+ byId('operatorRepo').addEventListener('click',()=>{addEvent('فتح مستودعات GitHub','مستودعات الحساب');openExternal('https://github.com/m5moshbk?tab=repositories');});
+ byId('operatorHosting').addEventListener('click',()=>{addEvent('فتح لوحة الاستضافة','Render');openExternal('https://dashboard.render.com/');});
+ byId('operatorCreateTask').addEventListener('click',()=>{const p=selected(),type=byId('operatorTaskType').value,note=byId('operatorTaskNote').value.trim();if(!p)return setStatus('اختر المشروع قبل تجهيز المهمة.');state.currentTask={project:p.name,url:p.url,type,label:labels[type]||type,note,createdAt:new Date().toISOString()};state.checks=(plans[type]||plans.audit).map(text=>({text,done:false}));renderChecks();persist();addEvent('تجهيز خطة مهمة',state.currentTask.label+(note?' · '+note:''));setStatus('تم تجهيز قائمة تحقق لـ '+p.name+'؛ نفّذ الخطوات في بيئة المشروع ثم حدّث حالاتها.');});
+ byId('operatorCopyTask').addEventListener('click',async()=>{const p=selected();if(!p)return setStatus('اختر المشروع أولًا.');const task=state.currentTask;const text='M5mOsH Nexus — مهمة تطوير\nالمشروع: '+p.name+'\nالرابط: '+p.url+'\nالنوع: '+(task?.label||labels[byId('operatorTaskType').value])+'\nالوصف: '+(byId('operatorTaskNote').value.trim()||'لم يحدد بعد')+'\nقائمة التحقق:\n'+(state.checks.map(x=>(x.done?'[x] ':'[ ] ')+x.text).join('\n')||'لم تُنشأ بعد')+'\nتنبيه: لا تنفذ تغييرات إنتاجية أو دفع أو بيانات دون مراجعة وموافقة صريحة.';try{await navigator.clipboard.writeText(text);addEvent('نسخ ملخص المهمة','تم النسخ إلى الحافظة');setStatus('تم نسخ ملخص المهمة.');}catch(_){const area=document.createElement('textarea');area.value=text;area.className='operator-textarea';area.setAttribute('aria-label','ملخص المهمة للنسخ اليدوي');checklist.prepend(area);area.focus();area.select();setStatus('تعذر النسخ التلقائي؛ تم تحديد النص لتنسخه يدويًا.');}});
+ byId('operatorExport').addEventListener('click',()=>{const payload={product:'M5mOsH Nexus',exportedAt:new Date().toISOString(),currentTask:state.currentTask,checklist:state.checks,events:state.events,notice:'Browser-local record only; not a server-side audit log.'};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='m5mosh-nexus-worklog.json';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);addEvent('تصدير سجل العمل','m5mosh-nexus-worklog.json');setStatus('تم تجهيز ملف سجل العمل للتصدير.');});
+ byId('operatorLogNow').addEventListener('click',()=>{addEvent('نقطة مراجعة','تم التسجيل يدويًا بواسطة المالك');setStatus('تم تسجيل نقطة المراجعة في سجل المتصفح.');});
+ byId('operatorClearChecklist').addEventListener('click',()=>{if(!confirm('إعادة ضبط قائمة التحقق الحالية؟ سيبقى سجل الأحداث محفوظًا.'))return;state.checks=[];state.currentTask=null;renderChecks();persist();addEvent('إعادة ضبط قائمة التحقق','بموافقة المستخدم');setStatus('أعيد ضبط قائمة التحقق؛ سجل الأحداث محفوظ.');});
+ byId('operatorConfirm').addEventListener('change',e=>{if(e.target.checked){addEvent('تأكيد سياسة العمل','أقر المستخدم بضرورة الموافقة قبل تغييرات الإنتاج والبيانات والدفع.');setStatus('تم تسجيل الإقرار فقط؛ لم تُمنح صلاحيات إضافية ولم يُنفذ أي تغيير على الخوادم.');}else setStatus('أُلغي الإقرار المحلي؛ لا يتغير أي إعداد على الخوادم.');});
+ projectSelect.addEventListener('change',()=>{const p=selected();if(p)setStatus('المشروع المحدد: '+p.name+'. اختر أداة أو جهّز مهمة.');});
+ populate();
+})();
 
 search.addEventListener('input',update);filters.forEach(b=>b.addEventListener('click',()=>{category=b.dataset.filter;filters.forEach(x=>x.classList.toggle('active',x===b));update()}));
 </script></body></html>
