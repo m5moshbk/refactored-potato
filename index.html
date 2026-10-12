@@ -68,6 +68,30 @@
 @keyframes modalFade{from{opacity:0}to{opacity:1}}@keyframes modalRise{from{opacity:0;transform:translateY(12px) scale(.99)}to{opacity:1;transform:translateY(0) scale(1)}}
 @media(max-width:600px){.modal-backdrop{padding:0}.project-modal{height:100dvh;border-radius:0;border:0}.modal-head{padding:10px;gap:8px}.modal-actions{gap:5px}.modal-action{padding:8px;font-size:11px}.modal-heading small{max-width:48vw}.modal-foot{font-size:11px}}
 @media(prefers-reduced-motion:reduce){.modal-backdrop.open,.project-modal{animation:none}}
+
+/* Side-by-side owner workbench: local browser UI, not server authorization */
+#nexusWorkbenchToggle{position:fixed;z-index:9000;left:16px;bottom:16px;border:1px solid #61e4df80;border-radius:14px;padding:13px 16px;background:linear-gradient(120deg,#122a36,#201c3a);color:#effcff;font-weight:800;box-shadow:0 12px 40px #0008;cursor:pointer}
+#nexusWorkbench{position:fixed;z-index:8999;inset:12px 12px 12px 12px;display:none;grid-template-columns:minmax(250px,.8fr) minmax(0,1.4fr);gap:12px;padding:12px;border:1px solid #52617a;border-radius:20px;background:#080b13f5;backdrop-filter:blur(18px);box-shadow:0 30px 100px #000b}
+#nexusWorkbench.open{display:grid}
+.nw-pane{min-width:0;min-height:0;display:flex;flex-direction:column;overflow:hidden;border:1px solid #ffffff1c;border-radius:14px;background:#111725}
+.nw-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px;border-bottom:1px solid #ffffff18}
+.nw-head strong{font-size:14px}.nw-head small{display:block;color:#91a0b8;font-size:11px;margin-top:4px}
+.nw-actions{display:flex;flex-wrap:wrap;gap:7px;padding:10px}
+.nw-btn{border:1px solid #34435c;background:#182236;color:#eaf2ff;padding:8px 10px;border-radius:9px;cursor:pointer;font:inherit;font-size:12px}
+.nw-btn.primary{background:#61e4df;color:#061116;border-color:#61e4df;font-weight:800}
+.nw-select,.nw-note{width:calc(100% - 20px);margin:0 10px 9px;border:1px solid #34435c;border-radius:9px;background:#0b1220;color:#eef3ff;padding:10px;font:inherit;font-size:12px}
+.nw-note{resize:vertical;min-height:66px}
+.nw-log{overflow:auto;min-height:90px;flex:1;padding:0 10px 10px}
+.nw-log-row{padding:9px 0;border-bottom:1px solid #ffffff12;color:#cbd6e8;font-size:11px;line-height:1.6;overflow-wrap:anywhere}
+.nw-log-row time{display:block;color:#7f91ad;font-size:10px}
+.nw-view{position:relative;flex:1;min-height:0;background:#080b13}
+#nwFrame{width:100%;height:100%;border:0;background:white}
+#nwEmpty{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:28px;color:#9baac0;line-height:2}
+.nw-foot{padding:9px 12px;border-top:1px solid #ffffff14;color:#91a0b8;font-size:10px;line-height:1.7}
+.nw-owner-note{margin:0 10px 10px;padding:9px;border:1px solid #f4c87542;border-radius:9px;color:#f4dba7;font-size:10px;line-height:1.7}
+@media(max-width:760px){#nexusWorkbench{inset:0;border-radius:0;padding:7px;grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(190px,.8fr) minmax(240px,1.2fr);gap:7px}.nw-pane:first-child{min-height:0}.nw-log{max-height:90px}.nw-head{padding:8px}.nw-actions{padding:7px}.nw-note{min-height:44px;margin-bottom:6px}#nexusWorkbenchToggle{left:10px;bottom:10px;padding:11px 12px}}
+@media(prefers-reduced-motion:reduce){#nexusWorkbench,#nexusWorkbenchToggle{scroll-behavior:auto;transition:none}}
+
 </style></head>
 <body><div class="wrap">
 <header class="top"><div class="brand"><div class="mark">N</div><div>M5mOsH Nexus<div class="muted" style="font-size:11px;font-weight:500;margin-top:3px">مركز إدارة منظومة المشاريع الرقمية</div></div></div><span class="tag">نسخة تشغيلية أولية · v0.1</span></header>
@@ -184,6 +208,33 @@
   <footer class="modal-foot"><span>معاينة مباشرة داخل Nexus</span><span>Esc للإغلاق · يبقى مركز المشاريع مفتوحًا</span></footer>
  </section>
 </div>
+
+<button id="nexusWorkbenchToggle" type="button" aria-controls="nexusWorkbench" aria-expanded="false">⌘ مساحة المالك</button>
+<section id="nexusWorkbench" aria-label="مساحة المالك جنبًا إلى جنب">
+ <section class="nw-pane">
+  <header class="nw-head"><div><strong>مركز التحكم والتطوير</strong><small id="nwStatus">مساحة محلية لهذا المتصفح</small></div><button class="nw-btn" id="nwClose" type="button" aria-label="إغلاق مساحة المالك">إغلاق ×</button></header>
+  <div class="nw-actions">
+   <button class="nw-btn primary" id="nwOpenSelected" type="button">فتح في النافذة المجاورة ↗</button>
+   <button class="nw-btn" id="nwOpenNew" type="button">فتح بتبويب مستقل</button>
+   <button class="nw-btn" id="nwRecordNote" type="button">حفظ ملاحظة</button>
+   <button class="nw-btn" id="nwExportLog" type="button">تصدير السجل JSON</button>
+  </div>
+  <label for="nwProject" class="muted" style="font-size:11px;padding:0 12px 5px">المشروع المحدد</label>
+  <select id="nwProject" class="nw-select" aria-label="اختيار المشروع"></select>
+  <label for="nwNote" class="muted" style="font-size:11px;padding:0 12px 5px">ملاحظة / هدف التطوير</label>
+  <textarea id="nwNote" class="nw-note" placeholder="اكتب ما تريد مراجعته أو تغييره…"></textarea>
+  <div class="nw-owner-note">الخصوصية والصلاحيات: هذا سجل محلي في هذا المتصفح فقط. الواجهة الثابتة لا تثبت هويتك ولا تمنع الآخرين من فتح الموقع العام. لا تكتب كلمات مرور أو مفاتيح API هنا. حماية المالك الحقيقية تتطلب تسجيل دخول وخادمًا موثوقًا.</div>
+  <div class="nw-head"><strong>سجل النقرات والأحداث</strong><button class="nw-btn" id="nwClearLog" type="button">مسح السجل المحلي</button></div>
+  <div id="nwLog" class="nw-log" aria-live="polite"></div>
+  <div class="nw-foot">يحفظ السجل محليًا عند توفر مساحة المتصفح. امسح البيانات أو استخدم جهازًا آخر وستختلف النتيجة؛ صدّر نسخة احتياطية عند الحاجة.</div>
+ </section>
+ <section class="nw-pane">
+  <header class="nw-head"><div><strong id="nwViewTitle">نافذة المشروع</strong><small id="nwViewUrl">اختر مشروعًا من القائمة أو انقر بطاقة مشروع.</small></div><div class="nw-actions" style="padding:0"><button class="nw-btn" id="nwRefresh" type="button">تحديث ↻</button><button class="nw-btn" id="nwExternal" type="button">فتح خارجي ↗</button></div></header>
+  <div class="nw-view"><div id="nwEmpty">مساحة عرض المشروع<br>اختر أي مشروع من المكتبة، ثم افتحه هنا بجانب أدوات التحكم والسجل.</div><iframe id="nwFrame" title="عرض المشروع المحدد" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" style="display:none"></iframe></div>
+  <div class="nw-foot">قد تمنع بعض المواقع التضمين داخل نافذة؛ عندها استخدم «فتح خارجي». العرض داخل النافذة لا يعني امتلاك صلاحية إدارة الخدمة أو تغييرها.</div>
+ </section>
+</section>
+
 <footer class="footer"><span>© M5mOsH Nexus · Project Operations Hub</span><span>واجهة عربية RTL · متجاوبة · لا تخزّن بيانات حساسة</span></footer>
 </div><script>
 const search=document.getElementById('search'),cards=[...document.querySelectorAll('.project')],filters=[...document.querySelectorAll('.filter')],empty=document.getElementById('empty');let category='all';
@@ -275,4 +326,32 @@ if(manifesto&&!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
 })();
 
 search.addEventListener('input',update);filters.forEach(b=>b.addEventListener('click',()=>{category=b.dataset.filter;filters.forEach(x=>x.classList.toggle('active',x===b));update()}));
+
+/* Side-by-side workbench and click journal; storage remains local to this browser. */
+(()=> {
+ const $=id=>document.getElementById(id), panel=$('nexusWorkbench'),toggle=$('nexusWorkbenchToggle'),select=$('nwProject'),frame=$('nwFrame'),log=$('nwLog'),status=$('nwStatus');
+ const key='m5mosh-nexus-click-journal-v1'; let events=[],activeUrl='',activeName='';
+ try{const saved=JSON.parse(localStorage.getItem(key)||'[]');if(Array.isArray(saved))events=saved.slice(0,250)}catch(_){}
+ function save(){try{localStorage.setItem(key,JSON.stringify(events.slice(0,250)))}catch(_){status.textContent='تعذر التخزين المحلي؛ صدّر السجل للاحتفاظ به.'}renderLog()}
+ function record(action,detail=''){events.unshift({time:new Date().toISOString(),action,detail,url:activeUrl});events=events.slice(0,250);save()}
+ function renderLog(){log.replaceChildren();if(!events.length){const el=document.createElement('div');el.className='nw-log-row';el.textContent='سيظهر هنا سجل النقرات والإجراءات بعد بدء الاستخدام.';log.append(el);return}events.slice(0,35).forEach(ev=>{const row=document.createElement('div');row.className='nw-log-row';const time=document.createElement('time');try{time.textContent=new Date(ev.time).toLocaleString('ar-SA')}catch(_){time.textContent=ev.time||''}row.append(time,document.createTextNode((ev.action||'حدث')+(ev.detail?' · '+ev.detail:'')));log.append(row)})}
+ function projects(){select.replaceChildren();document.querySelectorAll('.project').forEach((card,i)=>{const link=card.querySelector('.project-foot a.open');if(!link)return;const opt=document.createElement('option');opt.value=link.href;opt.textContent=(card.querySelector('h3')?.textContent||('مشروع '+(i+1))).trim();opt.dataset.name=opt.textContent;select.append(opt)});if(!select.options.length){const opt=document.createElement('option');opt.textContent='لا توجد مشاريع مرتبطة';opt.value='';select.append(opt)}}
+ function openProject(url,name,source='اختيار مشروع'){if(!url){status.textContent='لا يوجد رابط لهذا المشروع.';return}activeUrl=url;activeName=name||'المشروع';$('nwViewTitle').textContent=activeName;$('nwViewUrl').textContent=url;$('nwEmpty').style.display='none';frame.style.display='block';frame.src=url;status.textContent='تم فتح '+activeName+' في مساحة العرض؛ إن منع التضمين افتحه خارجيًا.';record(source,activeName);$('nwExternal').disabled=false}
+ function show(){panel.classList.add('open');toggle.setAttribute('aria-expanded','true');record('فتح مساحة المالك');}
+ function hide(){panel.classList.remove('open');toggle.setAttribute('aria-expanded','false');record('إغلاق مساحة المالك')}
+ toggle.addEventListener('click',()=>panel.classList.contains('open')?hide():show());$('nwClose').addEventListener('click',hide);
+ select.addEventListener('change',()=>{const opt=select.selectedOptions[0];if(opt)record('اختيار مشروع',opt.textContent)});
+ $('nwOpenSelected').addEventListener('click',()=>{const opt=select.selectedOptions[0];if(opt)openProject(opt.value,opt.textContent,'فتح المشروع داخل النافذة المجاورة')});
+ $('nwOpenNew').addEventListener('click',()=>{const opt=select.selectedOptions[0];if(opt){record('فتح تبويب مستقل',opt.textContent);window.open(opt.value,'_blank','noopener,noreferrer')}});
+ $('nwExternal').addEventListener('click',()=>{if(activeUrl){record('فتح المشروع خارجيًا',activeName);window.open(activeUrl,'_blank','noopener,noreferrer')}});
+ $('nwRefresh').addEventListener('click',()=>{if(activeUrl){frame.src=activeUrl;record('تحديث نافذة المشروع',activeName);status.textContent='تم طلب تحديث المعاينة.'}else status.textContent='اختر مشروعًا أولًا.'});
+ $('nwRecordNote').addEventListener('click',()=>{const note=$('nwNote').value.trim();if(!note){status.textContent='اكتب ملاحظة أولًا ليتم حفظها.';return}record('حفظ ملاحظة',note);$('nwNote').value='';status.textContent='حُفظت الملاحظة في سجل المتصفح.'});
+ $('nwExportLog').addEventListener('click',()=>{const data={workspace:'M5mOsH Nexus',exportedAt:new Date().toISOString(),events};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json;charset=utf-8'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='m5mosh-nexus-click-journal.json';a.click();URL.revokeObjectURL(url);record('تصدير سجل النقرات','JSON')});
+ $('nwClearLog').addEventListener('click',()=>{if(!confirm('هل تريد مسح سجل النقرات المحلي؟ لا يمكن استعادته بعد المسح ما لم تكن صدّرت نسخة.'))return;events=[];save();record('إعادة إنشاء سجل النقرات')});
+ document.addEventListener('click',e=>{if(e.target.closest('#nexusWorkbench'))return;const el=e.target.closest('button,a,input,select,textarea,[role="button"],.project');if(!el)return;const label=(el.getAttribute('aria-label')||el.innerText||el.textContent||el.getAttribute('title')||el.tagName||'عنصر').trim().replace(/\s+/g,' ').slice(0,140);if(el.id==='nexusWorkbenchToggle')return;record('نقرة واجهة',label)},true);
+ document.querySelectorAll('.project').forEach(card=>{card.style.cursor='pointer';card.addEventListener('dblclick',()=>{const a=card.querySelector('.project-foot a.open');if(a){show();select.value=a.href;openProject(a.href,card.querySelector('h3')?.textContent||'المشروع','فتح المشروع بالنقر المزدوج')}})});
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&panel.classList.contains('open'))hide()});
+ projects();renderLog();
+})();
+
 </script></body></html>
