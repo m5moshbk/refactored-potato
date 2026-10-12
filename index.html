@@ -92,6 +92,16 @@
 @media(max-width:760px){#nexusWorkbench{inset:0;border-radius:0;padding:7px;grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(190px,.8fr) minmax(240px,1.2fr);gap:7px}.nw-pane:first-child{min-height:0}.nw-log{max-height:90px}.nw-head{padding:8px}.nw-actions{padding:7px}.nw-note{min-height:44px;margin-bottom:6px}#nexusWorkbenchToggle{left:10px;bottom:10px;padding:11px 12px}}
 @media(prefers-reduced-motion:reduce){#nexusWorkbench,#nexusWorkbenchToggle{scroll-behavior:auto;transition:none}}
 
+
+/* Explicit operation controls: direct state changes remain in authenticated provider dashboard */
+.nw-operation-box{margin:0 10px 10px;padding:10px;border:1px solid #61e4df38;border-radius:11px;background:#0b1422}
+.nw-operation-box h4{margin:0 0 7px;font-size:12px}
+.nw-operation-box p{margin:0 0 9px;color:#9baac0;font-size:10px;line-height:1.7}
+.nw-operation-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+.nw-operation-actions .nw-btn{min-width:0}
+.nw-operation-actions .nw-btn.warn{border-color:#f4c87560;color:#f4dba7}
+.nw-operation-actions .nw-btn.danger{border-color:#ff8e8e60;color:#ffb5b5}
+
 </style></head>
 <body><div class="wrap">
 <header class="top"><div class="brand"><div class="mark">N</div><div>M5mOsH Nexus<div class="muted" style="font-size:11px;font-weight:500;margin-top:3px">مركز إدارة منظومة المشاريع الرقمية</div></div></div><span class="tag">نسخة تشغيلية أولية · v0.1</span></header>
@@ -221,6 +231,18 @@
   </div>
   <label for="nwProject" class="muted" style="font-size:11px;padding:0 12px 5px">المشروع المحدد</label>
   <select id="nwProject" class="nw-select" aria-label="اختيار المشروع"></select>
+  
+  <section class="nw-operation-box" aria-label="إجراءات التشغيل">
+   <h4>إجراءات التشغيل والتحكم</h4>
+   <p>اختر إجراءً. التشغيل والإيقاف الفعليان يتمان من لوحة مزوّد الخدمة بعد مراجعة اسم الخدمة وتأكيدك؛ هذه الواجهة لا تدّعي تنفيذ ذلك نيابةً عنك.</p>
+   <div class="nw-operation-actions">
+    <button class="nw-btn primary" id="nwManageHosting" type="button">لوحة إدارة الخدمة ↗</button>
+    <button class="nw-btn" id="nwOpenCode" type="button">المصدر والكود ↗</button>
+    <button class="nw-btn" id="nwLogStart" type="button">تسجيل نية التشغيل</button>
+    <button class="nw-btn warn" id="nwLogStop" type="button">تسجيل نية الإيقاف</button>
+   </div>
+  </section>
+
   <label for="nwNote" class="muted" style="font-size:11px;padding:0 12px 5px">ملاحظة / هدف التطوير</label>
   <textarea id="nwNote" class="nw-note" placeholder="اكتب ما تريد مراجعته أو تغييره…"></textarea>
   <div class="nw-owner-note">الخصوصية والصلاحيات: هذا سجل محلي في هذا المتصفح فقط. الواجهة الثابتة لا تثبت هويتك ولا تمنع الآخرين من فتح الموقع العام. لا تكتب كلمات مرور أو مفاتيح API هنا. حماية المالك الحقيقية تتطلب تسجيل دخول وخادمًا موثوقًا.</div>
@@ -351,6 +373,13 @@ search.addEventListener('input',update);filters.forEach(b=>b.addEventListener('c
  document.addEventListener('click',e=>{if(e.target.closest('#nexusWorkbench'))return;const el=e.target.closest('button,a,input,select,textarea,[role="button"],.project');if(!el)return;const label=(el.getAttribute('aria-label')||el.innerText||el.textContent||el.getAttribute('title')||el.tagName||'عنصر').trim().replace(/\s+/g,' ').slice(0,140);if(el.id==='nexusWorkbenchToggle')return;record('نقرة واجهة',label)},true);
  document.querySelectorAll('.project').forEach(card=>{card.style.cursor='pointer';card.addEventListener('dblclick',()=>{const a=card.querySelector('.project-foot a.open');if(a){show();select.value=a.href;openProject(a.href,card.querySelector('h3')?.textContent||'المشروع','فتح المشروع بالنقر المزدوج')}})});
  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&panel.classList.contains('open'))hide()});
+ 
+ /* Service operations are deliberately routed to the provider dashboard; no pretend start/stop. */
+ $('nwManageHosting').addEventListener('click',()=>{record('فتح لوحة إدارة التشغيل','Render · راجع الخدمة المحددة قبل أي تغيير');window.open('https://dashboard.render.com/','_blank','noopener,noreferrer');status.textContent='فتحت لوحة Render. اختر الخدمة المطابقة وتحقق من اسمها قبل أي تشغيل أو إيقاف.'});
+ $('nwOpenCode').addEventListener('click',()=>{record('فتح مستودعات الكود','GitHub · اختر مستودع المشروع الصحيح');window.open('https://github.com/m5moshbk?tab=repositories','_blank','noopener,noreferrer')});
+ $('nwLogStart').addEventListener('click',()=>{const opt=select.selectedOptions[0];if(!opt||!opt.value){status.textContent='اختر مشروعًا أولًا.';return}if(!confirm('تسجيل نية تشغيل '+opt.textContent+'؟ هذا لا يشغّل الخدمة؛ سيفتح سجلًا محليًا فقط.'))return;record('نية تشغيل مسجلة فقط',opt.textContent+' · لم يُنفّذ تشغيل');status.textContent='سُجلت نية التشغيل فقط. لتنفيذها افتح لوحة Render وتأكد من الخدمة قبل التأكيد هناك.'});
+ $('nwLogStop').addEventListener('click',()=>{const opt=select.selectedOptions[0];if(!opt||!opt.value){status.textContent='اختر مشروعًا أولًا.';return}if(!confirm('تسجيل نية إيقاف '+opt.textContent+'؟ لن تتوقف الخدمة بهذا الزر.'))return;record('نية إيقاف مسجلة فقط',opt.textContent+' · لم يُنفّذ إيقاف');status.textContent='سُجلت نية الإيقاف فقط. افتح لوحة Render وراجع أثر الإيقاف قبل تنفيذه هناك.'});
+
  projects();renderLog();
 /* Open the owner workbench automatically on every page visit. This is a convenience only, not authentication. */
 panel.classList.add('open');
