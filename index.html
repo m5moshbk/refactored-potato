@@ -9,6 +9,49 @@
 @media(max-width:800px){.hero{grid-template-columns:1fr;padding-top:35px}.orb-wrap{min-height:180px}.orb{width:140px;height:140px}.stats{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:repeat(2,1fr)}.two{grid-template-columns:1fr}}
 @media(max-width:520px){.top{align-items:flex-start}.tag{max-width:130px;text-align:center}.grid{grid-template-columns:1fr}.project{min-height:190px}.hero h1{font-size:37px}.section-head{align-items:flex-start;flex-direction:column}}
 
+
+/* Cinematic project identity and motion-led introduction */
+.hero-cinematic{position:relative;isolation:isolate;overflow:hidden;border-bottom:1px solid #ffffff0c}
+.hero-cinematic:before{content:"";position:absolute;z-index:-1;inset:5% -8% 0 24%;background:radial-gradient(ellipse at 55% 40%,#61e4df10,transparent 45%),radial-gradient(ellipse at 80% 60%,#9b8cff12,transparent 48%);pointer-events:none}
+.hero-copy{position:relative;animation:copyArrive .75s cubic-bezier(.2,.7,.2,1) both}
+.pulse-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--cyan);box-shadow:0 0 14px var(--cyan);margin-inline-end:7px;animation:dotPulse 2s ease-in-out infinite}
+.brand-reveal{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:19px 0 4px;font-weight:900;letter-spacing:clamp(1px,.5vw,5px);font-size:clamp(18px,2vw,25px)}
+.brand-prefix{color:#b6c5df;animation:brandEnter .65s .12s both}
+.brand-divider{color:#ffffff3b;font-weight:300}
+.brand-name{display:inline-block;background:linear-gradient(100deg,#fff 8%,var(--cyan) 38%,var(--violet) 64%,#fff 82%);background-size:230% auto;background-clip:text;color:transparent;animation:brandShine 5s linear infinite,brandEnter .75s .24s both;text-shadow:0 0 32px #61e4df13}
+.hero-cinematic h1{margin-top:10px;letter-spacing:-1px}
+.hero-gradient{background:linear-gradient(100deg,#fff 5%,var(--cyan) 42%,#b9aaff 75%,#fff);background-size:220% auto;background-clip:text;color:transparent;animation:brandShine 8s linear infinite}
+.hero-intro{max-width:640px!important;font-size:clamp(15px,1.5vw,18px);line-height:2!important}
+.hero-manifesto{display:flex;align-items:center;gap:12px;margin:20px 0 22px;color:#dce8ff;font-size:13px;min-height:25px}
+.manifesto-line{width:32px;height:1px;flex:none;background:linear-gradient(90deg,var(--cyan),var(--violet));box-shadow:0 0 12px #61e4df75}
+#manifestoText{animation:manifestoIn .5s ease both}
+.hero-principles{display:flex;gap:9px 18px;flex-wrap:wrap;margin-top:24px;color:#8190aa;font-size:11px;letter-spacing:.6px}
+.hero-principles span{border-inline-start:1px solid #ffffff24;padding-inline-start:10px}
+.soul-visual{min-height:350px;isolation:isolate}
+.soul-visual .orb{width:clamp(150px,17vw,210px);height:clamp(150px,17vw,210px);background:radial-gradient(circle at 45% 38%,#182a3b 0,#0c1220 65%);border-color:#61e4df85;box-shadow:0 0 75px #61e4df16,inset 0 0 45px #9b8cff24;z-index:2}
+.soul-visual .orb strong{font-size:clamp(23px,3vw,32px);letter-spacing:3px}
+.soul-visual .orb:before{inset:-22px;border-color:#9b8cff68;animation:orbitSpin 18s linear infinite}
+.soul-visual .orb:after{inset:-42px;border-color:#61e4df3b;animation:orbitSpin 26s linear infinite reverse}
+.orbit{position:absolute;border:1px solid #ffffff0d;border-radius:50%;pointer-events:none}
+.orbit-one{width:270px;height:270px;transform:rotateX(62deg) rotate(-28deg)}
+.orbit-two{width:320px;height:320px;transform:rotateX(66deg) rotate(42deg)}
+.orbit-three{width:370px;height:370px;transform:rotateX(70deg) rotate(5deg);border-color:#61e4df16}
+.orbit-node{position:absolute;z-index:3;display:grid;place-items:center;gap:3px;width:54px;height:54px;border:1px solid #ffffff24;border-radius:16px;background:#111a2bdd;backdrop-filter:blur(8px);box-shadow:0 10px 28px #0005;animation:nodeFloat 5s ease-in-out infinite}
+.orbit-node span{font-size:20px;color:var(--cyan);line-height:1}
+.orbit-node small{font-size:9px;color:#aebbd0}
+.node-idea{top:14%;right:13%;animation-delay:-1s}.node-build{bottom:22%;left:8%;animation-delay:-2.6s}.node-grow{top:20%;left:11%;animation-delay:-3.8s}
+.visual-caption{position:absolute;bottom:4px;display:flex;align-items:center;color:#91a0b8;font-size:11px;letter-spacing:.3px}
+@keyframes copyArrive{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes brandEnter{from{opacity:0;transform:translateY(9px);filter:blur(5px)}to{opacity:1;transform:translateY(0);filter:blur(0)}}
+@keyframes brandShine{to{background-position:220% center}}
+@keyframes dotPulse{0%,100%{opacity:.6;transform:scale(.85)}50%{opacity:1;transform:scale(1.2)}}
+@keyframes orbitSpin{from{rotate:0deg}to{rotate:360deg}}
+@keyframes nodeFloat{0%,100%{translate:0 0}50%{translate:0 -9px}}
+@keyframes manifestoIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:800px){.hero-cinematic{gap:6px}.soul-visual{min-height:300px}.orbit-three{width:300px;height:300px}.orbit-two{width:265px;height:265px}.orbit-one{width:220px;height:220px}.hero-principles{margin-top:18px}}
+@media(max-width:520px){.brand-reveal{margin-top:15px}.hero-cinematic h1{font-size:clamp(33px,9vw,42px)}.hero-manifesto{font-size:12px}.soul-visual{min-height:275px}.node-idea{right:7%}.node-build{left:4%}.node-grow{left:5%}.visual-caption{bottom:0}}
+@media(prefers-reduced-motion:reduce){.hero-copy,.brand-prefix,.brand-name,.hero-gradient,.soul-visual .orb,.soul-visual .orb:before,.soul-visual .orb:after,.orbit-node,.pulse-dot,#manifestoText{animation:none!important;transition:none!important}}
+
 /* Direct project preview modal */
 .project-foot{flex-wrap:wrap}
 .preview-btn{appearance:none;cursor:pointer;font:inherit;font-size:12px;color:var(--cyan);background:#61e4df0c;border:1px solid #61e4df55;border-radius:10px;padding:8px 10px}
@@ -28,7 +71,7 @@
 </style></head>
 <body><div class="wrap">
 <header class="top"><div class="brand"><div class="mark">N</div><div>M5mOsH Nexus<div class="muted" style="font-size:11px;font-weight:500;margin-top:3px">مركز إدارة منظومة المشاريع الرقمية</div></div></div><span class="tag">نسخة تشغيلية أولية · v0.1</span></header>
-<section class="hero"><div><div class="eyebrow">ONE WORKSPACE. MANY PROJECTS.</div><h1>منظومتك الرقمية،<br><span>في مكان واحد.</span></h1><p>مركز موحّد للوصول إلى مشاريعك، معايناتها، مستودعاتها وخدمات الاستضافة. ابدأ من لوحة واحدة، تابع الحالة، وانتقل مباشرةً إلى الأداة التي تحتاجها.</p><div class="actions"><a class="btn primary" href="#projects">استعراض المشاريع ↙</a><a class="btn" href="https://dashboard.render.com/" target="_blank" rel="noreferrer">فتح Render ↗</a><a class="btn" href="https://github.com/m5moshbk" target="_blank" rel="noreferrer">ملفات GitHub ↗</a></div></div><div class="orb-wrap"><div class="orb"><div><strong>NEXUS</strong><small>M5mOsH · DIGITAL CORE</small></div></div></div></section>
+<section class="hero hero-cinematic"><div class="hero-copy"><div class="eyebrow"><span class="pulse-dot"></span> مساحة واحدة · أفكار تتحول إلى واقع</div><div class="brand-reveal" aria-label="M5mOsH Nexus"><span class="brand-prefix">M5mOsH</span><span class="brand-divider">/</span><span class="brand-name">NEXUS</span></div><h1>كل مشروع له روح،<br><span class="hero-gradient">وهنا تبدأ رحلته.</span></h1><p class="hero-intro">هذه ليست مجرد قائمة روابط؛ إنها مساحة تجمع الفكرة، والكود، والتجربة، والتطوير في مكان واحد. ادخل إلى مشروعك، شاهد واجهته، وافهم أين يقف وإلى أين يمكن أن يصل.</p><div class="hero-manifesto"><span class="manifesto-line"></span><span id="manifestoText" aria-live="polite">الفكرة تبدأ بشرارة… ثم تصبح تجربة يراها الناس.</span></div><div class="actions"><a class="btn primary" href="#projects">اكتشف المشاريع <span aria-hidden="true">↙</span></a><a class="btn" href="https://dashboard.render.com/" target="_blank" rel="noreferrer">مساحة التشغيل ↗</a><a class="btn" href="https://github.com/m5moshbk" target="_blank" rel="noreferrer">مصدر الأفكار والكود ↗</a></div><div class="hero-principles"><span>01 · تخيّل</span><span>02 · ابنِ</span><span>03 · أطلق</span><span>04 · طوّر</span></div></div><div class="orb-wrap soul-visual" aria-label="تصوّر مرئي لفكرة تتحول إلى منظومة رقمية"><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><div class="orbit orbit-three"></div><div class="orbit-node node-idea"><span>✧</span><small>فكرة</small></div><div class="orbit-node node-build"><span>⌘</span><small>بناء</small></div><div class="orbit-node node-grow"><span>↗</span><small>نمو</small></div><div class="orb"><div><strong>NEXUS</strong><small>IDEA → IMPACT</small></div></div><div class="visual-caption"><span class="pulse-dot"></span> الفكرة تتحرك · المشروع يتطور</div></div></section>
 <section class="stats"><div class="stat"><b>11+</b><span>مشروع وخدمة مسجّلة</span></div><div class="stat"><b>3</b><span>محاور عمل رئيسية</span></div><div class="stat"><b>24/7</b><span>وصول إلى الروابط</span></div><div class="stat"><b>v0.1</b><span>إصدار لوحة البداية</span></div></section>
 <section id="projects"><div class="section-head"><div><h2>مكتبة المشاريع</h2><p>روابط مباشرة إلى المعاينات والخدمات المعروفة في مساحة العمل.</p></div><span class="tag">PROJECT DIRECTORY</span></div><div class="tools"><input id="search" class="search" type="search" placeholder="ابحث باسم المشروع أو وظيفته…" aria-label="ابحث في المشاريع"><button class="filter active" data-filter="all">الكل</button><button class="filter" data-filter="web">مواقع ومنصات</button><button class="filter" data-filter="tools">أدوات وأنظمة</button><button class="filter" data-filter="payments">مدفوعات وتجارة</button></div>
 <div class="grid" id="grid">
@@ -100,6 +143,14 @@ modalClose.addEventListener('click',closeProjectPreview);
 projectModal.addEventListener('click',e=>{if(e.target===projectModal)closeProjectPreview()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&projectModal.classList.contains('open'))closeProjectPreview()});
 projectFrame.addEventListener('load',()=>{if(projectModal.classList.contains('open'))setTimeout(()=>{try{const doc=projectFrame.contentDocument;if(doc&&doc.location.href==='about:blank')previewFallback.style.display='block'}catch(_){/* Cross-origin is expected for external projects. */}},900)});
+
+
+const manifesto=document.getElementById('manifestoText');
+if(manifesto&&!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+ const thoughts=['الفكرة تبدأ بشرارة… ثم تصبح تجربة يراها الناس.','الكود ليس النهاية؛ إنه بداية شيء يمكن استخدامه.','كل واجهة تحكي قصة، وكل تحسين يفتح احتمالًا جديدًا.','من التصوّر إلى الإطلاق… تتضح الرؤية خطوة بعد خطوة.'];
+ let thoughtIndex=0;
+ setInterval(()=>{thoughtIndex=(thoughtIndex+1)%thoughts.length;manifesto.style.animation='none';void manifesto.offsetWidth;manifesto.textContent=thoughts[thoughtIndex];manifesto.style.animation='manifestoIn .5s ease both'},4200);
+}
 
 search.addEventListener('input',update);filters.forEach(b=>b.addEventListener('click',()=>{category=b.dataset.filter;filters.forEach(x=>x.classList.toggle('active',x===b));update()}));
 </script></body></html>
