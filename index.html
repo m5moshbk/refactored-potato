@@ -352,6 +352,10 @@ search.addEventListener('input',update);filters.forEach(b=>b.addEventListener('c
  document.querySelectorAll('.project').forEach(card=>{card.style.cursor='pointer';card.addEventListener('dblclick',()=>{const a=card.querySelector('.project-foot a.open');if(a){show();select.value=a.href;openProject(a.href,card.querySelector('h3')?.textContent||'المشروع','فتح المشروع بالنقر المزدوج')}})});
  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&panel.classList.contains('open'))hide()});
  projects();renderLog();
+/* Open the owner workbench automatically on every page visit. This is a convenience only, not authentication. */
+panel.classList.add('open');
+toggle.setAttribute('aria-expanded','true');
+status.textContent='تم فتح مساحة التحكم تلقائيًا. اختر مشروعًا لبدء العمل.';
 })();
 
 </script></body></html>
