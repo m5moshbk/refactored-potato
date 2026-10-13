@@ -102,6 +102,22 @@
 .nw-operation-actions .nw-btn.warn{border-color:#f4c87560;color:#f4dba7}
 .nw-operation-actions .nw-btn.danger{border-color:#ff8e8e60;color:#ffb5b5}
 
+
+/* Adaptive tactile owner cockpit */
+.nw-cockpit{margin:0 10px 10px;padding:12px;border:1px solid #61e4df55;border-radius:14px;background:linear-gradient(145deg,#0d1c2b,#151329);box-shadow:inset 0 0 26px #61e4df08}
+.nw-cockpit-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.nw-cockpit-head strong{font-size:13px}.nw-live-chip{font-size:10px;color:#61e4df;border:1px solid #61e4df44;border-radius:99px;padding:5px 8px;white-space:nowrap}
+.nw-context{font-size:11px;color:#c8d5e9;line-height:1.8;margin-bottom:10px;padding:8px 9px;border-radius:9px;background:#ffffff06;overflow-wrap:anywhere}
+.nw-command-input{width:100%;border:1px solid #34435c;border-radius:10px;background:#070d18;color:#f0f6ff;padding:12px;font:inherit;font-size:13px;outline:none;margin-bottom:8px}
+.nw-command-input:focus{border-color:#61e4df;box-shadow:0 0 0 3px #61e4df15}
+.nw-command-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.nw-command{min-height:52px;display:flex;align-items:center;justify-content:center;gap:7px;text-align:center;border:1px solid #35435a;border-radius:12px;padding:10px 8px;background:#ffffff07;color:#eaf3ff;font:inherit;font-size:12px;font-weight:750;cursor:pointer;touch-action:manipulation;transition:transform .16s,border-color .16s,background .16s}
+.nw-command:active{transform:scale(.97);background:#61e4df1b}.nw-command.primary{background:linear-gradient(110deg,#61e4df,#a4f4e4);color:#071119;border:0}
+.nw-command.warn{border-color:#f4c87555;color:#f4dba7}
+.nw-cockpit-hint{margin:9px 0 0;color:#92a4be;font-size:10px;line-height:1.8}
+#nwCommandStatus{margin-top:8px;padding:8px;border-radius:9px;background:#61e4df0a;border:1px solid #61e4df20;font-size:11px;line-height:1.8;color:#d5e5f7}
+@media(max-width:760px){.nw-command{min-height:56px;font-size:13px}.nw-cockpit{padding:10px;margin-inline:7px}.nw-command-input{font-size:16px}}
+
 </style></head>
 <body><div class="wrap">
 <header class="top"><div class="brand"><div class="mark">N</div><div>M5mOsH Nexus<div class="muted" style="font-size:11px;font-weight:500;margin-top:3px">مركز إدارة منظومة المشاريع الرقمية</div></div></div><span class="tag">نسخة تشغيلية أولية · v0.1</span></header>
@@ -232,6 +248,24 @@
   <label for="nwProject" class="muted" style="font-size:11px;padding:0 12px 5px">المشروع المحدد</label>
   <select id="nwProject" class="nw-select" aria-label="اختيار المشروع"></select>
   
+
+  <section class="nw-cockpit" aria-label="وحدة التحكم الذكية لكل مشروع">
+   <div class="nw-cockpit-head"><strong>وحدة تحكم المشروع</strong><span class="nw-live-chip">وضع المالك · لمس مباشر</span></div>
+   <div class="nw-context" id="nwProjectContext" aria-live="polite">اختر مشروعًا لعرض أدواته وسياقه.</div>
+   <label for="nwCommandInput" style="display:block;font-size:11px;color:#9baac0;margin-bottom:6px">اكتب أمرًا بلغة طبيعية</label>
+   <input id="nwCommandInput" class="nw-command-input" type="text" autocomplete="off" placeholder="مثال: افتح المشروع، الكود، خطة إصلاح، حالة النشر">
+   <div class="nw-command-grid">
+    <button class="nw-command primary" id="nwCmdOpen" type="button">↗ فتح المشروع</button>
+    <button class="nw-command" id="nwCmdPreview" type="button">▣ عرض بجانب التحكم</button>
+    <button class="nw-command" id="nwCmdSource" type="button">⌘ المصدر والكود</button>
+    <button class="nw-command" id="nwCmdHosting" type="button">⌁ لوحة التشغيل</button>
+    <button class="nw-command" id="nwCmdPlan" type="button">✦ فهم وتجهيز خطة</button>
+    <button class="nw-command warn" id="nwCmdStop" type="button">Ⅱ طلب إيقاف آمن</button>
+   </div>
+   <div id="nwCommandStatus" role="status" aria-live="polite">اختر المشروع، ثم المس الإجراء المطلوب. الإجراءات الحساسة تتطلب تأكيدًا وصلاحية حقيقية لدى مزود الخدمة.</div>
+   <p class="nw-cockpit-hint">الواجهة تفهم أوامر مختارة وتجهّز خطوات العمل. تشغيل الخوادم أو إيقافها أو تعديل البيانات لا يحدث إلا عبر واجهة موثقة ومصرّح بها؛ لا توجد صلاحية خفية هنا.</p>
+  </section>
+
   <section class="nw-operation-box" aria-label="إجراءات التشغيل">
    <h4>إجراءات التشغيل والتحكم</h4>
    <p>اختر إجراءً. التشغيل والإيقاف الفعليان يتمان من لوحة مزوّد الخدمة بعد مراجعة اسم الخدمة وتأكيدك؛ هذه الواجهة لا تدّعي تنفيذ ذلك نيابةً عنك.</p>
@@ -380,7 +414,23 @@ search.addEventListener('input',update);filters.forEach(b=>b.addEventListener('c
  $('nwLogStart').addEventListener('click',()=>{const opt=select.selectedOptions[0];if(!opt||!opt.value){status.textContent='اختر مشروعًا أولًا.';return}if(!confirm('تسجيل نية تشغيل '+opt.textContent+'؟ هذا لا يشغّل الخدمة؛ سيفتح سجلًا محليًا فقط.'))return;record('نية تشغيل مسجلة فقط',opt.textContent+' · لم يُنفّذ تشغيل');status.textContent='سُجلت نية التشغيل فقط. لتنفيذها افتح لوحة Render وتأكد من الخدمة قبل التأكيد هناك.'});
  $('nwLogStop').addEventListener('click',()=>{const opt=select.selectedOptions[0];if(!opt||!opt.value){status.textContent='اختر مشروعًا أولًا.';return}if(!confirm('تسجيل نية إيقاف '+opt.textContent+'؟ لن تتوقف الخدمة بهذا الزر.'))return;record('نية إيقاف مسجلة فقط',opt.textContent+' · لم يُنفّذ إيقاف');status.textContent='سُجلت نية الإيقاف فقط. افتح لوحة Render وراجع أثر الإيقاف قبل تنفيذه هناك.'});
 
+
+ /* Adaptive per-project owner cockpit: real navigation, honest status, no fake server mutations. */
+ const cmdInput=$('nwCommandInput'),cmdStatus=$('nwCommandStatus'),projectContext=$('nwProjectContext');
+ function selectedProject(){const opt=select.selectedOptions[0];return opt&&opt.value?{url:opt.value,name:opt.dataset.name||opt.textContent||'المشروع'}:null}
+ function syncCockpit(){const p=selectedProject();projectContext.textContent=p?'المشروع النشط: '+p.name+' · '+new URL(p.url).hostname+' · وضع التحكم والتطوير':'اختر مشروعًا من القائمة لتحديد السياق.';if(p){activeUrl=p.url;activeName=p.name;$('nwViewTitle').textContent=p.name;$('nwViewUrl').textContent=p.url} }
+ function cmdOpen(){const p=selectedProject();if(!p){cmdStatus.textContent='اختر مشروعًا أولًا.';return}openProject(p.url,p.name,'فتح المشروع من وحدة تحكم المالك');cmdStatus.textContent='فُتح المشروع داخل مساحة العرض. إذا منع الموقع التضمين استخدم فتح خارجي.'}
+ function cmdPreview(){const p=selectedProject();if(!p){cmdStatus.textContent='اختر مشروعًا أولًا.';return}openProject(p.url,p.name,'معاينة من وحدة التحكم');}
+ function cmdSource(){record('فتح مركز المصدر والكود',activeName||'المستودعات');window.open('https://github.com/m5moshbk?tab=repositories','_blank','noopener,noreferrer');cmdStatus.textContent='فتح مستودعات GitHub؛ اختر مستودع المشروع المطابق قبل التعديل.'}
+ function cmdHosting(){record('فتح لوحة تشغيل الاستضافة',activeName||'الخدمات');window.open('https://dashboard.render.com/','_blank','noopener,noreferrer');cmdStatus.textContent='لوحة Render مفتوحة. تحقق من اسم الخدمة والبيئة قبل أي إجراء تشغيلي.'}
+ function cmdPlan(){const p=selectedProject();if(!p){cmdStatus.textContent='اختر مشروعًا أولًا.';return}const raw=cmdInput.value.trim();const task=raw||'راجع '+p.name+'، افهم البنية الحالية، افحص الواجهة والتشغيل والأمان، ثم اقترح تغييرات صغيرة واختبرها قبل النشر.';$('nwNote').value=task;record('تجهيز مهمة من وحدة التحكم',p.name+' · '+task);cmdStatus.textContent='جهزت وصف المهمة في حقل الملاحظة. لم أغيّر الكود أو الإنتاج؛ أرسل الوصف هنا للمساعدة في تنفيذ المهمة.'; $('nwNote').focus()}
+ function cmdStop(){const p=selectedProject();if(!p){cmdStatus.textContent='اختر مشروعًا أولًا.';return}if(!confirm('هل تريد تسجيل طلب مراجعة إيقاف الخدمة: '+p.name+'؟ لن يتوقف الموقع بهذا الزر.'))return;record('طلب مراجعة إيقاف فقط',p.name+' · لم يُنفّذ إيقاف');cmdStatus.textContent='سُجل طلب مراجعة الإيقاف فقط. لوقف الخدمة فعليًا افتح لوحة Render، وتأكد من الخدمة والآثار، ثم نفّذ الإجراء بصلاحيتك.'}
+ $('nwCmdOpen').addEventListener('click',cmdOpen);$('nwCmdPreview').addEventListener('click',cmdPreview);$('nwCmdSource').addEventListener('click',cmdSource);$('nwCmdHosting').addEventListener('click',cmdHosting);$('nwCmdPlan').addEventListener('click',cmdPlan);$('nwCmdStop').addEventListener('click',cmdStop);
+ select.addEventListener('change',syncCockpit);
+ cmdInput.addEventListener('keydown',e=>{if(e.key!=='Enter')return;const q=cmdInput.value.trim().toLowerCase();if(/إيقاف|وقف|توقف|stop/.test(q)){cmdStop();return}if(/كود|مصدر|github|مستودع/.test(q)){cmdSource();return}if(/render|تشغيل|استضافة|نشر|حالة/.test(q)){cmdHosting();return}if(/خطة|إصلاح|راجع|افحص|تطوير|مهمة|حل/.test(q)){cmdPlan();return}if(/عرض|معاينة|preview/.test(q)){cmdPreview();return}cmdOpen()});
+
  projects();renderLog();
+ syncCockpit();
 /* Open the owner workbench automatically on every page visit. This is a convenience only, not authentication. */
 panel.classList.add('open');
 toggle.setAttribute('aria-expanded','true');
