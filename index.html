@@ -132,6 +132,25 @@
 #projectEditStatus{padding:8px 11px;border-top:1px solid #ffffff12;color:#a8bbd4;font-size:10px;line-height:1.7}
 @media(max-width:600px){.project-edit-dock{inset:auto 7px 7px 7px;border-radius:13px}.project-edit-toolbar{gap:5px;padding:7px}.project-edit-btn{flex:1;min-height:43px;padding:8px 7px;font-size:11px}.project-edit-form{padding:0 8px 8px}#projectEditIdea{font-size:16px;min-height:76px}}
 
+
+/* Visual owner editor: direct click-to-select controls for the Nexus page */
+#nexusVisualBar{position:fixed;z-index:12000;top:12px;left:12px;right:12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 12px;background:#0b1220f2;border:1px solid #61e4df80;border-radius:15px;box-shadow:0 16px 50px #0009;backdrop-filter:blur(16px)}
+#nexusVisualBar[hidden],#nexusInspector[hidden]{display:none!important}
+#nexusVisualBar button,#nexusInspector button{border:1px solid #34435c;background:#182236;color:#eef3ff;border-radius:9px;padding:9px 11px;font:inherit;font-size:12px;font-weight:700;cursor:pointer}
+#nexusVisualBar button.primary,#nexusInspector button.primary{background:#61e4df;color:#061116;border-color:#61e4df}
+#nexusVisualBar .nv-hint{font-size:11px;color:#aebbd0;flex:1;min-width:140px}
+body.nexus-editing [data-nv-target="1"]{cursor:pointer!important;outline:1px dashed #61e4df65;outline-offset:2px}
+body.nexus-editing [data-nv-selected="1"]{outline:2px solid #61e4df!important;outline-offset:3px;box-shadow:0 0 0 5px #61e4df20!important}
+#nexusInspector{position:fixed;z-index:12001;right:12px;bottom:12px;width:min(360px,calc(100vw - 24px));max-height:70dvh;overflow:auto;background:#0b1220f7;border:1px solid #61e4df80;border-radius:16px;padding:14px;box-shadow:0 20px 65px #000b;backdrop-filter:blur(18px);color:#eef3ff}
+#nexusInspector h3{margin:0 0 10px;font-size:15px}
+#nexusInspector label{display:block;font-size:11px;color:#aebbd0;margin:9px 0 5px}
+#nexusInspector input[type="text"],#nexusInspector input[type="number"],#nexusInspector textarea{width:100%;border:1px solid #34435c;border-radius:8px;background:#070d18;color:#eef3ff;padding:9px;font:inherit;font-size:13px}
+#nexusInspector textarea{min-height:72px;resize:vertical}
+#nexusInspector input[type="color"]{width:100%;height:38px;border:1px solid #34435c;border-radius:8px;background:#070d18}
+#nexusInspector .nv-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.nv-editor-tip{position:fixed;z-index:11999;bottom:12px;left:12px;background:#0b1220ed;color:#b9cbe2;border:1px solid #61e4df55;border-radius:10px;padding:9px 12px;font-size:11px;max-width:calc(100vw - 24px)}
+@media(max-width:600px){#nexusVisualBar{top:6px;left:6px;right:6px;gap:5px;padding:8px}#nexusVisualBar button{padding:8px;font-size:11px}#nexusInspector{right:6px;bottom:6px;width:calc(100vw - 12px);max-height:54dvh}}
+
 </style></head>
 <body><div class="wrap">
 <header class="top"><div class="brand"><div class="mark">N</div><div>M5mOsH Nexus<div class="muted" style="font-size:11px;font-weight:500;margin-top:3px">مركز إدارة منظومة المشاريع الرقمية</div></div></div><span class="tag">نسخة تشغيلية أولية · v0.1</span></header>
@@ -519,4 +538,62 @@ toggle.setAttribute('aria-expanded','true');
 status.textContent='تم فتح مساحة التحكم تلقائيًا. اختر مشروعًا لبدء العمل.';
 })();
 
-</script></body></html>
+
+/* Owner visual editor: local drafts and downloadable HTML, no false claim of deployment. */
+(()=> {
+ const $=id=>document.getElementById(id);
+ const bar=$('nexusVisualBar'),inspector=$('nexusInspector'),toggle=$('nvToggle'),status=$('nvStatus'),tip=$('nvTip');
+ const storeKey='m5mosh-nexus-visual-edits-v1';
+ const eligible='h1,h2,h3,h4,p,span,strong,small,a,button,.project,.panel,.stat,.tag,.eyebrow,.hero-manifesto,.brand-reveal';
+ let enabled=false,selected=null,undoStack=[];
+ function targets(){return [...document.querySelectorAll(eligible)].filter(el=>!el.closest('#nexusVisualBar,#nexusInspector,#nexusWorkbench,.modal-backdrop'))}
+ function assignIds(){targets().forEach((el,i)=>{if(!el.dataset.nvId)el.dataset.nvId='nv-'+i;el.dataset.nvTarget='1'})}
+ function snapshot(el){return {id:el.dataset.nvId,text:el.innerHTML,color:el.style.color||'',background:el.style.background||'',fontSize:el.style.fontSize||'',parent:el.parentElement?.dataset.nvId||'',index:[...el.parentElement.children].indexOf(el)}}
+ function remember(el){undoStack.push({el,html:el.innerHTML,style:el.getAttribute('style'),parent:el.parentElement,index:[...el.parentElement.children].indexOf(el)});if(undoStack.length>40)undoStack.shift()}
+ function restoreSaved(){try{const list=JSON.parse(localStorage.getItem(storeKey)||'[]');if(!Array.isArray(list))return;assignIds();list.forEach(item=>{const el=document.querySelector('[data-nv-id="'+CSS.escape(item.id)+'"]');if(!el)return;if(typeof item.text==='string')el.innerHTML=item.text;el.style.color=item.color||'';el.style.background=item.background||'';el.style.fontSize=item.fontSize||'';});}catch(e){}}
+ function selectEl(el){if(!el)return;if(selected)delete selected.dataset.nvSelected;selected=el;selected.dataset.nvSelected='1';inspector.hidden=false;$('nvText').value=selected.innerText||'';$('nvTextColor').value=toHex(getComputedStyle(selected).color)||'#eef3ff';$('nvBgColor').value=toHex(getComputedStyle(selected).backgroundColor)||'#111725';$('nvSize').value=parseInt(getComputedStyle(selected).fontSize)||16;status.textContent='تم تحديد: '+selected.tagName.toLowerCase()+' · '+(selected.innerText||'عنصر').trim().replace(/\s+/g,' ').slice(0,55)}
+ function toHex(value){const m=value.match(/\d+/g);if(!m||m.length<3)return '';return '#'+m.slice(0,3).map(v=>Number(v).toString(16).padStart(2,'0')).join('')}
+ function save(){assignIds();const list=targets().map(el=>({id:el.dataset.nvId,text:el.innerHTML,color:el.style.color||'',background:el.style.background||'',fontSize:el.style.fontSize||''}));try{localStorage.setItem(storeKey,JSON.stringify(list));status.textContent='حُفظت التعديلات على هذا المتصفح فقط. استخدم تصدير HTML لحفظ نسخة ملف.'}catch(e){status.textContent='تعذر الحفظ المحلي؛ صدّر HTML للاحتفاظ بالتعديلات.'}}
+ function exportHtml(){const clone=document.documentElement.cloneNode(true);clone.querySelectorAll('#nexusVisualBar,#nexusInspector,#nvTip').forEach(el=>el.remove());clone.querySelectorAll('[data-nv-selected],[data-nv-target]').forEach(el=>{el.removeAttribute('data-nv-selected');el.removeAttribute('data-nv-target');el.removeAttribute('data-nv-id')});const blob=new Blob(['<!doctype html>\n'+clone.outerHTML],{type:'text/html;charset=utf-8'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='m5mosh-nexus-edited.html';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);status.textContent='تم تنزيل نسخة HTML المعدّلة. لم تُنشر تلقائيًا.'}
+ function start(){enabled=!enabled;document.body.classList.toggle('nexus-editing',enabled);toggle.textContent=enabled?'إيقاف التحكم بالنقر':'بدء التحكم بالنقر';tip.hidden=!enabled;status.textContent=enabled?'انقر العنصر الذي تريد تعديله.':'أوقف وضع التحديد؛ تظل التعديلات الحالية ظاهرة.'}
+ document.addEventListener('click',e=>{if(!enabled||e.target.closest('#nexusVisualBar,#nexusInspector,#nexusWorkbench,.modal-backdrop'))return;const el=e.target.closest(eligible);if(!el)return;e.preventDefault();e.stopPropagation();selectEl(el)},true);
+ $('nvApply').addEventListener('click',()=>{if(!selected)return;remember(selected);selected.innerText=$('nvText').value;selected.style.color=$('nvTextColor').value;selected.style.background=$('nvBgColor').value;selected.style.fontSize=Math.max(8,Math.min(100,Number($('nvSize').value)||16))+'px';status.textContent='طُبقت التغييرات على المعاينة الحالية. اضغط حفظ أو صدّر HTML.'});
+ $('nvSave').addEventListener('click',save);
+ $('nvExport').addEventListener('click',exportHtml);
+ $('nvUndo').addEventListener('click',()=>{const item=undoStack.pop();if(!item){status.textContent='لا توجد تغييرات للتراجع عنها في هذه الجلسة.';return}item.el.innerHTML=item.html;if(item.style===null)item.el.removeAttribute('style');else item.el.setAttribute('style',item.style);if(item.parent&&item.el.parentElement!==item.parent)item.parent.insertBefore(item.el,item.parent.children[item.index]||null);selectEl(item.el);status.textContent='تم التراجع عن آخر تعديل.'});
+ $('nvUp').addEventListener('click',()=>{if(!selected||!selected.previousElementSibling)return;remember(selected);selected.parentElement.insertBefore(selected,selected.previousElementSibling);status.textContent='تم نقل العنصر للأعلى في المعاينة.'});
+ $('nvDown').addEventListener('click',()=>{if(!selected||!selected.nextElementSibling)return;remember(selected);selected.parentElement.insertBefore(selected.nextElementSibling,selected);status.textContent='تم نقل العنصر للأسفل في المعاينة.'});
+ $('nvResetStyle').addEventListener('click',()=>{if(!selected)return;remember(selected);selected.style.removeProperty('color');selected.style.removeProperty('background');selected.style.removeProperty('font-size');status.textContent='أزيل التنسيق المخصص من العنصر.'});
+ toggle.addEventListener('click',start);
+ $('nvClose').addEventListener('click',()=>{bar.hidden=true;inspector.hidden=true;tip.hidden=true;document.body.classList.remove('nexus-editing');enabled=false});
+ const openButton=document.createElement('button');openButton.id='nvOpen';openButton.type='button';openButton.textContent='✦ محرر التصميم';openButton.style.cssText='position:fixed;z-index:11000;right:14px;bottom:14px;border:1px solid #61e4df80;border-radius:12px;padding:12px 14px;background:linear-gradient(120deg,#122a36,#201c3a);color:#effcff;font-weight:800;box-shadow:0 12px 40px #0008;cursor:pointer';
+ openButton.addEventListener('click',()=>{bar.hidden=!bar.hidden;if(!bar.hidden){assignIds();status.textContent='اختر بدء التحكم بالنقر ثم حدد أي عنصر من صفحة Nexus.'}});
+ document.body.appendChild(openButton);bar.hidden=true;assignIds();restoreSaved();assignIds();
+})();
+
+</script>
+<div id="nexusVisualBar" hidden aria-label="محرر التصميم البصري">
+  <strong style="color:#61e4df;font-size:13px">Nexus Visual Editor</strong>
+  <button id="nvToggle" class="primary">بدء التحكم بالنقر</button>
+  <button id="nvSave">حفظ التعديلات محليًا</button>
+  <button id="nvExport">تصدير HTML المعدّل</button>
+  <button id="nvUndo">تراجع عن آخر تغيير</button>
+  <button id="nvClose">إغلاق المحرر</button>
+  <span class="nv-hint" id="nvStatus">فعّل التحكم ثم انقر أي عنصر نصي أو بطاقة في هذه الصفحة.</span>
+</div>
+<aside id="nexusInspector" hidden aria-label="خصائص العنصر المحدد">
+  <h3>خصائص العنصر المحدد</h3>
+  <label for="nvText">النص</label><textarea id="nvText"></textarea>
+  <label for="nvTextColor">لون النص</label><input id="nvTextColor" type="color" value="#eef3ff">
+  <label for="nvBgColor">لون الخلفية</label><input id="nvBgColor" type="color" value="#111725">
+  <label for="nvSize">حجم الخط (px)</label><input id="nvSize" type="number" min="8" max="100" value="16">
+  <div class="nv-actions">
+    <button id="nvApply" class="primary">تطبيق</button>
+    <button id="nvUp">نقل للأعلى</button><button id="nvDown">نقل للأسفل</button>
+    <button id="nvResetStyle">إزالة تنسيق العنصر</button>
+  </div>
+  <p style="font-size:10px;color:#91a0b8;line-height:1.7">التعديلات هنا تخص صفحة Nexus نفسها. المواقع الخارجية داخل المعاينة لا يمكن تعديلها من هنا؛ يلزم ربط محرر بمصدرها البرمجي.</p>
+</aside>
+<div class="nv-editor-tip" id="nvTip" hidden>وضع المصمم مفعّل: انقر عنوانًا أو نصًا أو بطاقة لفتح خصائصها.</div>
+
+</body></html>
