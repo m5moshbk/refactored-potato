@@ -118,6 +118,20 @@
 #nwCommandStatus{margin-top:8px;padding:8px;border-radius:9px;background:#61e4df0a;border:1px solid #61e4df20;font-size:11px;line-height:1.8;color:#d5e5f7}
 @media(max-width:760px){.nw-command{min-height:56px;font-size:13px}.nw-cockpit{padding:10px;margin-inline:7px}.nw-command-input{font-size:16px}}
 
+
+/* Project-in-context edit dock: overlay belongs to Nexus; external iframe stays sandboxed by origin policy. */
+.project-edit-dock{position:absolute;z-index:5;inset:auto 12px 12px 12px;max-width:820px;margin-inline:auto;border:1px solid #61e4df60;border-radius:16px;background:#09111ded;backdrop-filter:blur(20px);box-shadow:0 14px 45px #0009;color:#eff7ff;overflow:hidden}
+.project-edit-toolbar{display:flex;align-items:center;justify-content:center;gap:7px;flex-wrap:wrap;padding:9px}
+.project-edit-btn{border:1px solid #34465f;border-radius:10px;padding:10px 12px;background:#17243a;color:#edf5ff;font:inherit;font-size:12px;font-weight:750;cursor:pointer;touch-action:manipulation}
+.project-edit-btn:active{transform:scale(.97)}.project-edit-btn.primary{background:linear-gradient(110deg,#61e4df,#a5f5e5);color:#071219;border-color:transparent}
+.project-edit-btn.back{border-color:#f4c87550;color:#f4dba7}
+.project-edit-form{display:none;padding:0 10px 10px}.project-edit-form.open{display:block}
+.project-edit-form label{display:block;font-size:11px;color:#9eafc7;margin:3px 0 6px}
+#projectEditIdea{width:100%;min-height:68px;max-height:26vh;resize:vertical;border:1px solid #34465f;border-radius:10px;background:#050a13;color:#f2f7ff;padding:11px;font:inherit;font-size:14px;line-height:1.7;outline:none}
+#projectEditIdea:focus{border-color:#61e4df;box-shadow:0 0 0 3px #61e4df18}
+#projectEditStatus{padding:8px 11px;border-top:1px solid #ffffff12;color:#a8bbd4;font-size:10px;line-height:1.7}
+@media(max-width:600px){.project-edit-dock{inset:auto 7px 7px 7px;border-radius:13px}.project-edit-toolbar{gap:5px;padding:7px}.project-edit-btn{flex:1;min-height:43px;padding:8px 7px;font-size:11px}.project-edit-form{padding:0 8px 8px}#projectEditIdea{font-size:16px;min-height:76px}}
+
 </style></head>
 <body><div class="wrap">
 <header class="top"><div class="brand"><div class="mark">N</div><div>M5mOsH Nexus<div class="muted" style="font-size:11px;font-weight:500;margin-top:3px">مركز إدارة منظومة المشاريع الرقمية</div></div></div><span class="tag">نسخة تشغيلية أولية · v0.1</span></header>
@@ -230,7 +244,25 @@
    <div class="modal-heading"><strong id="modalTitle">معاينة المشروع</strong><small id="modalUrl"></small></div>
    <div class="modal-actions"><a class="modal-action" id="modalExternal" href="#" target="_blank" rel="noopener noreferrer">فتح مستقل ↗</a><button class="modal-close" id="modalClose" type="button" aria-label="إغلاق النافذة">×</button></div>
   </header>
-  <div class="modal-content"><iframe class="preview-frame" id="projectFrame" title="معاينة مباشرة للمشروع" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="fullscreen"></iframe><div class="preview-fallback" id="previewFallback">إذا لم تظهر الواجهة، فقد يمنع الموقع عرض نفسه داخل نافذة مضمّنة. استخدم «فتح مستقل» للوصول إليه مباشرة.</div></div>
+  <div class="modal-content"><iframe class="preview-frame" id="projectFrame" title="معاينة مباشرة للمشروع" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="fullscreen"></iframe>
+  <aside class="project-edit-dock" id="projectEditDock" aria-label="أدوات المالك للمشروع الحالي">
+   <div class="project-edit-toolbar">
+    <button class="project-edit-btn primary" id="projectEditToggle" type="button">✎ فكرة / تعديل</button>
+    <button class="project-edit-btn" id="projectEditPlan" type="button">✦ جهّز مهمة</button>
+    <button class="project-edit-btn" id="projectOwnerPanel" type="button">⌘ لوحة المالك</button>
+    <button class="project-edit-btn back" id="projectBack" type="button">↩ رجوع للمشاريع</button>
+   </div>
+   <div class="project-edit-form" id="projectEditForm">
+    <label for="projectEditIdea">اكتب التغيير الذي تتخيله للمشروع الحالي</label>
+    <textarea id="projectEditIdea" placeholder="مثال: أضف زر طلب واضحًا أعلى الصفحة، واجعله مناسبًا للجوال، ثم اختبر الروابط…"></textarea>
+    <div class="project-edit-toolbar" style="justify-content:flex-start;padding:8px 0 0">
+     <button class="project-edit-btn primary" id="projectSaveIdea" type="button">حفظ كطلب تعديل وتجهيز المهمة</button>
+     <button class="project-edit-btn" id="projectCancelIdea" type="button">إلغاء</button>
+    </div>
+   </div>
+   <div id="projectEditStatus" role="status" aria-live="polite">وضع المالك: اكتب فكرتك لتتحول إلى طلب تعديل قابل للمراجعة. لا يجري تعديل الموقع الخارجي تلقائيًا من داخل المعاينة.</div>
+  </aside>
+<div class="preview-fallback" id="previewFallback">إذا لم تظهر الواجهة، فقد يمنع الموقع عرض نفسه داخل نافذة مضمّنة. استخدم «فتح مستقل» للوصول إليه مباشرة.</div></div>
   <footer class="modal-foot"><span>معاينة مباشرة داخل Nexus</span><span>Esc للإغلاق · يبقى مركز المشاريع مفتوحًا</span></footer>
  </section>
 </div>
@@ -298,11 +330,28 @@ function update(){const q=search.value.trim().toLowerCase();let count=0;cards.fo
 
 const projectModal=document.getElementById('projectModal'),projectFrame=document.getElementById('projectFrame'),modalTitle=document.getElementById('modalTitle'),modalUrl=document.getElementById('modalUrl'),modalExternal=document.getElementById('modalExternal'),modalClose=document.getElementById('modalClose'),previewFallback=document.getElementById('previewFallback');
 let previousFocus=null;
+
+function syncOwnerProject(card){
+ const name=card.querySelector('h3')?.textContent?.trim()||'المشروع';
+ const link=card.querySelector('.project-foot a.open');
+ const url=link?.href||'';
+ const opt=[...document.querySelectorAll('#nwProject option')].find(x=>x.value===url);
+ if(opt){document.getElementById('nwProject').value=opt.value;document.getElementById('nwProject').dispatchEvent(new Event('change'));}
+ const opCard=[...document.querySelectorAll('.project')].find(x=>x.dataset.operatorId&&x.querySelector('h3')?.textContent?.trim()===name);
+ const op=document.getElementById('operatorProject');
+ if(opCard&&op){op.value=opCard.dataset.operatorId;op.dispatchEvent(new Event('change'));}
+ const st=document.getElementById('projectEditStatus');
+ if(st)st.textContent='المشروع الحالي: '+name+' · اكتب فكرتك أو جهّز مهمة. الرجوع يعيدك إلى المكتبة.';
+}
+
 function openProjectPreview(card){
  const link=card.querySelector('.project-foot a.open');
  if(!link)return;
  previousFocus=document.activeElement;
  const url=link.href;
+ syncOwnerProject(card);
+ const ideaBox=document.getElementById('projectEditIdea');if(ideaBox)ideaBox.value='';
+ document.getElementById('projectEditForm')?.classList.remove('open');
  modalTitle.textContent=card.querySelector('h3')?.textContent?.trim()||'معاينة المشروع';
  modalUrl.textContent=url;
  modalExternal.href=url;
@@ -320,7 +369,13 @@ function closeProjectPreview(){
  projectFrame.src='about:blank';
  if(previousFocus&&typeof previousFocus.focus==='function')previousFocus.focus();
 }
+
 cards.forEach(card=>{
+ card.style.cursor='pointer';
+ card.setAttribute('tabindex','0');
+ card.setAttribute('aria-label','فتح مساحة التحكم للمشروع '+(card.querySelector('h3')?.textContent?.trim()||''));
+ card.addEventListener('click',e=>{if(e.target.closest('a,button,input,select,textarea'))return;openProjectPreview(card)});
+ card.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target===card){e.preventDefault();openProjectPreview(card)}});
  const foot=card.querySelector('.project-foot');
  if(!foot||!foot.querySelector('a.open'))return;
  const btn=document.createElement('button');
@@ -329,6 +384,32 @@ cards.forEach(card=>{
  btn.addEventListener('click',()=>openProjectPreview(card));
  foot.appendChild(btn);
 });
+
+/* Project modal owner dock: keep the library and workbench state while editing intent. */
+document.getElementById('projectEditToggle').addEventListener('click',()=>{const f=document.getElementById('projectEditForm');f.classList.toggle('open');if(f.classList.contains('open'))document.getElementById('projectEditIdea').focus();});
+document.getElementById('projectCancelIdea').addEventListener('click',()=>{document.getElementById('projectEditForm').classList.remove('open')});
+function saveProjectEditRequest(){
+ const idea=document.getElementById('projectEditIdea').value.trim();
+ if(!idea){document.getElementById('projectEditStatus').textContent='اكتب وصف التعديل أولًا.';document.getElementById('projectEditIdea').focus();return}
+ const name=document.getElementById('modalTitle').textContent;
+ const url=document.getElementById('modalUrl').textContent;
+ const request={id:'REQ-'+Date.now(),createdAt:new Date().toISOString(),project:name,url,idea,status:'draft_for_review',note:'طلب تعديل محلي؛ لم يُغيّر كود المشروع أو الموقع المنشور.'};
+ try{const key='m5mosh-nexus-edit-requests-v1';const list=JSON.parse(localStorage.getItem(key)||'[]');list.unshift(request);localStorage.setItem(key,JSON.stringify(list.slice(0,100)));}catch(_){}
+ const taskNote=document.getElementById('operatorTaskNote');if(taskNote)taskNote.value=idea;
+ const taskType=document.getElementById('operatorTaskType');if(taskType)taskType.value='ui';
+ const opProject=document.getElementById('operatorProject');
+ const card=[...document.querySelectorAll('.project')].find(c=>c.querySelector('h3')?.textContent?.trim()===name);
+ if(card&&opProject&&card.dataset.operatorId)opProject.value=card.dataset.operatorId;
+ if(typeof addEvent==='function'){try{addEvent('حفظ طلب تعديل',name+' · '+idea)}catch(_){}}
+ document.getElementById('projectEditStatus').textContent='حُفظ طلب التعديل في هذا المتصفح وجُهز وصف المهمة. لم يُنفّذ التعديل على الموقع. افتح لوحة المالك لمراجعته ونسخ ملخصه.';
+ document.getElementById('projectEditForm').classList.remove('open');
+ const ownerStatus=document.getElementById('operatorStatus');if(ownerStatus&&ownerStatus.lastElementChild)ownerStatus.lastElementChild.textContent='طلب تعديل محفوظ محليًا للمشروع: '+name;
+}
+document.getElementById('projectSaveIdea').addEventListener('click',saveProjectEditRequest);
+document.getElementById('projectEditPlan').addEventListener('click',()=>{document.getElementById('projectEditForm').classList.add('open');document.getElementById('projectEditIdea').focus()});
+document.getElementById('projectOwnerPanel').addEventListener('click',()=>{closeProjectPreview();const panel=document.getElementById('nexusWorkbench'),toggle=document.getElementById('nexusWorkbenchToggle');panel.classList.add('open');toggle.setAttribute('aria-expanded','true');document.getElementById('nwStatus').textContent='مساحة المالك · '+document.getElementById('modalTitle').textContent;});
+document.getElementById('projectBack').addEventListener('click',closeProjectPreview);
+
 modalClose.addEventListener('click',closeProjectPreview);
 projectModal.addEventListener('click',e=>{if(e.target===projectModal)closeProjectPreview()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&projectModal.classList.contains('open'))closeProjectPreview()});
