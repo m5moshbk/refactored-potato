@@ -609,4 +609,78 @@ status.textContent='تم فتح مساحة التحكم تلقائيًا. اخت
 </aside>
 <div class="nv-editor-tip" id="nvTip" hidden>وضع المصمم مفعّل: انقر عنوانًا أو نصًا أو بطاقة لفتح خصائصها.</div>
 
+
+<style>
+#nxRepairCenter{margin:22px 0;border:1px solid #f4c87555;border-radius:18px;padding:18px;background:linear-gradient(130deg,#201b16ee,#111725ee);color:var(--text)}
+#nxRepairCenter h2{margin:0 0 7px;font-size:22px}#nxRepairCenter p{line-height:1.8;color:#b8c5d9;font-size:13px}
+.nx-repair-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.nx-repair-btn{border:1px solid #ffffff26;border-radius:10px;padding:10px 13px;background:#ffffff08;color:var(--text);font:inherit;font-size:12px;font-weight:800;cursor:pointer}.nx-repair-btn.primary{background:linear-gradient(110deg,#f4c875,#ffe5a6);color:#1b1509;border:0}.nx-repair-state{margin-top:12px;padding:11px;border-radius:10px;border:1px solid #f4c87530;background:#f4c87509;font-size:12px;line-height:1.8;white-space:pre-line}
+.project .nx-card-repair{display:inline-flex;align-items:center;justify-content:center;margin:7px 0 0;padding:8px 10px;border-radius:9px;border:1px solid #f4c87566;background:#f4c8750b;color:#ffe0a0;font:inherit;font-size:11px;font-weight:800;cursor:pointer}
+@media(max-width:600px){#nxRepairCenter{padding:14px}}
+</style>
+<section id="nxRepairCenter" aria-labelledby="nxRepairTitle">
+ <div class="eyebrow">REPAIR WORKFLOW · EXPLICIT ACTIONS</div>
+ <h2 id="nxRepairTitle">مركز إصلاح المشاريع</h2>
+ <p>اختر «إصلاح المشروع» من بطاقة أي مشروع. يجهّز المركز سياق العطل، ويفتح أدوات الاستضافة والمصدر، ويسجّل الإجراء محليًا. هذه النسخة من Nexus ثابتة؛ لذلك لا تستطيع وحدها إعادة تشغيل خادم أو تعديل قاعدة بيانات أو إصلاح كل عطل تلقائيًا. التفعيل الكامل يحتاج خادمًا آمنًا مربوطًا بـ Render/GitHub وصلاحيات محفوظة خارج المتصفح.</p>
+ <label class="operator-label" for="nxRepairProject">المشروع المراد إصلاحه</label>
+ <select class="operator-select" id="nxRepairProject"><option value="">اختر مشروعًا من المكتبة…</option></select>
+ <div class="nx-repair-actions">
+  <button class="nx-repair-btn primary" id="nxRepairStart" type="button">⚙ تجهيز الإصلاح</button>
+  <button class="nx-repair-btn" id="nxRepairSite" type="button">فتح الموقع ↗</button>
+  <button class="nx-repair-btn" id="nxRepairRender" type="button">فتح Render ↗</button>
+  <button class="nx-repair-btn" id="nxRepairRepo" type="button">فتح GitHub ↗</button>
+ </div>
+ <div class="nx-repair-state" id="nxRepairState" role="status" aria-live="polite">لم يبدأ الفحص بعد. اختر المشروع ثم اضغط «تجهيز الإصلاح».</div>
+</section>
+<script>
+(function(){
+ const $=id=>document.getElementById(id), select=$('nxRepairProject'), state=$('nxRepairState');
+ const cards=[...document.querySelectorAll('.project')];
+ function details(card){
+  if(!card)return null;
+  const a=card.querySelector('.project-foot a.open');
+  const name=card.querySelector('h3')?.textContent?.trim()||'مشروع غير مسمى';
+  const url=a?.href||'';
+  const repoLink=card.querySelector('a[href*="github.com"]');
+  const repo=repoLink?.href||'https://github.com/m5moshbk';
+  return {card,name,url,repo,render:'https://dashboard.render.com/'};
+ }
+ function syncOptions(){
+  const prev=select.value;select.innerHTML='<option value="">اختر مشروعًا من المكتبة…</option>';
+  cards.forEach((c,i)=>{const d=details(c);if(!d)return;const o=document.createElement('option');o.value=String(i);o.textContent=d.name;select.appendChild(o)});
+  if([...select.options].some(o=>o.value===prev))select.value=prev;
+ }
+ function chosen(){return details(cards[Number(select.value)])}
+ function setStatus(text){state.textContent=text}
+ function logRepair(d,stage){
+  try{
+   const k='m5mosh-nexus-repair-log-v1', list=JSON.parse(localStorage.getItem(k)||'[]');
+   list.unshift({at:new Date().toISOString(),project:d.name,url:d.url,stage});
+   localStorage.setItem(k,JSON.stringify(list.slice(0,100)));
+  }catch(_){}
+ }
+ function prepare(d){
+  if(!d){setStatus('اختر مشروعًا أولًا.');return}
+  const op=[...document.querySelectorAll('#operatorProject option')].find(o=>o.textContent.trim()===d.name);
+  if(op){$('operatorProject').value=op.value;$('operatorProject').dispatchEvent(new Event('change'))}
+  $('operatorTaskType').value='bug';
+  $('operatorTaskNote').value='إصلاح المشروع: '+d.name+'\n1) فحص حالة الخدمة وآخر نشر في Render.\n2) مراجعة سجل البناء والتشغيل لتحديد السبب.\n3) إصلاح السبب المحدد في المصدر أو الإعدادات.\n4) إعادة النشر/التشغيل بعد تأكيد الإجراء.\n5) التحقق من الصحة وتوثيق النتيجة.\nرابط الخدمة: '+d.url+'\nالمستودع: '+d.repo;
+  setStatus('تم تجهيز خطة إصلاح لـ '+d.name+'.\nالخطوة التالية: افتح Render وراجع حالة الخدمة وآخر نشر/السجلات. لا تعتبر تعذّر المعاينة وحده دليلًا على توقف الموقع؛ قد يمنع المتصفح التضمين أو طلبات الفحص.\nلم تُنفّذ إعادة تشغيل أو تغييرات على الخادم من هذه الصفحة الثابتة.');
+  logRepair(d,'prepared_not_executed');
+  if($('operatorStatus')?.lastElementChild)$('operatorStatus').lastElementChild.textContent='تم تجهيز خطة إصلاح: '+d.name+' — لم تُنفذ تغييرات على الخادم.';
+ }
+ select.addEventListener('change',()=>{const d=chosen();if(d)setStatus('المحدد: '+d.name+'\n'+d.url+'\nاضغط «تجهيز الإصلاح» لإعداد قائمة خطوات مخصصة.')});
+ $('nxRepairStart').addEventListener('click',()=>prepare(chosen()));
+ $('nxRepairSite').addEventListener('click',()=>{const d=chosen();if(!d||!d.url){setStatus('هذا المشروع لا يحتوي على رابط معاينة مسجل.');return}window.open(d.url,'_blank','noopener,noreferrer')});
+ $('nxRepairRender').addEventListener('click',()=>{const d=chosen();if(!d){setStatus('اختر مشروعًا أولًا.');return}logRepair(d,'opened_render_dashboard');window.open(d.render,'_blank','noopener,noreferrer');setStatus('فُتحت لوحة Render. اختر الخدمة المطابقة للمشروع، ثم راجع الحالة وآخر نشر والسجلات. لم يُنفذ restart تلقائيًا.')});
+ $('nxRepairRepo').addEventListener('click',()=>{const d=chosen();if(!d){setStatus('اختر مشروعًا أولًا.');return}window.open(d.repo,'_blank','noopener,noreferrer')});
+ cards.forEach((card,i)=>{
+  const foot=card.querySelector('.project-foot');if(!foot||foot.querySelector('.nx-card-repair'))return;
+  const d=details(card);const b=document.createElement('button');b.type='button';b.className='nx-card-repair';b.textContent='⚙ إصلاح المشروع';
+  b.addEventListener('click',e=>{e.stopPropagation();select.value=String(i);prepare(details(card));$('nxRepairCenter').scrollIntoView({behavior:'smooth',block:'center'})});
+  foot.appendChild(b);
+ });
+ syncOptions();
+})();
+</script>
+
 </body></html>
