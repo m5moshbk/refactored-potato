@@ -156,6 +156,28 @@ body.nexus-editing [data-nv-selected="1"]{outline:2px solid #61e4df!important;ou
 .nv-editor-tip{position:fixed;z-index:11999;bottom:12px;left:12px;background:#0b1220ed;color:#b9cbe2;border:1px solid #61e4df55;border-radius:10px;padding:9px 12px;font-size:11px;max-width:calc(100vw - 24px)}
 @media(max-width:600px){#nexusVisualBar{top:6px;left:6px;right:6px;gap:5px;padding:8px}#nexusVisualBar button{padding:8px;font-size:11px}#nexusInspector{right:6px;bottom:6px;width:calc(100vw - 12px);max-height:54dvh}}
 
+
+/* Nexus privacy & co-pilot layer */
+.nx-vision{margin:28px 0;padding:24px;border:1px solid #61e4df35;border-radius:24px;background:linear-gradient(125deg,#101c2cdd,#19142bdd);box-shadow:0 20px 70px #0003}
+.nx-vision h2{margin:0 0 8px;font-size:clamp(22px,3vw,32px)}
+.nx-vision-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-top:18px}
+.nx-vcard{border:1px solid #ffffff18;background:#090f1ccc;border-radius:18px;padding:18px;min-width:0;position:relative;overflow:hidden}
+.nx-vcard:before{content:"";position:absolute;inset:0 auto 0 0;width:2px;background:linear-gradient(transparent,var(--cyan),var(--violet),transparent);animation:nxGlow 4s linear infinite}
+.nx-vcard h3{margin:0 0 9px;font-size:16px}.nx-vcard p{font-size:13px;line-height:1.8;color:var(--muted)}
+.nx-vpill{display:inline-flex;border:1px solid #ffffff20;border-radius:999px;padding:5px 9px;font-size:11px;color:var(--cyan);margin:3px}
+.nx-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.nx-actions button,.nx-select{background:#121d2d;color:var(--text);border:1px solid #61e4df55;border-radius:11px;padding:10px 13px;font:inherit;cursor:pointer}
+.nx-actions button.primary{background:linear-gradient(120deg,#61e4df,#9b8cff);color:#06101a;font-weight:800}
+.nx-privacy-alert{border-right:3px solid #f4c875;padding:12px 14px;background:#f4c8750d;color:#f8dfaa;border-radius:10px;font-size:13px;line-height:1.9}
+.nx-progress{height:5px;border-radius:9px;background:#ffffff12;overflow:hidden;margin-top:12px}.nx-progress span{display:block;height:100%;width:var(--w,45%);background:linear-gradient(90deg,var(--cyan),var(--violet));animation:nxFlow 3s ease-in-out infinite alternate}
+.nx-filterrow{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+.nx-filterrow button{background:#0c1320;border:1px solid #ffffff1c;border-radius:999px;padding:8px 12px;color:var(--text);cursor:pointer}
+.nx-filterrow button[aria-pressed=true]{border-color:var(--cyan);color:var(--cyan);background:#61e4df10}
+.nx-statusline{font-size:12px;color:#9ce9d8;margin-top:10px;min-height:18px}
+@keyframes nxGlow{0%{transform:translateY(-100%)}100%{transform:translateY(100%)}}
+@keyframes nxFlow{from{filter:hue-rotate(0deg);opacity:.6}to{filter:hue-rotate(55deg);opacity:1}}
+@media(prefers-reduced-motion:reduce){.nx-vcard:before,.nx-progress span{animation:none}}
+
 </style></head>
 <body><div class="wrap">
 <header class="top"><div class="brand"><div class="mark">N</div><div>M5mOsH Nexus<div class="muted" style="font-size:11px;font-weight:500;margin-top:3px">مركز إدارة منظومة المشاريع الرقمية</div></div></div><span class="tag">نسخة تشغيلية أولية · v0.1</span></header>
@@ -683,4 +705,67 @@ status.textContent='تم فتح مساحة التحكم تلقائيًا. اخت
 })();
 </script>
 
+
+<section class="nx-vision" id="nxVision">
+  <div class="eyebrow">M5mOsH NEXUS · VISION LAB</div>
+  <h2>مختبر التطوير — أفكار تتحول إلى مهام</h2>
+  <p class="muted">كتالوج موحّد حسب المجال، ومعاينات للمشاريع المسجلة، واقتراحات تطوير يمكنك اعتمادها وإضافتها إلى خطة العمل.</p>
+  <div class="nx-filterrow" id="nxDomainFilters" aria-label="تصفية مجالات المشاريع">
+    <button type="button" data-domain="all" aria-pressed="true">كل المجالات</button>
+    <button type="button" data-domain="web">مواقع وتجارب</button>
+    <button type="button" data-domain="commerce">تجارة ومدفوعات</button>
+    <button type="button" data-domain="ai">ذكاء اصطناعي وأتمتة</button>
+    <button type="button" data-domain="security">أمن وأدوات</button>
+    <button type="button" data-domain="ops">تشغيل ومراقبة</button>
+  </div>
+  <div class="nx-vision-grid" id="nxDomainCards">
+    <article class="nx-vcard" data-kind="web"><span class="nx-vpill">مواقع وتجارب</span><h3>M5mOsH Nexus</h3><p>بوابة المشاريع الرئيسية: فهرسة، تصنيف، معاينات، وسجل إنجاز. الخطوة القادمة: مصدر بيانات حي بدل القائمة الثابتة.</p><div class="nx-progress"><span style="--w:62%"></span></div><div class="nx-actions"><button type="button" data-open="https://m5mosh-nexus.onrender.com">فتح المعاينة</button><button class="primary" type="button" data-idea="ربط كتالوج Nexus بمصدر بيانات موثوق وإظهار آخر نشر وفحص صحة لكل خدمة.">اعتماد التطوير</button></div></article>
+    <article class="nx-vcard" data-kind="commerce"><span class="nx-vpill">تجارة ومدفوعات</span><h3>M5mOsH Commerce Hub</h3><p>نموذج عمليات تجارية وطلبات وسجل تدقيق. تكاملات الدفع ما زالت تجريبية؛ لا توجد مدفوعات حقيقية مفعلة وفق توثيق المشروع.</p><div class="nx-progress"><span style="--w:48%"></span></div><div class="nx-actions"><button type="button" data-open="https://m5mosh-commerce-hub.onrender.com">فتح رابط الخدمة</button><button class="primary" type="button" data-idea="مراجعة Commerce Hub: التحقق من قاعدة البيانات، اختبارات API، صلاحيات الأدوار، وتجارب الدفع الوهمية قبل الإنتاج.">اعتماد التطوير</button></div></article>
+    <article class="nx-vcard" data-kind="ai ops"><span class="nx-vpill">ذكاء اصطناعي وأتمتة</span><h3>SADA · صَدَى</h3><p>بنية API تشخيصية وعميل Pythonista. سجل الأحداث الحالي داخل الذاكرة مؤقت؛ المطلوب ذاكرة دائمة محمية وموافقة قبل الإجراءات الحساسة.</p><div class="nx-progress"><span style="--w:42%"></span></div><div class="nx-actions"><button type="button" data-open="https://github.com/m5moshbk/SADA">المصدر</button><button class="primary" type="button" data-idea="تطوير SADA إلى مساعد مشاريع: ذاكرة دائمة بقاعدة بيانات، سجل تدقيق، استرجاع موثق، وخطة مهام يوافق عليها المالك قبل التنفيذ.">اعتماد التطوير</button></div></article>
+    <article class="nx-vcard" data-kind="ops"><span class="nx-vpill">تشغيل ومراقبة</span><h3>Sawa Play Monitor</h3><p>لوحة مراقبة وتحليل أحداث. يجب التأكد من مصدر البيانات الحقيقي، واستمرارية التخزين، وعدم عرض بيانات تجريبية كأنها فعلية.</p><div class="nx-progress"><span style="--w:40%"></span></div><div class="nx-actions"><button type="button" data-open="https://sawa-play-monitor.onrender.com">فتح المعاينة</button><button class="primary" type="button" data-idea="فحص Sawa Play Monitor: توثيق مصدر كل حدث، فصل بيانات العينة عن الحقيقي، إعداد تخزين دائم وفحص صحة وتنبيهات قابلة للتدقيق.">اعتماد التطوير</button></div></article>
+    <article class="nx-vcard" data-kind="security ops"><span class="nx-vpill">أمن وأدوات</span><h3>Elite Console X</h3><p>لوحة وبوت Telegram. يلزم التأكد من كلمة مرور اللوحة، وحماية الأسرار، ومكان حفظ SQLite قبل الاعتماد على الأرصدة والسجلات.</p><div class="nx-progress"><span style="--w:55%"></span></div><div class="nx-actions"><button type="button" data-open="https://elite-console-x.onrender.com">فتح المعاينة</button><button class="primary" type="button" data-idea="مراجعة Elite Console X: اختبار تسجيل دخول الإدارة، نقل البيانات المهمة إلى تخزين دائم، فحص الأسرار، وإضافة health endpoint واختبارات تكامل.">اعتماد التطوير</button></div></article>
+    <article class="nx-vcard" data-kind="commerce web"><span class="nx-vpill">تجارة ومدفوعات</span><h3>BeeFitness Payments Gateway</h3><p>بوابة تكامل في وضع المعاينة. لا تحولها إلى وضع حي قبل مفاتيح التاجر الرسمية واختبارات الاعتماد والرفض والإلغاء والاسترداد.</p><div class="nx-progress"><span style="--w:35%"></span></div><div class="nx-actions"><button type="button" data-open="https://beefitness-payments-gateway.onrender.com">فتح المعاينة</button><button class="primary" type="button" data-idea="إكمال بوابة الدفع في sandbox: توثيق التوقيعات، اختبار webhooks ومنع التكرار، حالات الدفع والاسترداد، ثم مراجعة رسمية قبل الإنتاج.">اعتماد التطوير</button></div></article>
+    <article class="nx-vcard" data-kind="security"><span class="nx-vpill">أمن وأدوات</span><h3>Crispy & Seeka</h3><p>مختبر متصفح محلي بأدوات تقرير. لا يمكن لصفحة ويب إثبات هوية مادية ثابتة أو قراءة أسرار العتاد؛ يجب إبقاء حدود القياس واضحة.</p><div class="nx-progress"><span style="--w:58%"></span></div><div class="nx-actions"><button type="button" data-open="https://crispy-seeka-a64y.onrender.com">فتح المعاينة</button><button class="primary" type="button" data-idea="تدقيق Crispy & Seeka: اختبارات الخصوصية، مراجعة صلاحيات مشاركة التقارير، وتوثيق حدود بصمة المتصفح ومنع ادعاءات هوية غير مثبتة.">اعتماد التطوير</button></div></article>
+    <article class="nx-vcard" data-kind="web commerce"><span class="nx-vpill">مواقع وتجارب</span><h3>AUS Luxe · المتجر</h3><p>مشروع واجهة متجر سيارات وملحقات ورد في سجل العمل؛ يجب التحقق من المستودع الفعلي قبل اعتبار الرابط منشورًا.</p><div class="nx-progress"><span style="--w:25%"></span></div><div class="nx-actions"><button type="button" data-open="https://github.com/m5moshbk/aus-luxe-auto-store">المستودع</button><button class="primary" type="button" data-idea="استرجاع AUS Luxe: فحص ملفات المستودع والفروع، استعادة آخر نسخة مكتملة، اختبار التصميم المتجاوب، ثم نشر معاينة موثقة.">اعتماد التطوير</button></div></article>
+  </div>
+  <div class="nx-vcard" style="margin-top:16px">
+    <h3>✦ شريك التطوير — اقتراحات تنتظر موافقتك</h3>
+    <p>هذه المرحلة تستخدم قواعد اقتراحات محلية داخل الصفحة، وليست بعدُ نموذج ذكاء اصطناعي متصلًا أو نظامًا يعمل في الخلفية. عند اعتماد فكرة، تُضاف إلى خانة مهام المشغل لتراجعها وتقرر متى تنفذ.</p>
+    <div class="nx-privacy-alert"><strong>الخصوصية بوضوح:</strong> الواجهة الحالية منشورة على الإنترنت ومستودع GitHub متاح وفق إعداداته. هذا التحديث لا يجعل المستودعات خاصة ولا يشفر ملفات الخادم أو قواعد البيانات. لا تضع كلمات مرور أو مفاتيح API أو بيانات حساسة هنا. لحماية فعلية نحتاج ضبط صلاحيات المستودعات، وتأمين الأسرار في Render، وتشفير التخزين المطلوب، ونسخ احتياطية واختبار استعادة.</div>
+    <div class="nx-actions"><button class="primary" type="button" id="nxPrivacyPlan">إضافة خطة حماية إلى المهام</button><button type="button" id="nxAiPlan">اقتراح خطة تطوير أسبوعية</button></div>
+    <div class="nx-statusline" id="nxVisionStatus" aria-live="polite">جاهز — لا تُنفذ تغييرات على الخادم من هذه اللوحة حتى الآن.</div>
+  </div>
+</section>
+
+<script>
+(()=> {
+ const status=document.getElementById('nxVisionStatus');
+ const taskBox=document.getElementById('operatorTaskNote');
+ const taskType=document.getElementById('operatorTaskType');
+ const project=document.getElementById('operatorProject');
+ const setTask=(title,detail)=>{
+   if(taskBox){taskBox.value=title+'\n\n'+detail;taskBox.dispatchEvent(new Event('input',{bubbles:true}));}
+   if(taskType)taskType.value='bug';
+   if(status)status.textContent='تمت إضافة اقتراح إلى خانة المهام للمراجعة. لم يُنشر أي كود ولم تتغير إعدادات الخادم.';
+   const target=document.getElementById('operatorTaskNote');
+   if(target)target.scrollIntoView({behavior:'smooth',block:'center'});
+ };
+ document.querySelectorAll('#nxDomainFilters button').forEach(btn=>btn.addEventListener('click',()=>{
+   const kind=btn.dataset.domain;
+   document.querySelectorAll('#nxDomainFilters button').forEach(b=>b.setAttribute('aria-pressed',String(b===btn)));
+   document.querySelectorAll('#nxDomainCards [data-kind]').forEach(card=>{
+     card.hidden=kind!=='all'&&!card.dataset.kind.split(' ').includes(kind);
+   });
+ }));
+ document.querySelectorAll('[data-open]').forEach(btn=>btn.addEventListener('click',()=>{
+   const url=btn.dataset.open;
+   if(url)window.open(url,'_blank','noopener,noreferrer');
+ }));
+ document.querySelectorAll('[data-idea]').forEach(btn=>btn.addEventListener('click',()=>{
+   setTask('اقتراح تطوير معتمد للمراجعة',btn.dataset.idea+'\n\nقبل التنفيذ: فحص الحالة الحالية، تحديد النطاق والمخاطر، إعداد اختبار، ثم طلب موافقة صريحة على أي إجراء يغير الإنتاج.');
+ }));
+ document.getElementById('nxPrivacyPlan')?.addEventListener('click',()=>setTask('خطة حماية وخصوصية المشاريع','1) جرد المستودعات العامة والخاصة وتحديد الملكية.\n2) نقل الأسرار من الملفات إلى متغيرات بيئة آمنة وإبطال أي مفتاح مكشوف.\n3) مراجعة صلاحيات GitHub وRender والمستخدمين.\n4) اختيار قاعدة بيانات دائمة مع نسخ احتياطية واختبار استعادة.\n5) تشفير البيانات الحساسة أثناء النقل والتخزين حسب دعم كل خدمة.\n6) سجل تدقيق وصلاحيات أقل امتيازًا.\n7) عدم حذف أو تغيير أي مشروع قبل نسخة احتياطية وموافقة صريحة.'));
+ document.getElementById('nxAiPlan')?.addEventListener('click',()=>setTask('خطة تطوير أسبوعية — شريك Nexus','اليوم 1: جرد الملفات والفروع والتكرارات.\nاليوم 2: اختبار صحة روابط وخدمات Render.\nاليوم 3: ترتيب الأسرار والصلاحيات.\nاليوم 4: إصلاح أعلى عطل مثبت مع اختبارات.\nاليوم 5: توحيد المعاينات حسب المجال.\nاليوم 6: بناء واجهة API آمنة لمراقبة الحالة.\nاليوم 7: مراجعة النتائج وتقرير الإنجاز والوقت.\nكل يوم: لا تنفيذ على الإنتاج دون موافقة، واكتب نتيجة قابلة للتحقق لكل مهمة.'));
+})();
+</script>
 </body></html>
