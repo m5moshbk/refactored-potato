@@ -400,6 +400,7 @@ function saveProjectEditRequest(){
  const opProject=document.getElementById('operatorProject');
  const card=[...document.querySelectorAll('.project')].find(c=>c.querySelector('h3')?.textContent?.trim()===name);
  if(card&&opProject&&card.dataset.operatorId)opProject.value=card.dataset.operatorId;
+ const taskButton=document.getElementById('operatorCreateTask');if(taskButton)taskButton.click();
  if(typeof addEvent==='function'){try{addEvent('حفظ طلب تعديل',name+' · '+idea)}catch(_){}}
  document.getElementById('projectEditStatus').textContent='حُفظ طلب التعديل في هذا المتصفح وجُهز وصف المهمة. لم يُنفّذ التعديل على الموقع. افتح لوحة المالك لمراجعته ونسخ ملخصه.';
  document.getElementById('projectEditForm').classList.remove('open');
