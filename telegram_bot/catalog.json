@@ -1,0 +1,523 @@
+{
+  "owner": "M5mOsH",
+  "updated": "2026-10-14",
+  "note": "التصنيف أولي، والمستودعات غير المفحوصة موسومة بذلك.",
+  "repositories": [
+    {
+      "name": "Gemail-Hack",
+      "full_name": "m5moshbk/Gemail-Hack",
+      "url": "https://github.com/m5moshbk/Gemail-Hack",
+      "category": "بحاجة للتصنيف",
+      "purpose": "المهمة غير مؤكدة من الاسم وحده؛ راجع README والملفات قبل الاستخدام.",
+      "usage": "افحص README والملفات قبل التشغيل ولا تنسب للمشروع وظيفة غير موثقة.",
+      "default_branch": "master",
+      "sections": [
+        "README",
+        "ملفات المصدر",
+        "الاختبارات/النشر إن وجدت"
+      ],
+      "status": "تصنيف أولي؛ يلزم تحقق وظيفي"
+    },
+    {
+      "name": "instainsane",
+      "full_name": "m5moshbk/instainsane",
+      "url": "https://github.com/m5moshbk/instainsane",
+      "category": "بحاجة للتصنيف",
+      "purpose": "المهمة غير مؤكدة من الاسم وحده؛ راجع README والملفات قبل الاستخدام.",
+      "usage": "افحص README والملفات قبل التشغيل ولا تنسب للمشروع وظيفة غير موثقة.",
+      "default_branch": "master",
+      "sections": [
+        "README",
+        "ملفات المصدر",
+        "الاختبارات/النشر إن وجدت"
+      ],
+      "status": "تصنيف أولي؛ يلزم تحقق وظيفي"
+    },
+    {
+      "name": "Ttb3",
+      "full_name": "m5moshbk/Ttb3",
+      "url": "https://github.com/m5moshbk/Ttb3",
+      "category": "بحاجة للتصنيف",
+      "purpose": "المهمة غير مؤكدة من الاسم وحده؛ راجع README والملفات قبل الاستخدام.",
+      "usage": "افحص README والملفات قبل التشغيل ولا تنسب للمشروع وظيفة غير موثقة.",
+      "default_branch": "main",
+      "sections": [
+        "README",
+        "ملفات المصدر",
+        "الاختبارات/النشر إن وجدت"
+      ],
+      "status": "تصنيف أولي؛ يلزم تحقق وظيفي"
+    },
+    {
+      "name": "Ahmed",
+      "full_name": "m5moshbk/Ahmed",
+      "url": "https://github.com/m5moshbk/Ahmed",
+      "category": "بحاجة للتصنيف",
+      "purpose": "المهمة غير مؤكدة من الاسم وحده؛ راجع README والملفات قبل الاستخدام.",
+      "usage": "افحص README والملفات قبل التشغيل ولا تنسب للمشروع وظيفة غير موثقة.",
+      "default_branch": "main",
+      "sections": [
+        "README",
+        "ملفات المصدر",
+        "الاختبارات/النشر إن وجدت"
+      ],
+      "status": "تصنيف أولي؛ يلزم تحقق وظيفي"
+    },
+    {
+      "name": "rouat-aljory",
+      "full_name": "m5moshbk/rouat-aljory",
+      "url": "https://github.com/m5moshbk/rouat-aljory",
+      "category": "بحاجة للتصنيف",
+      "purpose": "المهمة غير مؤكدة من الاسم وحده؛ راجع README والملفات قبل الاستخدام.",
+      "usage": "افحص README والملفات قبل التشغيل ولا تنسب للمشروع وظيفة غير موثقة.",
+      "default_branch": "main",
+      "sections": [
+        "README",
+        "ملفات المصدر",
+        "الاختبارات/النشر إن وجدت"
+      ],
+      "status": "تصنيف أولي؛ يلزم تحقق وظيفي"
+    },
+    {
+      "name": "Jizan1448-site",
+      "full_name": "m5moshbk/Jizan1448-site",
+      "url": "https://github.com/m5moshbk/Jizan1448-site",
+      "category": "مواقع ومحتوى",
+      "purpose": "المهمة غير مؤكدة من الاسم وحده؛ راجع README والملفات قبل الاستخدام.",
+      "usage": "افحص README والملفات قبل التشغيل ولا تنسب للمشروع وظيفة غير موثقة.",
+      "default_branch": "main",
+      "sections": [
+        "README",
+        "ملفات المصدر",
+        "الاختبارات/النشر إن وجدت"
+      ],
+      "status": "تصنيف أولي؛ يلزم تحقق وظيفي"
+    },
+    {
+      "name": "wedding-invite",
+      "full_name": "m5moshbk/wedding-invite",
+      "url": "https://github.com/m5moshbk/wedding-invite",
+      "category": "مواقع ومحتوى",
+      "purpose": "المهمة غير مؤكدة من الاسم وحده؛ راجع README والملفات قبل الاستخدام.",
+      "usage": "افحص README والملفات قبل التشغيل ولا تنسب للمشروع وظيفة غير موثقة.",
+      "default_branch": "main",
+      "sections": [
+        "README",
+        "ملفات المصدر",
+        "الاختبارات/النشر إن وجدت"
+      ],
+      "status": "تصنيف أولي؛ يلزم تحقق وظيفي"
+    },
+    {
+      "name": "urban-octo-couscous",
+      "full_name": "m5moshbk/urban-octo-couscous",
+      "url": "https://github.com/m5moshbk/urban-octo-couscous",
+      "category": "بحاجة للتصنيف",
+      "purpose": "المهمة غير مؤكدة من الاسم وحده؛ راجع README والملفات قبل الاستخدام.",
+      "usage": "افحص README والملفات قبل التشغيل ولا تنسب للمشروع وظيفة غير موثقة.",
+      "default_branch": "main",
+      "sections": [
+        "README",
+        "ملفات المصدر",
+        "الاختبارات/النشر إن وجدت"
+      ],
+      "status": "تصنيف أولي؛ يلزم تحقق وظيفي"
+    },
+    {
+      "name": "Tuwami-X",
+      "full_name": "m5moshbk/Tuwami-X",
+      "url": "https://github.com/m5moshbk/Tuwami-X",
+      "category": "بحاجة للتصنيف",
+      "purpose": "المهمة غير مؤكدة من الاسم وحده؛ راجع README والملفات قبل الاستخدام.",
+      "usage": "افحص README والملفات قبل التشغيل ولا تنسب للمشروع وظيفة غير موثقة.",
+      "default_branch": "main",
+      "sections": [
+        "README",
+        "ملفات المصدر",
+        "الاختبارات/النشر إن وجدت"
+      ],
+      "status": "تصنيف أولي؛ يلزم تحقق وظيفي"
+    },
+    {
+      "name": "nSr-ftns",
+      "full_name": "m5moshbk/nSr-ftns",
+      "url": "https://github.com/m5moshbk/nSr-ftns",
+      "category": "بحاجة للتصنيف",
+      "purpose": "المهمة غير مؤكدة من الاسم وحده؛ راجع README والملفات قبل الاستخدام.",
+      "usage": "افحص README والملفات قبل التشغيل ولا تنسب للمشروع وظيفة غير موثقة.",
+      "default_branch": "main",
+      "sections": [
+        "README",
+        "ملفات المصدر",
+        "الاختبارات/النشر إن وجدت"
+      ],
+      "status": "تصنيف أولي؛ يلزم تحقق وظيفي"
+    },
+    {
+      "name": "Modat",
+      "full_name": "m5moshbk/Modat",
+      "url": "https://github.com/m5moshbk/Modat",
+      "category": "بحاجة للتصنيف",
+      "purpose": "المهمة غير مؤكدة من الاسم وحده؛ راجع README والملفات قبل الاستخدام.",
+      "usage": "افحص README والملفات قبل التشغيل ولا تنسب للمشروع وظيفة غير موثقة.",
+      "default_branch": "main",
+      "sections": [
+        "README",
+        "ملفات المصدر",
+        "الاختبارات/النشر إن وجدت"
+      ],
+      "status": "تصنيف أولي؛ يلزم تحقق وظيفي"
+    },
+    {
+      "name": "Tamara-Business-Site",
+      "full_name": "m5moshbk/Tamara-Business-Site",
+      "url": "https://github.com/m5moshbk/Tamara-Business-Site",
+      "category": "متاجر",
+      "purpose": "واجهة أعمال لخدمات Tabby وTamara؛ نموذج أولي ولا يثبت معالجة مدفوعات حقيقية.",
+      "usage": "راجع README والاختبارات والإعدادات؛ لا تفترض أن كل الوظائف تعمل.",
+      "default_branch": "main",
+      "sections": [
+        "واجهة الأعمال",
+        "خدمات الدفع",
+        "تكامل الدفع: يحتاج تحقق"
+      ],
+      "status": "تصنيف أولي؛ يلزم تحقق وظيفي"
+    },
+    {
+      "name": "Sentinel-Brain",
+      "full_name": "m5moshbk/Sentinel-Brain",
+      "url": "https://github.com/m5moshbk/Sentinel-Brain",
+      "category": "أدوات",
+      "purpose": "الوظيفة الفعلية تحتاج فحص المصدر.",
+      "usage": "راجع README والاختبارات والإعدادات؛ لا تفترض أن كل الوظائف تعمل.",
+      "default_branch": "main",
+      "sections": [
+        "README",
+        "ملفات المصدر",
+        "الاختبارات/النشر إن وجدت"
+      ],
+      "status": "تصنيف أولي؛ يلزم تحقق وظيفي"
+    },
+    {
+      "name": "SADA",
+      "full_name": "m5moshbk/SADA",
+      "url": "https://github.com/m5moshbk/SADA",
+      "category": "أدوات",
+      "purpose": "صَدَى: API تشخيصية/echo وبصمة SHA-256 وسجل مؤقت وعميل Pythonista؛ السجل ليس ذاكرة دائمة.",
+      "usage": "راجع README والاختبارات والإعدادات؛ لا تفترض أن كل الوظائف تعمل.",
+      "default_branch": "main",
+      "sections": [
+        "API",
+        "التشخيص وEcho",
+        "SHA-256",
+        "سجل مؤقت",
+        "عميل Pythonista"
+      ],
+      "status": "تصنيف أولي؛ يلزم تحقق وظيفي"
+    },
+    {
+      "name": "Crispy-Seeka",
+      "full_name": "m5moshbk/Crispy-Seeka",
+      "url": "https://github.com/m5moshbk/Crispy-Seeka",
+      "category": "بحاجة للتصنيف",
+      "purpose": "المهمة غير مؤكدة من الاسم وحده؛ راجع README والملفات قبل الاستخدام.",
+      "usage": "افحص README والملفات قبل التشغيل ولا تنسب للمشروع وظيفة غير موثقة.",
+      "default_branch": "main",
+      "sections": [
+        "README",
+        "ملفات المصدر",
+        "الاختبارات/النشر إن وجدت"
+      ],
+      "status": "تصنيف أولي؛ يلزم تحقق وظيفي"
+    },
+    {
+      "name": "m5moshbk-Elite-Console-X",
+      "full_name": "m5moshbk/m5moshbk-Elite-Console-X",
+      "url": "https://github.com/m5moshbk/m5moshbk-Elite-Console-X",
+      "category": "أدوات",
+      "purpose": "لوحة/كونسول إدارة؛ افحص المصادقة ومتغيرات البيئة.",
+      "usage": "راجع README والاختبارات والإعدادات؛ لا تفترض أن كل الوظائف تعمل.",
+      "default_branch": "main",
+      "sections": [
+        "README",
+        "ملفات المصدر",
+        "الاختبارات/النشر إن وجدت"
+      ],
+      "status": "تصنيف أولي؛ يلزم تحقق وظيفي"
+    },
+    {
+      "name": "Sawa-Play-Monitor",
+      "full_name": "m5moshbk/Sawa-Play-Monitor",
+      "url": "https://github.com/m5moshbk/Sawa-Play-Monitor",
+      "category": "أدوات",
+      "purpose": "لوحة أحداث وتقارير وتحليل وSQLite وواجهات API؛ Telegram اختياري. صحة الويب لا تثبت اتصال المصدر الخارجي.",
+      "usage": "راجع README والاختبارات والإعدادات؛ لا تفترض أن كل الوظائف تعمل.",
+      "default_branch": "main",
+      "sections": [
+        "لوحة الويب",
+        "واجهات API",
+        "محرك التحليل",
+        "SQLite",
+        "Telegram اختياري",
+        "Render"
+      ],
+      "status": "تصنيف أولي؛ يلزم تحقق وظيفي"
+    },
+    {
+      "name": "refactored-potato",
+      "full_name": "m5moshbk/refactored-potato",
+      "url": "https://github.com/m5moshbk/refactored-potato",
+      "category": "مركز المشاريع",
+      "purpose": "M5mOsH Nexus: فهرس وتصنيف للمستودعات وبوت Telegram للقراءة فقط.",
+      "usage": "راجع README والاختبارات والإعدادات؛ لا تفترض أن كل الوظائف تعمل.",
+      "default_branch": "main",
+      "sections": [
+        "فهرس المستودعات",
+        "تصنيف المتاجر والأدوات",
+        "بوت Telegram"
+      ],
+      "status": "تصنيف أولي؛ يلزم تحقق وظيفي"
+    },
+    {
+      "name": "redesigned-dollop",
+      "full_name": "m5moshbk/redesigned-dollop",
+      "url": "https://github.com/m5moshbk/redesigned-dollop",
+      "category": "بحاجة للتصنيف",
+      "purpose": "المهمة غير مؤكدة من الاسم وحده؛ راجع README والملفات قبل الاستخدام.",
+      "usage": "افحص README والملفات قبل التشغيل ولا تنسب للمشروع وظيفة غير موثقة.",
+      "default_branch": "main",
+      "sections": [
+        "README",
+        "ملفات المصدر",
+        "الاختبارات/النشر إن وجدت"
+      ],
+      "status": "تصنيف أولي؛ يلزم تحقق وظيفي"
+    },
+    {
+      "name": "didactic-parakeet",
+      "full_name": "m5moshbk/didactic-parakeet",
+      "url": "https://github.com/m5moshbk/didactic-parakeet",
+      "category": "بحاجة للتصنيف",
+      "purpose": "المهمة غير مؤكدة من الاسم وحده؛ راجع README والملفات قبل الاستخدام.",
+      "usage": "افحص README والملفات قبل التشغيل ولا تنسب للمشروع وظيفة غير موثقة.",
+      "default_branch": "main",
+      "sections": [
+        "README",
+        "ملفات المصدر",
+        "الاختبارات/النشر إن وجدت"
+      ],
+      "status": "تصنيف أولي؛ يلزم تحقق وظيفي"
+    },
+    {
+      "name": "crispy-spork",
+      "full_name": "m5moshbk/crispy-spork",
+      "url": "https://github.com/m5moshbk/crispy-spork",
+      "category": "بحاجة للتصنيف",
+      "purpose": "المهمة غير مؤكدة من الاسم وحده؛ راجع README والملفات قبل الاستخدام.",
+      "usage": "افحص README والملفات قبل التشغيل ولا تنسب للمشروع وظيفة غير موثقة.",
+      "default_branch": "main",
+      "sections": [
+        "README",
+        "ملفات المصدر",
+        "الاختبارات/النشر إن وجدت"
+      ],
+      "status": "تصنيف أولي؛ يلزم تحقق وظيفي"
+    },
+    {
+      "name": "jubilant-barnacle",
+      "full_name": "m5moshbk/jubilant-barnacle",
+      "url": "https://github.com/m5moshbk/jubilant-barnacle",
+      "category": "بحاجة للتصنيف",
+      "purpose": "المهمة غير مؤكدة من الاسم وحده؛ راجع README والملفات قبل الاستخدام.",
+      "usage": "افحص README والملفات قبل التشغيل ولا تنسب للمشروع وظيفة غير موثقة.",
+      "default_branch": "main",
+      "sections": [
+        "README",
+        "ملفات المصدر",
+        "الاختبارات/النشر إن وجدت"
+      ],
+      "status": "تصنيف أولي؛ يلزم تحقق وظيفي"
+    },
+    {
+      "name": "super-engine",
+      "full_name": "m5moshbk/super-engine",
+      "url": "https://github.com/m5moshbk/super-engine",
+      "category": "بحاجة للتصنيف",
+      "purpose": "المهمة غير مؤكدة من الاسم وحده؛ راجع README والملفات قبل الاستخدام.",
+      "usage": "افحص README والملفات قبل التشغيل ولا تنسب للمشروع وظيفة غير موثقة.",
+      "default_branch": "main",
+      "sections": [
+        "README",
+        "ملفات المصدر",
+        "الاختبارات/النشر إن وجدت"
+      ],
+      "status": "تصنيف أولي؛ يلزم تحقق وظيفي"
+    },
+    {
+      "name": "special-carnival",
+      "full_name": "m5moshbk/special-carnival",
+      "url": "https://github.com/m5moshbk/special-carnival",
+      "category": "بحاجة للتصنيف",
+      "purpose": "المهمة غير مؤكدة من الاسم وحده؛ راجع README والملفات قبل الاستخدام.",
+      "usage": "افحص README والملفات قبل التشغيل ولا تنسب للمشروع وظيفة غير موثقة.",
+      "default_branch": "main",
+      "sections": [
+        "README",
+        "ملفات المصدر",
+        "الاختبارات/النشر إن وجدت"
+      ],
+      "status": "تصنيف أولي؛ يلزم تحقق وظيفي"
+    },
+    {
+      "name": "psychic-octo-palm-tree",
+      "full_name": "m5moshbk/psychic-octo-palm-tree",
+      "url": "https://github.com/m5moshbk/psychic-octo-palm-tree",
+      "category": "بحاجة للتصنيف",
+      "purpose": "المهمة غير مؤكدة من الاسم وحده؛ راجع README والملفات قبل الاستخدام.",
+      "usage": "افحص README والملفات قبل التشغيل ولا تنسب للمشروع وظيفة غير موثقة.",
+      "default_branch": "main",
+      "sections": [
+        "README",
+        "ملفات المصدر",
+        "الاختبارات/النشر إن وجدت"
+      ],
+      "status": "تصنيف أولي؛ يلزم تحقق وظيفي"
+    },
+    {
+      "name": "studious-adventure",
+      "full_name": "m5moshbk/studious-adventure",
+      "url": "https://github.com/m5moshbk/studious-adventure",
+      "category": "بحاجة للتصنيف",
+      "purpose": "المهمة غير مؤكدة من الاسم وحده؛ راجع README والملفات قبل الاستخدام.",
+      "usage": "افحص README والملفات قبل التشغيل ولا تنسب للمشروع وظيفة غير موثقة.",
+      "default_branch": "main",
+      "sections": [
+        "README",
+        "ملفات المصدر",
+        "الاختبارات/النشر إن وجدت"
+      ],
+      "status": "تصنيف أولي؛ يلزم تحقق وظيفي"
+    },
+    {
+      "name": "automatic-fortnight",
+      "full_name": "m5moshbk/automatic-fortnight",
+      "url": "https://github.com/m5moshbk/automatic-fortnight",
+      "category": "بحاجة للتصنيف",
+      "purpose": "المهمة غير مؤكدة من الاسم وحده؛ راجع README والملفات قبل الاستخدام.",
+      "usage": "افحص README والملفات قبل التشغيل ولا تنسب للمشروع وظيفة غير موثقة.",
+      "default_branch": "main",
+      "sections": [
+        "README",
+        "ملفات المصدر",
+        "الاختبارات/النشر إن وجدت"
+      ],
+      "status": "تصنيف أولي؛ يلزم تحقق وظيفي"
+    },
+    {
+      "name": "probable-fortnight",
+      "full_name": "m5moshbk/probable-fortnight",
+      "url": "https://github.com/m5moshbk/probable-fortnight",
+      "category": "بحاجة للتصنيف",
+      "purpose": "المهمة غير مؤكدة من الاسم وحده؛ راجع README والملفات قبل الاستخدام.",
+      "usage": "افحص README والملفات قبل التشغيل ولا تنسب للمشروع وظيفة غير موثقة.",
+      "default_branch": "main",
+      "sections": [
+        "README",
+        "ملفات المصدر",
+        "الاختبارات/النشر إن وجدت"
+      ],
+      "status": "تصنيف أولي؛ يلزم تحقق وظيفي"
+    },
+    {
+      "name": "aus-luxe-auto-store",
+      "full_name": "m5moshbk/aus-luxe-auto-store",
+      "url": "https://github.com/m5moshbk/aus-luxe-auto-store",
+      "category": "متاجر",
+      "purpose": "مستودع AUS Luxe ثانٍ مرشح للمقارنة؛ لا تؤرشفه قبل مقارنة الملفات والفروع والتاريخ.",
+      "usage": "راجع README والاختبارات والإعدادات؛ لا تفترض أن كل الوظائف تعمل.",
+      "default_branch": "main",
+      "sections": [
+        "README",
+        "ملفات المصدر",
+        "الاختبارات/النشر إن وجدت"
+      ],
+      "status": "تصنيف أولي؛ يلزم تحقق وظيفي"
+    },
+    {
+      "name": "todo-list-app",
+      "full_name": "m5moshbk/todo-list-app",
+      "url": "https://github.com/m5moshbk/todo-list-app",
+      "category": "أدوات",
+      "purpose": "تطبيق قائمة مهام بحسب الاسم؛ التفاصيل تحتاج مراجعة الكود.",
+      "usage": "راجع README والاختبارات والإعدادات؛ لا تفترض أن كل الوظائف تعمل.",
+      "default_branch": "main",
+      "sections": [
+        "README",
+        "ملفات المصدر",
+        "الاختبارات/النشر إن وجدت"
+      ],
+      "status": "تصنيف أولي؛ يلزم تحقق وظيفي"
+    },
+    {
+      "name": "scaling-computing-machine",
+      "full_name": "m5moshbk/scaling-computing-machine",
+      "url": "https://github.com/m5moshbk/scaling-computing-machine",
+      "category": "بحاجة للتصنيف",
+      "purpose": "المهمة غير مؤكدة من الاسم وحده؛ راجع README والملفات قبل الاستخدام.",
+      "usage": "افحص README والملفات قبل التشغيل ولا تنسب للمشروع وظيفة غير موثقة.",
+      "default_branch": "main",
+      "sections": [
+        "README",
+        "ملفات المصدر",
+        "الاختبارات/النشر إن وجدت"
+      ],
+      "status": "تصنيف أولي؛ يلزم تحقق وظيفي"
+    },
+    {
+      "name": "bookish-octo-eureka",
+      "full_name": "m5moshbk/bookish-octo-eureka",
+      "url": "https://github.com/m5moshbk/bookish-octo-eureka",
+      "category": "بحاجة للتصنيف",
+      "purpose": "المهمة غير مؤكدة من الاسم وحده؛ راجع README والملفات قبل الاستخدام.",
+      "usage": "افحص README والملفات قبل التشغيل ولا تنسب للمشروع وظيفة غير موثقة.",
+      "default_branch": "main",
+      "sections": [
+        "README",
+        "ملفات المصدر",
+        "الاختبارات/النشر إن وجدت"
+      ],
+      "status": "تصنيف أولي؛ يلزم تحقق وظيفي"
+    },
+    {
+      "name": "curly-octo-adventure",
+      "full_name": "m5moshbk/curly-octo-adventure",
+      "url": "https://github.com/m5moshbk/curly-octo-adventure",
+      "category": "بحاجة للتصنيف",
+      "purpose": "المهمة غير مؤكدة من الاسم وحده؛ راجع README والملفات قبل الاستخدام.",
+      "usage": "افحص README والملفات قبل التشغيل ولا تنسب للمشروع وظيفة غير موثقة.",
+      "default_branch": "main",
+      "sections": [
+        "README",
+        "ملفات المصدر",
+        "الاختبارات/النشر إن وجدت"
+      ],
+      "status": "تصنيف أولي؛ يلزم تحقق وظيفي"
+    },
+    {
+      "name": "super-duper-octo-adventure",
+      "full_name": "m5moshbk/super-duper-octo-adventure",
+      "url": "https://github.com/m5moshbk/super-duper-octo-adventure",
+      "category": "متاجر",
+      "purpose": "واجهة متجر AUS Luxe RTL؛ لا يثبت وجود دفع أو إرسال طلبات خلفية.",
+      "usage": "راجع README والاختبارات والإعدادات؛ لا تفترض أن كل الوظائف تعمل.",
+      "default_branch": "main",
+      "sections": [
+        "واجهة المتجر",
+        "عرض المنتجات",
+        "RTL",
+        "الدفع: يحتاج تحقق"
+      ],
+      "status": "تصنيف أولي؛ يلزم تحقق وظيفي"
+    }
+  ]
+}
