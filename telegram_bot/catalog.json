@@ -519,5 +519,205 @@
       ],
       "status": "تصنيف أولي؛ يلزم تحقق وظيفي"
     }
+  ],
+  "services": [
+    {
+      "name": "m5mosh-nexus-telegram-catalog",
+      "type": "Web Service",
+      "url": "https://m5mosh-nexus-telegram-catalog.onrender.com",
+      "repo": "m5moshbk/refactored-potato",
+      "branch": "main",
+      "runtime": "Python",
+      "status": "نشطة حسب Render؛ أوامر Telegram تنتظر TELEGRAM_BOT_TOKEN",
+      "purpose": "بوت فهرسة المستودعات والمشاريع للقراءة فقط",
+      "dashboard": "https://dashboard.render.com/web/srv-db7eap0473hc73d2rovg"
+    },
+    {
+      "name": "m5mosh-nexus",
+      "type": "Static Site",
+      "url": "https://m5mosh-nexus.onrender.com",
+      "repo": "m5moshbk/refactored-potato",
+      "branch": "main",
+      "runtime": "Static",
+      "status": "الخدمة غير معلّقة حسب Render؛ يلزم اختبار الواجهة",
+      "purpose": "لوحة Nexus الثابتة",
+      "dashboard": "https://dashboard.render.com/static/srv-db6mnhm7bikc73aj3pb0"
+    },
+    {
+      "name": "aus-luxe-auto-store",
+      "type": "Static Site",
+      "url": "https://aus-luxe-auto-store.onrender.com",
+      "repo": "m5moshbk/super-duper-octo-adventure",
+      "branch": "main",
+      "runtime": "Static",
+      "status": "الخدمة غير معلّقة حسب Render؛ الوظائف الخلفية غير مثبتة",
+      "purpose": "معاينة متجر AUS Luxe",
+      "dashboard": "https://dashboard.render.com/static/srv-db6t75aj9qps73af6hm0"
+    },
+    {
+      "name": "m5mosh-final-portfolio-preview",
+      "type": "Web Service",
+      "url": "https://m5mosh-final-portfolio-preview.onrender.com",
+      "repo": "m5moshbk/bizweb-platform",
+      "branch": "finish/portfolio-motion-and-code-review",
+      "runtime": "Node",
+      "status": "خدمة معاينة؛ تحقق من المحتوى الحالي",
+      "purpose": "معاينة المحفظة",
+      "dashboard": "https://dashboard.render.com/web/srv-db4f6dss728c73aiv5jg"
+    },
+    {
+      "name": "m5mosh-v2-ux-fix-preview",
+      "type": "Web Service",
+      "url": "https://m5mosh-v2-ux-fix-preview.onrender.com",
+      "repo": "m5moshbk/bizweb-platform",
+      "branch": "fix/ux-accessibility-controls-v2",
+      "runtime": "Node",
+      "status": "معاينة فرع UX؛ ليست بالضرورة الإصدار الرئيسي",
+      "purpose": "معاينة إصلاحات UX وإمكانية الوصول",
+      "dashboard": "https://dashboard.render.com/web/srv-db4euqflk1mc73fqm6b0"
+    },
+    {
+      "name": "m5mosh-v1-polished-preview",
+      "type": "Web Service",
+      "url": "https://m5mosh-v1-polished-preview.onrender.com",
+      "repo": "m5moshbk/bizweb-platform",
+      "branch": "feature/ui-polish-v1",
+      "runtime": "Node",
+      "status": "معاينة فرع واجهة",
+      "purpose": "معاينة تنقيح الواجهة",
+      "dashboard": "https://dashboard.render.com/web/srv-db4epgbbc2fs73bie070"
+    },
+    {
+      "name": "m5mosh-v1-preview",
+      "type": "Static Site",
+      "url": "https://m5mosh-v1-preview.onrender.com",
+      "repo": "m5moshbk/bizweb-platform",
+      "branch": "feature/m5mosh-store-check-mvp",
+      "runtime": "Static",
+      "status": "معاينة ثابتة",
+      "purpose": "معاينة MVP واجهة متجر",
+      "dashboard": "https://dashboard.render.com/static/srv-db4br37lot8c738gi8t0"
+    },
+    {
+      "name": "m5mosh-v1-api-preview",
+      "type": "Web Service",
+      "url": "https://m5mosh-v1-api-preview.onrender.com",
+      "repo": "m5moshbk/bizweb-platform",
+      "branch": "feature/m5mosh-store-check-mvp",
+      "runtime": "Node",
+      "status": "معاينة API؛ يلزم اختبار endpoints",
+      "purpose": "API تجريبية لمشروع bizweb-platform",
+      "dashboard": "https://dashboard.render.com/web/srv-db4bqurtqb8s73ep4img"
+    },
+    {
+      "name": "m5mosh-digital-preview",
+      "type": "Static Site",
+      "url": "https://m5mosh-digital-preview.onrender.com",
+      "repo": "m5moshbk/bizweb-platform",
+      "branch": "main",
+      "runtime": "Static",
+      "status": "معاينة ثابتة",
+      "purpose": "معاينة الواجهة الرقمية",
+      "dashboard": "https://dashboard.render.com/static/srv-db4akcdg1s2s738qu6g0"
+    },
+    {
+      "name": "sawa-play-monitor",
+      "type": "Web Service",
+      "url": "https://sawa-play-monitor.onrender.com",
+      "repo": "m5moshbk/Sawa-Play-Monitor",
+      "branch": "main",
+      "runtime": "Python",
+      "status": "غير معلّقة حسب Render؛ لا يثبت ذلك اتصال مصدر البيانات",
+      "purpose": "مراقبة الأحداث والتقارير",
+      "dashboard": "https://dashboard.render.com/web/srv-davc0eid0e5s73fd8c3g"
+    },
+    {
+      "name": "m5mosh-control-center",
+      "type": "Web Service",
+      "url": "https://m5mosh-control-center.onrender.com",
+      "repo": "m5moshbk/SADA",
+      "branch": "control-center-integration",
+      "runtime": "Python",
+      "status": "غير معلّقة حسب Render؛ يلزم اختبار وظائف التحكم",
+      "purpose": "خدمة مركز التحكم/تجربة SADA",
+      "dashboard": "https://dashboard.render.com/web/srv-dav6ojt9fdbs73bil5o0"
+    },
+    {
+      "name": "elite-console-x",
+      "type": "Web Service",
+      "url": "https://elite-console-x.onrender.com",
+      "repo": "m5moshbk/m5moshbk-Elite-Console-X",
+      "branch": "main",
+      "runtime": "Python",
+      "status": "غير معلّقة حسب Render؛ يلزم اختبار المصادقة والوظائف",
+      "purpose": "لوحة Elite Console X",
+      "dashboard": "https://dashboard.render.com/web/srv-dav4cnp7lnhs73aq00f0"
+    },
+    {
+      "name": "hendaset-aldaaf-alajel",
+      "type": "Static Site",
+      "url": "https://hendaset-aldaaf-alajel.onrender.com",
+      "repo": "m5moshbk/bizweb-platform",
+      "branch": "main",
+      "runtime": "Static",
+      "status": "موقع ثابت؛ تحقق من كونه نسخة أم موقعًا مستقلًا",
+      "purpose": "معاينة مرتبطة بمشروع الدفع الآجل",
+      "dashboard": "https://dashboard.render.com/static/srv-dat9r5rbc2fs73bogrqg"
+    },
+    {
+      "name": "Crispy-Seeka-",
+      "type": "Static Site",
+      "url": "https://crispy-seeka-a64y.onrender.com",
+      "repo": "m5moshbk/Crispy-Seeka",
+      "branch": "main",
+      "runtime": "Static",
+      "status": "غير معلّقة حسب Render؛ يلزم التحقق من المحتوى",
+      "purpose": "واجهة ثابتة لمشروع Crispy-Seeka",
+      "dashboard": "https://dashboard.render.com/static/srv-darjiiojo6nc73888s80"
+    },
+    {
+      "name": "crispy-seeka-secure",
+      "type": "Web Service",
+      "url": "https://crispy-seeka-secure.onrender.com",
+      "repo": "m5moshbk/Crispy-Seeka",
+      "branch": "main",
+      "runtime": "Python",
+      "status": "معلّقة من المستخدم في Render",
+      "purpose": "خدمة Python مرتبطة بمشروع Crispy-Seeka",
+      "dashboard": "https://dashboard.render.com/web/srv-darjh6e0tbcc73bs0mv0"
+    },
+    {
+      "name": "Crispy-Seeka-1",
+      "type": "Static Site",
+      "url": "https://crispy-seeka-1.onrender.com",
+      "repo": "m5moshbk/Crispy-Seeka",
+      "branch": "main",
+      "runtime": "Static",
+      "status": "غير معلّقة حسب Render؛ مرشح لمقارنة التكرار",
+      "purpose": "نسخة ثابتة أخرى من Crispy-Seeka",
+      "dashboard": "https://dashboard.render.com/static/srv-darj2ju0tbcc73bq6al0"
+    },
+    {
+      "name": "Crispy-Seeka",
+      "type": "Web Service",
+      "url": "https://crispy-seeka.onrender.com",
+      "repo": "m5moshbk/Crispy-Seeka",
+      "branch": "main",
+      "runtime": "Docker",
+      "status": "معلّقة من المستخدم في Render",
+      "purpose": "خدمة Docker لمشروع Crispy-Seeka",
+      "dashboard": "https://dashboard.render.com/web/srv-darj1ve0tbcc73bq3t0g"
+    },
+    {
+      "name": "beefitness-payments-gateway",
+      "type": "Web Service",
+      "url": "https://beefitness-payments-gateway.onrender.com",
+      "repo": "m5moshbk/Tamara-Business-Site",
+      "branch": "main",
+      "runtime": "Node",
+      "status": "غير معلّقة حسب Render؛ لا يعني ذلك أن الدفع الإنتاجي يعمل",
+      "purpose": "خدمة بوابة مدفوعات؛ تحتاج تحقق أمني واختبار sandbox",
+      "dashboard": "https://dashboard.render.com/web/srv-dar2cbp7lnhs739pmurg"
+    }
   ]
 }
