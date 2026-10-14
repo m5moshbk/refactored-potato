@@ -110,9 +110,9 @@ def provider_status(chat_id=None):
     key_ready = bool(OPENAI_API_KEY) if selected == "openai" else bool(GEMINI_API_KEY)
     provider_name = "GPT / OpenAI" if selected == "openai" else "Gemini / Google"
     model_name = OPENAI_MODEL if selected == "openai" else GEMINI_MODEL
-    return ("المحرّك المحدد: " + provider_name + "\\n"
-            + "النموذج: " + model_name + "\\n"
-            + "المفتاح في بيئة Render: " + ("موجود" if key_ready else "غير موجود") + "\\n"
+    return ("المحرّك المحدد: " + provider_name + "\n"
+            + "النموذج: " + model_name + "\n"
+            + "المفتاح في بيئة Render: " + ("موجود" if key_ready else "غير موجود") + "\n"
             + "هذا يفحص وجود المتغير فقط، ولا يثبت صلاحية المفتاح أو الرصيد.")
 
 
