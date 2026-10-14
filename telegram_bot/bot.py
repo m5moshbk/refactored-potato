@@ -404,11 +404,19 @@ def ask_gpt(user_text):
         return "تعذر الاتصال بـ Gemini. راجع سجل Render لتشخيص الخطأ."
 
 
-def handle_message(chat_id, text):
+def handle_message(chat_id, text, forwarded=False):
     if not ADMIN or str(chat_id) != ADMIN:
         send(chat_id, "هذا البوت خاص، ولم تُمنح هذه المحادثة صلاحية الاستخدام.")
         return
-    cmd, _, arg = (text or "").strip().partition(" ")
+    raw_text = (text or "").strip()
+    if forwarded and raw_text:
+        prompt = ("حلل رسالة أو محادثة عميل متجر إلكتروني لأجل مساعدتي في تقديم خدمة مهنية. " 
+                  "استخرج: احتياج العميل المؤكد، ما يحتاج سؤالًا توضيحيًا، فرص الخدمات المناسبة دون وعود غير مؤكدة، " 
+                  "ومسودة رد سعودي مهني قصيرة. لا تفترض معلومات غير مذكورة، ولا تكرر أرقام الهاتف أو البيانات الشخصية غير اللازمة. " 
+                  "النص المنقول من العميل:\\n" + raw_text[:5000])
+        send(chat_id, ask_gpt(prompt), [[button("🛍️ فحص متجر العميل", "store_audit_help")], [button("🏠 القائمة الرئيسية", "menu")]])
+        return
+    cmd, _, arg = raw_text.partition(" ")
     cmd = cmd.split("@")[0].lower()
     if cmd in ("/start", "/help", "/مساعدة", "/menu"):
         send(chat_id, "🧭 M5mOsH Nexus\nاختر المجال من الأزرار. كتابة الأوامر اختيارية وليست مطلوبة للتنقل.", menu())
@@ -478,7 +486,8 @@ def polling():
                     continue
                 msg = item.get("message") or item.get("edited_message")
                 if msg and msg.get("chat") and msg.get("text"):
-                    handle_message(msg["chat"]["id"], msg["text"])
+                    forwarded = bool(msg.get("forward_origin") or msg.get("forward_date") or msg.get("forward_from"))
+                    handle_message(msg["chat"]["id"], msg["text"], forwarded=forwarded)
         except HTTPError as exc:
             # Never log the request URL: Telegram URLs contain the bot token.
             details = {}
