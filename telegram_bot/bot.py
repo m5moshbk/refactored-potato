@@ -5,6 +5,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError, URLError
+from store_audit import audit_store
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 with open(os.path.join(ROOT, "catalog.json"), encoding="utf-8") as f:
