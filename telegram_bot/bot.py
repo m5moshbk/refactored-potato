@@ -481,10 +481,10 @@ def handle_message(chat_id, text, forwarded=False):
             def progress_text(percent, label, detail=""):
                 filled = max(0, min(10, percent // 10))
                 bar = "█" * filled + "░" * (10 - filled)
-                return ("🔎 M5mOsH Nexus | فحص المتجر\\n"
-                        + "[" + bar + "] " + str(percent) + "%\\n"
-                        + "الحالة: " + label + "\\n"
-                        + detail + "\\n\\n"
+                return ("🔎 M5mOsH Nexus | فحص المتجر\n"
+                        + "[" + bar + "] " + str(percent) + "%\n"
+                        + "الحالة: " + label + "\n"
+                        + detail + "\n\n"
                         + "🛡️ قراءة فقط • لا تسجيل دخول ولا شراء ولا تغيير إعدادات")
             try:
                 started = send(chat_id, progress_text(1, "تهيئة الفحص", "جاري التحقق من الرابط العام..."))
@@ -496,7 +496,7 @@ def handle_message(chat_id, text, forwarded=False):
                         except Exception as exc:
                             print("Audit progress update error:", type(exc).__name__, flush=True)
                 report = audit_store(arg.strip(), progress=update_progress)
-                draft_marker = "مسودة رسالة للعميل:\\n"
+                draft_marker = "مسودة رسالة للعميل:\n"
                 draft = report.split(draft_marker, 1)[1].strip() if draft_marker in report else ""
                 keyboard = []
                 if draft and len(draft) <= 256:
