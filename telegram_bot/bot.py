@@ -1028,7 +1028,7 @@ def local_free_fallback(user_text, reason=""):
 def ask_gpt_resilient(user_text, chat_id=None):
     """Prefer the chosen engine; on failure, switch to Gemini once, then use offline mode."""
     provider = get_ai_provider(chat_id)
-    first_answer = ask_gpt_resilient(user_text, chat_id=chat_id)
+    first_answer = ask_gpt(user_text, chat_id=chat_id)
     if not _provider_failed(first_answer):
         return first_answer
 
