@@ -102,9 +102,9 @@ INTENT_GUIDANCE = {
 def review_response(text):
     """Lightweight local quality pass: normalize whitespace and remove empty clutter."""
     text = (text or "").strip()
-    text = re.sub(r"\\n[ \\t]*\\n[ \\t]*\\n+", "\\n\\n", text)
-    text = re.sub(r"[ \\t]+\\n", "\\n", text)
-    text = re.sub(r"\\n[ \\t]+", "\\n", text)
+    text = re.sub(r"\n[ \t]*\n[ \t]*\n+", "\n\n", text)
+    text = re.sub(r"[ \t]+\n", "\n", text)
+    text = re.sub(r"\n[ \t]+", "\n", text)
     return text[:3900].strip()
 
 
@@ -473,7 +473,7 @@ def ask_gpt(user_text, chat_id=None):
     )
     contents = []
     for turn in memory:
-        contents.append({"role": turn["role"], "parts": [{"text": turn["content"][:3000]}]})
+        contents.append({"role": "model" if turn["role"] == "assistant" else "user", "parts": [{"text": turn["content"][:3000]}]})
     contents.append({"role": "user", "parts": [{"text": user_text[:6000]}]})
     payload = {
         "systemInstruction": {"parts": [{"text": system_text}]},
