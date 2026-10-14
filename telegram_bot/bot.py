@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """M5mOsH Nexus Telegram catalog with interactive inline navigation; read-only."""
-import json, os, time, threading, sqlite3, re
+import json, os, time, threading, sqlite3, re, hashlib
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
@@ -60,6 +60,13 @@ def init_memory():
                 setting_value TEXT NOT NULL,
                 updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
                 PRIMARY KEY(chat_id, setting_key)
+            )
+        """)
+        db.execute("""
+            CREATE TABLE IF NOT EXISTS nexus_monitor_state (
+                state_key TEXT PRIMARY KEY,
+                state_value TEXT NOT NULL,
+                updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
             )
         """)
 
@@ -247,8 +254,7 @@ def api(method, params=None, timeout=35):
     for key, value in list(params.items()):
         if isinstance(value, (dict, list)):
             params[key] = json.dumps(value, ensure_ascii=False)
-    req = Request(API + TOKEN + "/" + method, data=urlencode(params).encode(),
-                  headers={"Content-Type": "application/x-www-form-urlencoded"})
+    req = Request(API + TOKEN + "/" + method, data=urlencode(params).encode(),                  headers={"Content-Type": "application/x-www-form-urlencoded"})
     with urlopen(req, timeout=timeout) as response:
         result = json.loads(response.read().decode("utf-8"))
     if not result.get("ok"):
@@ -409,6 +415,8 @@ def refresh_live_inventory():
 
     LIVE_STATUS["last_refresh"] = now
     LIVE_STATUS["errors"] = errors
+    if gh_token and render_key and not errors:
+        report_inventory_changes()
     print("Live inventory refresh:", "GitHub=" + LIVE_STATUS["github"],
           "Render=" + LIVE_STATUS["render"], "errors=" + str(errors), flush=True)
     return LIVE_STATUS
@@ -422,13 +430,82 @@ def live_status_text():
                "لا توجد أخطاء مسجلة في آخر محاولة.")
             + "\\n\\nلا تُعدّل هذه الميزة المستودعات أو الخدمات؛ إنها تقرأ بياناتها فقط.")
 
+def report_inventory_changes():
+    """Persist a read-only inventory snapshot and notify the admin only on real diffs."""
+    if not ADMIN:
+        return
+    def repo_rows():
+        return {
+            (r.get("full_name") or r.get("name") or "مستودع"): {
+                "updated_at": r.get("updated_at", ""),
+                "branch": r.get("default_branch", ""),
+                "url": r.get("url", "")
+            }
+            for r in repos()
+        }
+    def service_rows():
+        return {
+            (s.get("service_id") or s.get("name") or "خدمة"): {
+                "updated_at": s.get("updated_at", ""),
+                "status": s.get("status", ""),
+                "url": s.get("url", ""),
+                "branch": s.get("branch", "")
+            }
+            for s in services()
+        }
+    snapshot = json.dumps({"repositories": repo_rows(), "services": service_rows()},
+                          ensure_ascii=False, sort_keys=True)
+    with sqlite3.connect(MEMORY_DB, timeout=10) as db:
+        row = db.execute(
+            "SELECT state_value FROM nexus_monitor_state WHERE state_key='inventory_snapshot'"
+        ).fetchone()
+        previous = row[0] if row else None
+        db.execute("""
+            INSERT INTO nexus_monitor_state(state_key, state_value, updated_at)
+            VALUES ('inventory_snapshot', ?, CURRENT_TIMESTAMP)
+            ON CONFLICT(state_key) DO UPDATE SET
+                state_value=excluded.state_value, updated_at=CURRENT_TIMESTAMP
+        """, (snapshot,))
+    if not previous:
+        print("Nexus monitor baseline recorded; no change alert sent.", flush=True)
+        return
+    try:
+        old = json.loads(previous)
+        new = json.loads(snapshot)
+        changes = []
+        for key, label in (("repositories", "مستودعات GitHub"), ("services", "خدمات Render")):
+            before, after = old.get(key, {}), new.get(key, {})
+            added = sorted(set(after) - set(before))
+            removed = sorted(set(before) - set(after))
+            changed = sorted(k for k in set(before) & set(after) if before[k] != after[k])
+            if added:
+                changes.append("جديد في " + label + ": " + "، ".join(added[:6]) +
+                               ("، وغيرها" if len(added) > 6 else ""))
+            if removed:
+                changes.append("اختفى من " + label + ": " + "، ".join(removed[:6]) +
+                               ("، وغيرها" if len(removed) > 6 else ""))
+            if changed:
+                changes.append("تغير في " + label + ": " + "، ".join(changed[:6]) +
+                               ("، وغيرها" if len(changed) > 6 else ""))
+        if changes:
+            report = ("📋 تقرير تلقائي — رصد Nexus\n"
+                      + "الوقت: " + time.strftime("%Y-%m-%d %H:%M:%S UTC", time.gmtime())
+                      + "\n\n" + "\n".join("• " + item for item in changes)
+                      + "\n\nالمصدر: GitHub وRender مباشرة. الرصد للقراءة فقط؛ لم يُجرَ أي تغيير.")
+            send(ADMIN, report, [[button("📡 عرض الجرد", "live_inventory")],
+                                 [button("🏠 القائمة الرئيسية", "menu")]])
+            print("Nexus inventory change report sent.", flush=True)
+    except Exception as exc:
+        print("Nexus change report error:", type(exc).__name__, flush=True)
+
+
 def live_inventory_worker():
     while True:
         try:
             refresh_live_inventory()
         except Exception as exc:
             print("Live inventory worker error:", type(exc).__name__, flush=True)
-        time.sleep(900)
+        time.sleep(max(300, int(os.getenv("NEXUS_MONITOR_INTERVAL_SECONDS", "900"))))
 
 def repos():
     return CATALOG.get("repositories", [])
@@ -498,7 +575,6 @@ def category_repositories(index):
             for i, r in selected[:30]]
     rows.append([button("⬅️ التصنيفات", "categories"), button("🏠 الرئيسية", "menu")])
     return f"🗂️ المجال: {category}\nالمستودعات المسجلة: {len(selected)}", rows
-
 def overview():
     categories = category_list()
     counts = []
@@ -747,8 +823,7 @@ def ask_gpt(user_text, chat_id=None):
             body = json.loads(exc.read().decode("utf-8", errors="replace"))
             if isinstance(body, dict):
                 if provider == "openai":
-                    details = ((body.get("error") or {}).get("message") or "")
-                else:
+                    details = ((body.get("error") or {}).get("message") or "")                else:
                     details = ((body.get("error") or {}).get("message") or "")
         except Exception:
             pass
@@ -770,6 +845,64 @@ def ask_gpt(user_text, chat_id=None):
     except Exception as exc:
         print(provider + " request error:", type(exc).__name__, flush=True)
         return "تعذر إكمال طلب المحرك المحدد. راجع سجل Render لتشخيص الخطأ."
+
+
+def auto_test_ai_providers():
+    """Run a tiny connectivity check at startup and send a factual report."""
+    if not ADMIN or not TOKEN:
+        return
+    report = ["🩺 تقرير الاختبار التلقائي لمحركات الذكاء الاصطناعي",
+              "الوقت: " + time.strftime("%Y-%m-%d %H:%M:%S UTC", time.gmtime())]
+    for provider, key, model in (
+        ("openai", OPENAI_API_KEY, OPENAI_MODEL),
+        ("gemini", GEMINI_API_KEY, GEMINI_MODEL)
+    ):
+        label = "GPT / OpenAI" if provider == "openai" else "Gemini / Google"
+        if not key:
+            report.append("• " + label + ": لم يُختبر — المفتاح غير موجود في بيئة التشغيل.")
+            continue
+        try:
+            if provider == "openai":
+                payload = {"model": model, "instructions": "Connection test. Reply only OK.",
+                           "input": "Reply with exactly OK.", "max_output_tokens": 12}
+                req = Request("https://api.openai.com/v1/responses",
+                              data=json.dumps(payload).encode("utf-8"),
+                              headers={"Authorization": "Bearer " + key,
+                                       "Content-Type": "application/json"})
+            else:
+                payload = {"contents": [{"role": "user", "parts": [{"text": "Reply with exactly OK."}]}],
+                           "generationConfig": {"maxOutputTokens": 12}}
+                req = Request("https://generativelanguage.googleapis.com/v1beta/models/" +
+                              model + ":generateContent",
+                              data=json.dumps(payload).encode("utf-8"),
+                              headers={"x-goog-api-key": key, "Content-Type": "application/json"})
+            with urlopen(req, timeout=25) as response:
+                data = json.loads(response.read().decode("utf-8"))
+            if provider == "openai":
+                text_parts = [part.get("text", "") for item in data.get("output", [])
+                              if item.get("type") == "message"
+                              for part in item.get("content", [])
+                              if part.get("type") == "output_text"]
+            else:
+                text_parts = [part.get("text", "")
+                              for candidate in data.get("candidates", [])
+                              for part in (candidate.get("content") or {}).get("parts", [])]
+            if any(t.strip() for t in text_parts):
+                report.append("• " + label + ": نجح اختبار API (" + model + ").")
+            else:
+                report.append("• " + label + ": وصل الطلب لكن لم يُرجع نصًا؛ راجع سجلات Render.")
+        except HTTPError as exc:
+            report.append("• " + label + ": فشل اختبار API — HTTP " + str(exc.code) + ".")
+            print("AI startup test failed:", provider, "HTTP", exc.code, flush=True)
+        except Exception as exc:
+            report.append("• " + label + ": فشل اختبار الاتصال (" + type(exc).__name__ + ").")
+            print("AI startup test failed:", provider, type(exc).__name__, flush=True)
+    report.append("\nاختبار اتصال محدود فقط؛ لا يضمن توفر الحصة لاحقًا. لم تُعرض المفاتيح.")
+    try:
+        send(ADMIN, "\n".join(report), [[button("⚙️ إعدادات المحركات", "provider:settings")],
+                                         [button("🏠 القائمة الرئيسية", "menu")]])
+    except Exception as exc:
+        print("AI test report delivery error:", type(exc).__name__, flush=True)
 
 
 def split_customer_analysis(answer):
@@ -814,7 +947,7 @@ def handle_message(chat_id, text, forwarded=False):
     cmd, _, arg = raw_text.partition(" ")
     cmd = cmd.split("@")[0].lower()
     if cmd in ("/start", "/help", "/مساعدة", "/menu"):
-        send(chat_id, "🧭 M5mOsH Nexus\nاختر محرّك الذكاء الاصطناعي من أعلى القائمة ثم تصفح المشاريع.", menu(chat_id))
+        send(chat_id, "🧭 M5mOsH Nexus\nاختيار المحرّك اختياري؛ سيستخدم البوت المحرّك المحدد افتراضيًا ما لم تختر غيره من الأزرار بالأعلى.", menu(chat_id))
     elif cmd in ("/repos", "/المستودعات"):
         send(chat_id, f"📦 المستودعات المسجلة: {len(repos())}", page_keyboard("repo", 0, len(repos())))
     elif cmd in ("/services", "/خدمات"):
@@ -1003,7 +1136,8 @@ def main():
     threading.Thread(target=live_inventory_worker, daemon=True).start()
     if TOKEN:
         threading.Thread(target=polling, daemon=True).start()
-        print("Telegram polling started; inline menu enabled.", flush=True)
+        threading.Thread(target=auto_test_ai_providers, daemon=True).start()
+        print("Telegram polling started; inline menu enabled; AI self-test scheduled.", flush=True)
     else:
         print("TELEGRAM_BOT_TOKEN missing; health only until configured.", flush=True)
     HTTPServer(("0.0.0.0", PORT), Handler).serve_forever()
