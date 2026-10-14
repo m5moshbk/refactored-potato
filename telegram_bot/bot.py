@@ -79,9 +79,14 @@ OPENAI_MODELS = [
     ("gpt-6-luna", "GPT-6 Luna — اقتصادي وسريع"),
 ]
 GEMINI_MODELS = [
-    ("gemini-4-argon", "Gemini 4 Argon — الأحدث"),
-    ("gemini-3.8-flash", "Gemini 3.8 Flash — سريع"),
-    ("gemini-3.1-pro-preview", "Gemini 3.1 Pro — معاينة"),
+    ("gemini-4-argon", "Gemini 4 Argon — الأحدث والأقوى"),
+    ("gemini-3.8-flash", "Gemini 3.8 Flash — سريع ومتوازن"),
+    ("gemini-3.6-flash", "Gemini 3.6 Flash — سريع"),
+    ("gemini-3.1-pro-preview", "Gemini 3.1 Pro — معاينة للاستدلال"),
+    ("gemini-3.5-flash-lite", "Gemini 3.5 Flash-Lite — اقتصادي"),
+    ("gemini-3.1-flash-lite", "Gemini 3.1 Flash-Lite — خفيف"),
+    ("gemini-2.5-pro", "Gemini 2.5 Pro — توافق أقدم"),
+    ("gemini-2.5-flash", "Gemini 2.5 Flash — توافق أقدم"),
 ]
 
 
