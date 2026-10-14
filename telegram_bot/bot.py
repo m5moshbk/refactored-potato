@@ -14,6 +14,11 @@ TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
 ADMIN = os.getenv("TELEGRAM_ADMIN_CHAT_ID", "").strip()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "").strip()
 OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1-mini").strip()
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip()
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash").strip()
+DEFAULT_AI_PROVIDER = os.getenv("NEXUS_AI_PROVIDER", "openai").strip().lower()
+if DEFAULT_AI_PROVIDER not in ("openai", "gemini"):
+    DEFAULT_AI_PROVIDER = "openai"
 PORT = int(os.getenv("PORT", "10000"))
 OFFSET = 0
 PAGE_SIZE = 6
@@ -48,6 +53,67 @@ def init_memory():
             )
         """)
         db.execute("CREATE INDEX IF NOT EXISTS idx_project_notes_chat_id ON project_notes(chat_id, id)")
+        db.execute("""
+            CREATE TABLE IF NOT EXISTS nexus_settings (
+                chat_id TEXT NOT NULL,
+                setting_key TEXT NOT NULL,
+                setting_value TEXT NOT NULL,
+                updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                PRIMARY KEY(chat_id, setting_key)
+            )
+        """)
+
+
+
+def get_ai_provider(chat_id=None):
+    """Return the selected provider for this authorized chat, falling back to env default."""
+    if chat_id is None:
+        return DEFAULT_AI_PROVIDER
+    try:
+        with sqlite3.connect(MEMORY_DB, timeout=10) as db:
+            row = db.execute(
+                "SELECT setting_value FROM nexus_settings WHERE chat_id=? AND setting_key='ai_provider'",
+                (str(chat_id),)
+            ).fetchone()
+        value = (row[0] if row else DEFAULT_AI_PROVIDER).strip().lower()
+        return value if value in ("openai", "gemini") else DEFAULT_AI_PROVIDER
+    except Exception as exc:
+        print("AI provider preference read error:", type(exc).__name__, flush=True)
+        return DEFAULT_AI_PROVIDER
+
+
+def set_ai_provider(chat_id, provider):
+    if chat_id is None or provider not in ("openai", "gemini"):
+        return False
+    with sqlite3.connect(MEMORY_DB, timeout=10) as db:
+        db.execute("""
+            INSERT INTO nexus_settings(chat_id, setting_key, setting_value, updated_at)
+            VALUES (?, 'ai_provider', ?, CURRENT_TIMESTAMP)
+            ON CONFLICT(chat_id, setting_key) DO UPDATE SET
+                setting_value=excluded.setting_value, updated_at=CURRENT_TIMESTAMP
+        """, (str(chat_id), provider))
+    return True
+
+
+def provider_menu(chat_id=None):
+    selected = get_ai_provider(chat_id)
+    gpt_label = ("✅ GPT — OpenAI" if selected == "openai" else "🤖 GPT — OpenAI")
+    gemini_label = ("✅ Gemini — Google" if selected == "gemini" else "✨ Gemini — Google")
+    return [
+        [button(gpt_label, "provider:openai"), button(gemini_label, "provider:gemini")],
+        [button("⚙️ حالة المحرّك والإعدادات", "provider:settings")]
+    ]
+
+
+def provider_status(chat_id=None):
+    selected = get_ai_provider(chat_id)
+    key_ready = bool(OPENAI_API_KEY) if selected == "openai" else bool(GEMINI_API_KEY)
+    provider_name = "GPT / OpenAI" if selected == "openai" else "Gemini / Google"
+    model_name = OPENAI_MODEL if selected == "openai" else GEMINI_MODEL
+    return ("المحرّك المحدد: " + provider_name + "\\n"
+            + "النموذج: " + model_name + "\\n"
+            + "المفتاح في بيئة Render: " + ("موجود" if key_ready else "غير موجود") + "\\n"
+            + "هذا يفحص وجود المتغير فقط، ولا يثبت صلاحية المفتاح أو الرصيد.")
 
 
 def get_memory(chat_id, limit=None):
@@ -194,8 +260,9 @@ def button(label, data):
     return {"text": label, "callback_data": data}
 
 
-def menu():
+def menu(chat_id=None):
     return [
+        *provider_menu(chat_id),
         [button("📁 مستودعات GitHub", "repos:0")],
         [button("☁️ خدمات Render", "services:0")],
         [button("🛍️ فحص متجر عميل", "store_audit_help")],
@@ -465,7 +532,17 @@ def on_callback(chat_id, message_id, data):
             print("Message delete error:", type(exc).__name__, flush=True)
             send(chat_id, "تعذر حذف الرسالة تلقائيًا. يمكنك حذفها من تيليجرام يدويًا.")
     elif data == "menu":
-        edit(chat_id, message_id, "🧭 M5mOsH Nexus\nمركز موحّد لتصفح المشاريع والخدمات — وضع القراءة فقط.", menu())
+        edit(chat_id, message_id, "🧭 M5mOsH Nexus\nمركز موحّد لتصفح المشاريع والخدمات — وضع القراءة فقط.", menu(chat_id))
+    elif data == "provider:openai":
+        set_ai_provider(chat_id, "openai")
+        edit(chat_id, message_id, "تم اختيار GPT — OpenAI.\n\n" + provider_status(chat_id) + "\n\nملاحظة: وجود المفتاح لا يثبت توفر الرصيد.", menu(chat_id))
+    elif data == "provider:gemini":
+        set_ai_provider(chat_id, "gemini")
+        edit(chat_id, message_id, "تم اختيار Gemini — Google.\n\n" + provider_status(chat_id) + "\n\nإذا لم يكن GEMINI_API_KEY مضبوطًا في Render فلن يعمل هذا المحرّك.", menu(chat_id))
+    elif data == "provider:settings":
+        edit(chat_id, message_id, "⚙️ إعدادات محركات الذكاء الاصطناعي\n\n" + provider_status(chat_id) +
+             "\n\nمفاتيح البيئة المطلوبة: OPENAI_API_KEY و GEMINI_API_KEY. لا ترسل المفاتيح في تيليجرام.",
+             provider_menu(chat_id) + [[button("🏠 القائمة الرئيسية", "menu")]])
     elif data == "categories":
         edit(chat_id, message_id, "🗂️ اختر مجالًا لعرض المستودعات التابعة له. التصنيف أولي وقد يحتاج مراجعة.", category_keyboard())
     elif data.startswith("category:"):
@@ -546,10 +623,16 @@ def on_callback(chat_id, message_id, data):
 
 
 def ask_gpt(user_text, chat_id=None):
-    """Generate a response with OpenAI Responses API and recent project memory."""
-    if not OPENAI_API_KEY:
-        return ("مساعد OpenAI غير مفعّل بعد. أضف OPENAI_API_KEY من لوحة Render > Environment "
-                "باستخدام حقل السر هناك، ثم أعد النشر. لا ترسل المفتاح في تيليجرام أو المحادثات.")
+    """Generate a response using the selected OpenAI or Gemini provider."""
+    provider = get_ai_provider(chat_id)
+    if provider == "gemini":
+        if not GEMINI_API_KEY:
+            return ("محرك Gemini محدد لكنه غير مفعّل. أضف GEMINI_API_KEY من لوحة Render > Environment "
+                    "ثم أعد النشر. لا ترسل المفتاح في تيليجرام.")
+    elif not OPENAI_API_KEY:
+        return ("محرك GPT / OpenAI محدد لكنه غير مفعّل. تحقق من OPENAI_API_KEY في لوحة Render > Environment. "
+                "لا ترسل المفتاح في تيليجرام.")
+
     intent = classify_intent(user_text)
     memory = get_memory(chat_id) if chat_id is not None else []
     project_notes = get_project_notes(chat_id, limit=12) if chat_id is not None else []
@@ -566,72 +649,128 @@ def ask_gpt(user_text, chat_id=None):
         "راجع جوابك للتأكد من أنه مباشر وصادق ومناسب لتيليجرام. "
         + INTENT_GUIDANCE.get(intent, INTENT_GUIDANCE["general"])
     )
-    input_items = []
-    for turn in memory:
-        role = "assistant" if turn["role"] == "assistant" else "user"
-        input_items.append({"role": role, "content": [{"type": "input_text", "text": turn["content"][:3000]}]})
     context_parts = []
     if project_notes:
         context_parts.append("ملاحظات المشاريع والقرارات والخطوات المحفوظة (قد تكون قديمة):")
         context_parts.extend("- [" + n["kind"] + "] " + n["project"] + ": " + n["note"] for n in project_notes)
-    context_parts.append("رسالة المستخدم الحالية:\\n" + (user_text or "")[:6000])
-    input_items.append({"role": "user", "content": [{"type": "input_text", "text": "\\n\\n".join(context_parts)}]})
-    payload = {
-        "model": OPENAI_MODEL,
-        "instructions": system_text,
-        "input": input_items,
-        "max_output_tokens": 1100,
-        "tools": [{"type": "web_search"}]
-    }
-    req = Request("https://api.openai.com/v1/responses",
-                  data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
-                  headers={"Authorization": "Bearer " + OPENAI_API_KEY,
-                           "Content-Type": "application/json"})
+    context_parts.append("رسالة المستخدم الحالية:\n" + (user_text or "")[:6000])
+    current_context = "\n\n".join(context_parts)
+
+    if provider == "openai":
+        input_items = []
+        for turn in memory:
+            input_items.append({
+                "role": "assistant" if turn["role"] == "assistant" else "user",
+                "content": turn["content"][:3000]
+            })
+        input_items.append({"role": "user", "content": current_context})
+        payload = {
+            "model": OPENAI_MODEL,
+            "instructions": system_text,
+            "input": input_items,
+            "max_output_tokens": 1100,
+            "tools": [{"type": "web_search"}]
+        }
+        req = Request("https://api.openai.com/v1/responses",
+                      data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
+                      headers={"Authorization": "Bearer " + OPENAI_API_KEY,
+                               "Content-Type": "application/json"})
+    else:
+        gemini_contents = []
+        for turn in memory:
+            gemini_contents.append({
+                "role": "model" if turn["role"] == "assistant" else "user",
+                "parts": [{"text": turn["content"][:3000]}]
+            })
+        gemini_contents.append({"role": "user", "parts": [{"text": current_context}]})
+        payload = {
+            "systemInstruction": {"parts": [{"text": system_text}]},
+            "contents": gemini_contents,
+            "generationConfig": {"maxOutputTokens": 1100},
+            "tools": [{"google_search": {}}]
+        }
+        req = Request(
+            "https://generativelanguage.googleapis.com/v1beta/models/" + GEMINI_MODEL + ":generateContent",
+            data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
+            headers={"x-goog-api-key": GEMINI_API_KEY, "Content-Type": "application/json"}
+        )
+
     try:
         with urlopen(req, timeout=55) as response:
             result = json.loads(response.read().decode("utf-8"))
         parts = []
         source_links = []
-        for item in result.get("output", []):
-            if item.get("type") == "message":
-                for part in item.get("content", []):
-                    if part.get("type") == "output_text" and part.get("text"):
+        if provider == "openai":
+            for item in result.get("output", []):
+                if item.get("type") == "message":
+                    for part in item.get("content", []):
+                        if part.get("type") == "output_text" and part.get("text"):
+                            parts.append(part["text"])
+                        for annotation in part.get("annotations", []) or []:
+                            if annotation.get("type") == "url_citation":
+                                url = annotation.get("url", "")
+                                title = annotation.get("title") or url
+                                if url.startswith(("https://", "http://")) and url not in [x[1] for x in source_links]:
+                                    source_links.append((title[:100], url))
+        else:
+            candidates = result.get("candidates", [])
+            if candidates:
+                for part in (candidates[0].get("content") or {}).get("parts", []):
+                    if part.get("text"):
                         parts.append(part["text"])
-                    for annotation in part.get("annotations", []) or []:
-                        if annotation.get("type") == "url_citation":
-                            url = annotation.get("url", "")
-                            title = annotation.get("title") or url
-                            if url.startswith(("https://", "http://")) and url not in [x[1] for x in source_links]:
-                                source_links.append((title[:100], url))
-        answer = "\\n".join(parts).strip()
+                    for metadata in part.get("groundingMetadata", {}).get("groundingChunks", []):
+                        web = metadata.get("web") or {}
+                        url = web.get("uri", "")
+                        title = web.get("title") or url
+                        if url.startswith(("https://", "http://")) and url not in [x[1] for x in source_links]:
+                            source_links.append((title[:100], url))
+            # Gemini search citations are often returned on candidate-level grounding metadata.
+            if candidates:
+                for metadata in (candidates[0].get("groundingMetadata") or {}).get("groundingChunks", []):
+                    web = metadata.get("web") or {}
+                    url = web.get("uri", "")
+                    title = web.get("title") or url
+                    if url.startswith(("https://", "http://")) and url not in [x[1] for x in source_links]:
+                        source_links.append((title[:100], url))
+        answer = "\n".join(parts).strip()
         if answer and source_links:
-            answer += "\\n\\nالمصادر:"
-            answer += "".join("\\n• " + title + " — " + url for title, url in source_links[:5])
+            answer += "\n\nالمصادر:"
+            answer += "".join("\n• " + title + " — " + url for title, url in source_links[:5])
         if not answer:
-            print("OpenAI empty response: status=" + str(result.get("status", "unknown")), flush=True)
-            return "لم يُرجع OpenAI نصًا. راجع إعداد النموذج وسجل Render دون مشاركة المفتاح."
+            status = result.get("status", "unknown") if provider == "openai" else "no_candidate_text"
+            print(provider + " empty response: status=" + str(status), flush=True)
+            return "لم يُرجع المحرك المحدد نصًا. راجع سجلات Render دون مشاركة المفاتيح."
         return review_response(answer)
     except HTTPError as exc:
         details = ""
         try:
             body = json.loads(exc.read().decode("utf-8", errors="replace"))
-            details = ((body.get("error") or {}).get("message") or "") if isinstance(body, dict) else ""
+            if isinstance(body, dict):
+                if provider == "openai":
+                    details = ((body.get("error") or {}).get("message") or "")
+                else:
+                    details = ((body.get("error") or {}).get("message") or "")
         except Exception:
             pass
-        print("OpenAI HTTP error: status=" + str(exc.code) + " message=" + details[:180], flush=True)
-        if exc.code == 401:
-            return "تعذر توثيق OpenAI. تحقق من OPENAI_API_KEY في Render Environment؛ لا ترسل المفتاح في المحادثة."
+        print(provider + " HTTP error: status=" + str(exc.code) + " message=" + details[:180], flush=True)
+        if exc.code == 401 or exc.code == 403:
+            return ("تعذر توثيق المحرك أو لا يملك صلاحية الطلب. تحقق من مفتاح " +
+                    ("OPENAI_API_KEY" if provider == "openai" else "GEMINI_API_KEY") +
+                    " وإعدادات المشروع في مزود الخدمة.")
         if exc.code == 429:
-            return "بلغ استخدام OpenAI حد المعدل أو الرصيد المتاح. تحقق من الفوترة وحدود المشروع في منصة OpenAI."
-        if exc.code in (400, 403, 404):
-            return "رفضت OpenAI الطلب. تحقق من OPENAI_MODEL وصلاحيات المشروع وإتاحة أداة البحث في الحساب."
-        return "تعذر الاتصال بـ OpenAI. راجع سجل Render لرمز الخطأ دون مشاركة المفتاح."
+            return ("وصل المحرك المحدد إلى حد الاستخدام أو لا يتوفر رصيد. تحقق من الفوترة وحدود الحساب لدى " +
+                    ("OpenAI" if provider == "openai" else "Google AI Studio") + ".")
+        if exc.code in (400, 404):
+            return ("رفض " + ("OpenAI" if provider == "openai" else "Gemini") +
+                    " الطلب. تحقق من اسم النموذج وصيغة الطلب وتوفر أداة البحث في الحساب؛ راجع سجل Render لرمز الخطأ.")
+        return "تعذر الاتصال بالمحرك المحدد. راجع سجل Render لرمز الخطأ دون مشاركة المفاتيح."
     except URLError as exc:
-        print("OpenAI network error:", type(exc.reason).__name__, flush=True)
-        return "تعذر الوصول إلى OpenAI بسبب مشكلة اتصال. حاول لاحقًا."
+        print(provider + " network error:", type(exc.reason).__name__, flush=True)
+        return "تعذر الوصول إلى المحرك المحدد بسبب مشكلة اتصال. حاول لاحقًا."
     except Exception as exc:
-        print("OpenAI request error:", type(exc).__name__, flush=True)
-        return "تعذر إكمال طلب OpenAI. راجع سجل Render لتشخيص الخطأ."
+        print(provider + " request error:", type(exc).__name__, flush=True)
+        return "تعذر إكمال طلب المحرك المحدد. راجع سجل Render لتشخيص الخطأ."
+
 
 def split_customer_analysis(answer):
     """Separate internal notes from a concise client-facing reply."""
@@ -665,7 +804,7 @@ def handle_message(chat_id, text, forwarded=False):
             "اجعل الرد صادقًا ولا تزعم أن المرسل إنسان إذا سُئل عن ذلك. "
             "لا تكرر بيانات شخصية غير لازمة.\n\nالنص المنقول:\n" + raw_text[:5000]
         )
-        analysis = ask_gpt(prompt)
+        analysis = ask_gpt(prompt, chat_id=chat_id)
         internal, draft = split_customer_analysis(analysis)
         send(chat_id, "🧩 تحليل داخلي للرسالة\n\n" + internal,
              [[button("🛍️ فحص متجر العميل", "store_audit_help")],
@@ -675,7 +814,7 @@ def handle_message(chat_id, text, forwarded=False):
     cmd, _, arg = raw_text.partition(" ")
     cmd = cmd.split("@")[0].lower()
     if cmd in ("/start", "/help", "/مساعدة", "/menu"):
-        send(chat_id, "🧭 M5mOsH Nexus\nاختر المجال من الأزرار. كتابة الأوامر اختيارية وليست مطلوبة للتنقل.", menu())
+        send(chat_id, "🧭 M5mOsH Nexus\nاختر محرّك الذكاء الاصطناعي من أعلى القائمة ثم تصفح المشاريع.", menu(chat_id))
     elif cmd in ("/repos", "/المستودعات"):
         send(chat_id, f"📦 المستودعات المسجلة: {len(repos())}", page_keyboard("repo", 0, len(repos())))
     elif cmd in ("/services", "/خدمات"):
@@ -756,7 +895,7 @@ def handle_message(chat_id, text, forwarded=False):
     elif cmd == "/memory":
         send(chat_id, "🧠 عدد الرسائل في نافذة الذاكرة: " + str(len(get_memory(chat_id))) + "\nالمسار: " + MEMORY_DB + "\nالتخزين على Render قد يكون مؤقتًا دون قرص دائم.", [[button("🗑️ مسح الذاكرة", "memory_clear_confirm")], [button("🏠 القائمة الرئيسية", "menu")]])
     elif cmd in ("/help", "/مساعدة"):
-        send(chat_id, "الأوامر اختيارية؛ استخدم أزرار القائمة للتنقل.\n/start أو /menu، /repos، /services، /projects، /search كلمة، /help", menu())
+        send(chat_id, "الأوامر اختيارية؛ استخدم أزرار القائمة للتنقل.\n/start أو /menu، /repos، /services، /projects، /search كلمة، /help", menu(chat_id))
     elif cmd in ("/search", "/بحث"):
         q = arg.strip().casefold()
         if not q:
