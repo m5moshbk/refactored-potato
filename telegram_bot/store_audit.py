@@ -95,14 +95,20 @@ class _SafeRedirect(HTTPRedirectHandler):
         return super().redirect_request(req, fp, code, msg, headers, target)
 
 
-def audit_store(url):
-    """Fetch only public HTML pages; report visible signals, not proof of payment configuration."""
+def audit_store(url, progress=None):
+    """Fetch public HTML only; optional callback reports stages. No checkout or transactions."""
+    def stage(percent, label, detail=""):
+        if progress:
+            progress(percent, label, detail)
+    stage(5, "التحقق من الرابط", "التأكد من أن الوجهة عنوان عام مسموح")
+
     url = (url or "").strip()
     if not url:
         return "أرسل رابط المتجر بعد الأمر: /audit https://example.com"
     if "://" not in url:
         url = "https://" + url
     _public_http_url(url)
+    stage(15, "الاتصال بالموقع", "طلب الصفحة العامة دون تسجيل دخول")
     req = Request(url, headers={"User-Agent": "Mozilla/5.0 (compatible; M5mOsHStoreAudit/1.0)", "Accept": "text/html"})
     opener = build_opener(_SafeRedirect())
     try:
@@ -114,6 +120,7 @@ def audit_store(url):
             raw = resp.read(1_500_000)
     except Exception as exc:
         return "تعذر جلب الصفحة العامة: " + type(exc).__name__ + ". تحقق من الرابط أو جرّب لاحقًا."
+    stage(35, "استلام الصفحة", "تم استلام الاستجابة؛ التحقق من نوع المحتوى")
     if "text/html" not in content_type.lower():
         return "الرابط لم يُرجع صفحة HTML قابلة للفحص (Content-Type: " + (content_type or "غير معروف") + ")."
     charset = "utf-8"
@@ -124,6 +131,7 @@ def audit_store(url):
         page = raw.decode(charset, errors="replace")
     except LookupError:
         page = raw.decode("utf-8", errors="replace")
+    stage(50, "تحليل HTML", "استخراج العناوين والروابط والصور والبيانات الوصفية")
     parser = _AuditParser()
     parser.feed(page)
     text = html.unescape(re.sub(r"<[^>]+>", " ", page))
@@ -142,6 +150,7 @@ def audit_store(url):
         "الشروط والأحكام": ("الشروط", "الأحكام", "terms", "conditions"),
         "التواصل": ("اتصل بنا", "تواصل معنا", "contact", "whatsapp", "واتساب")
     }
+    stage(65, "فحص مؤشرات المتجر", "SEO والجوال والسياسات وطرق الدفع الظاهرة")
     findings = []
     def add(level, title, detail):
         findings.append((level, title, detail))
@@ -197,6 +206,7 @@ def audit_store(url):
         add("مؤشر موجود", "النماذج", f"تم اكتشاف {parser.forms} نموذجًا و{parser.inputs} حقل إدخال في HTML الأولي؛ لم تُرسل أي بيانات.")
     else:
         add("تحقق يدوي", "النماذج والتواصل", "لم يُكتشف نموذج HTML أولي؛ قد يستخدم الموقع واجهة ديناميكية أو وسائل تواصل خارجية.")
+    stage(85, "تجميع النتائج", "فصل الإشارات الظاهرة عن البنود التي تحتاج تحققًا يدويًا")
     parsed = urlparse(final_url)
     origin = parsed.scheme + "://" + parsed.netloc
     report = [
@@ -218,4 +228,6 @@ def audit_store(url):
         "مسودة رسالة للعميل:",
         "مرحبًا، راجعت بعض المؤشرات الظاهرة في متجرك، ويمكنني إعداد مراجعة أوسع تشمل وسائل الدفع، تجربة الجوال، صفحات المنتجات، الشحن والاسترجاع، عناصر الثقة، وسلامة رحلة الشراء. سأفصل بين الملاحظات المؤكدة والنقاط التي تحتاج اختبارًا من داخل لوحة المتجر، ثم أرسل لك الأولويات والخدمات المناسبة دون تغيير أي إعداد قبل موافقتك."
     ]
-    return "\n".join(report)[:3900]
+    result = "\n".join(report)[:3300]
+    stage(100, "اكتمل الفحص الأولي", "تم إعداد التقرير؛ لم يُختبر الدفع أو تسجيل الدخول")
+    return result
