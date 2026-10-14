@@ -5,7 +5,8 @@ import re
 import socket
 from html.parser import HTMLParser
 from urllib.parse import urljoin, urlparse
-from urllib.request import Request, urlopen, HTTPRedirectHandler, build_opener
+from urllib.error import HTTPError, URLError
+from urllib.request import Request, HTTPRedirectHandler, build_opener
 
 
 class _AuditParser(HTMLParser):
@@ -107,7 +108,10 @@ def audit_store(url, progress=None):
         return "أرسل رابط المتجر بعد الأمر: /audit https://example.com"
     if "://" not in url:
         url = "https://" + url
-    _public_http_url(url)
+    try:
+        _public_http_url(url)
+    except ValueError as exc:
+        return "تعذر فحص الرابط: " + str(exc)
     stage(15, "الاتصال بالموقع", "طلب الصفحة العامة دون تسجيل دخول")
     req = Request(url, headers={"User-Agent": "Mozilla/5.0 (compatible; M5mOsHStoreAudit/1.0)", "Accept": "text/html"})
     opener = build_opener(_SafeRedirect())
@@ -118,8 +122,40 @@ def audit_store(url, progress=None):
             status = resp.status
             content_type = resp.headers.get("Content-Type", "")
             raw = resp.read(1_500_000)
+    except HTTPError as exc:
+        code = exc.code
+        messages = {
+            400: "الرابط أو الطلب غير مقبول (400).",
+            401: "الموقع يطلب مصادقة (401)؛ الفحص لا يسجل الدخول.",
+            403: "الموقع رفض الطلب (403)، وقد يمنع أدوات الفحص الآلية.",
+            404: "الصفحة غير موجودة (404). تحقق من الرابط.",
+            408: "انتهت مهلة طلب الموقع (408).",
+            429: "الموقع حدّ من الطلبات (429). انتظر قليلًا ثم أعد المحاولة.",
+        }
+        if code in messages:
+            detail = messages[code]
+        elif 300 <= code < 400:
+            detail = "تعذر إكمال إعادة التوجيه (HTTP " + str(code) + ")."
+        elif 500 <= code < 600:
+            detail = "حدث خطأ من خادم الموقع (HTTP " + str(code) + ")."
+        else:
+            detail = "أعاد الموقع استجابة HTTP " + str(code) + "."
+        return "تعذر فحص الصفحة العامة: " + detail + " لن نحاول تجاوز الحماية أو تسجيل الدخول."
+    except URLError as exc:
+        reason = getattr(exc, "reason", None)
+        if isinstance(reason, (TimeoutError,)):
+            detail = "انتهت مهلة الاتصال بالموقع."
+        else:
+            detail = "تعذر الاتصال بالموقع أو حل اسم النطاق."
+        return "تعذر فحص الصفحة العامة: " + detail + " تحقق من الرابط وحالة الموقع ثم جرّب لاحقًا."
+    except (TimeoutError, socket.timeout):
+        return "تعذر فحص الصفحة العامة: انتهت مهلة الاتصال بالموقع."
+    except ValueError as exc:
+        return "تعذر فحص وجهة الرابط أو إعادة التوجيه: " + str(exc)
+    except OSError:
+        return "تعذر فحص الصفحة العامة بسبب مشكلة شبكة أو TLS. تحقق من الموقع ثم جرّب لاحقًا."
     except Exception as exc:
-        return "تعذر جلب الصفحة العامة: " + type(exc).__name__ + ". تحقق من الرابط أو جرّب لاحقًا."
+        return "تعذر فحص الصفحة العامة بسبب خطأ داخلي (" + type(exc).__name__ + "). لم يتم تجاوز الحماية أو تسجيل الدخول."
     stage(35, "استلام الصفحة", "تم استلام الاستجابة؛ التحقق من نوع المحتوى")
     if "text/html" not in content_type.lower():
         return "الرابط لم يُرجع صفحة HTML قابلة للفحص (Content-Type: " + (content_type or "غير معروف") + ")."
