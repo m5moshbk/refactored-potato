@@ -518,6 +518,21 @@
         "الدفع: يحتاج تحقق"
       ],
       "status": "تصنيف أولي؛ يلزم تحقق وظيفي"
+    },
+    {
+      "name": "bizweb-platform",
+      "full_name": "m5moshbk/bizweb-platform",
+      "url": "https://github.com/m5moshbk/bizweb-platform",
+      "category": "مواقع ومحتوى",
+      "purpose": "منصة الويب/المحفظة الرقمية التي تشير إليها عدة خدمات معاينة في Render.",
+      "usage": "مصدر المشروع ظاهر في إعدادات Render، لكنه لم يظهر ضمن قائمة مستودعات GitHub الحالية؛ تحقق من صلاحية الوصول ووجود المستودع قبل تعديل الكود.",
+      "default_branch": "غير متحقق",
+      "sections": [
+        "واجهة frontend",
+        "backend/API بحسب إعداد خدمة المعاينة",
+        "فروع معاينة متعددة"
+      ],
+      "status": "مرجع من إعدادات Render؛ غير مؤكد ضمن جرد GitHub المباشر"
     }
   ],
   "services": [
@@ -718,6 +733,30 @@
       "status": "غير معلّقة حسب Render؛ لا يعني ذلك أن الدفع الإنتاجي يعمل",
       "purpose": "خدمة بوابة مدفوعات؛ تحتاج تحقق أمني واختبار sandbox",
       "dashboard": "https://dashboard.render.com/web/srv-dar2cbp7lnhs739pmurg"
+    }
+  ],
+  "workspace_projects": [
+    {
+      "name": "Pythonista Device Inventory",
+      "category": "أدوات محلية",
+      "location": "Pythonista على iPhone",
+      "purpose": "جرد قراءة فقط للملفات التي تسمح Pythonista برؤيتها وإصدار تقارير JSON/CSV/log.",
+      "status": "مشروع محلي؛ لا يظهر كمستودع ضمن جرد GitHub الحالي",
+      "note": "لا يملك وصولًا شاملًا إلى كل ملفات iPhone أو iCloud ولا يسترجع المحذوف."
+    },
+    {
+      "name": "Mailer Inbox",
+      "category": "التسويق",
+      "location": "مساحة عمل/مشروع محادثة",
+      "purpose": "تجهيز حملات البريد التسويقية، مراجعة المحتوى قبل الموافقة، وتوثيق النتائج.",
+      "status": "لم يتم ربطه بمستودع أو خدمة Render في هذا الجرد"
+    },
+    {
+      "name": "SADA Pythonista Client",
+      "category": "أدوات محلية",
+      "location": "Pythonista على iPhone",
+      "purpose": "عميل محلي منفصل للتعامل مع مشروع صَدَى.",
+      "status": "يلزم فحص الملفات المحلية لربطه بمصدر محدد"
     }
   ]
 }
