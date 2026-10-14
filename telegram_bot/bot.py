@@ -665,6 +665,22 @@ def on_callback(chat_id, message_id, data):
     elif data == "provider:gemini":
         set_ai_provider(chat_id, "gemini")
         edit(chat_id, message_id, "تم اختيار Gemini — Google.\n\n" + provider_status(chat_id) + "\n\nإذا لم يكن GEMINI_API_KEY مضبوطًا في Render فلن يعمل هذا المحرّك.", menu(chat_id))
+    elif data == "models:openai":
+        edit(chat_id, message_id, "🧠 اختر نموذج GPT / OpenAI\nسيُحفظ اختيارك لهذه المحادثة.", model_menu("openai", chat_id))
+    elif data == "models:gemini":
+        edit(chat_id, message_id, "✨ اختر نموذج Gemini / Google\nقد يختلف توفر النموذج حسب مشروع Google API.", model_menu("gemini", chat_id))
+    elif data.startswith("model:"):
+        try:
+            _, model_provider, model_name = data.split(":", 2)
+            if set_ai_model(chat_id, model_provider, model_name):
+                set_ai_provider(chat_id, model_provider)
+                edit(chat_id, message_id, "تم حفظ اختيار النموذج.\n\n" + provider_status(chat_id),
+                     provider_menu(chat_id) + [[button("🏠 القائمة الرئيسية", "menu")]])
+            else:
+                edit(chat_id, message_id, "النموذج غير معروف أو غير مدعوم في قائمة Nexus.", provider_menu(chat_id))
+        except Exception as exc:
+            print("Model selection error:", type(exc).__name__, flush=True)
+            edit(chat_id, message_id, "تعذر حفظ اختيار النموذج.", provider_menu(chat_id))
     elif data == "provider:settings":
         edit(chat_id, message_id, "⚙️ إعدادات محركات الذكاء الاصطناعي\n\n" + provider_status(chat_id) +
              "\n\nمفاتيح البيئة المطلوبة: OPENAI_API_KEY و GEMINI_API_KEY. لا ترسل المفاتيح في تيليجرام.",
@@ -751,6 +767,7 @@ def on_callback(chat_id, message_id, data):
 def ask_gpt(user_text, chat_id=None):
     """Generate a response using the selected OpenAI or Gemini provider."""
     provider = get_ai_provider(chat_id)
+    selected_model = get_ai_model(chat_id, provider)
     if provider == "gemini":
         if not GEMINI_API_KEY:
             return ("محرك Gemini محدد لكنه غير مفعّل. أضف GEMINI_API_KEY من لوحة Render > Environment "
@@ -791,7 +808,7 @@ def ask_gpt(user_text, chat_id=None):
             })
         input_items.append({"role": "user", "content": current_context})
         payload = {
-            "model": OPENAI_MODEL,
+            "model": selected_model,
             "instructions": system_text,
             "input": input_items,
             "max_output_tokens": 1100,
@@ -816,7 +833,7 @@ def ask_gpt(user_text, chat_id=None):
             "tools": [{"google_search": {}}]
         }
         req = Request(
-            "https://generativelanguage.googleapis.com/v1beta/models/" + GEMINI_MODEL + ":generateContent",
+            "https://generativelanguage.googleapis.com/v1beta/models/" + selected_model + ":generateContent",
             data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
             headers={"x-goog-api-key": GEMINI_API_KEY, "Content-Type": "application/json"}
         )
@@ -883,7 +900,7 @@ def ask_gpt(user_text, chat_id=None):
             try:
                 fallback_payload = dict(payload)
                 fallback_payload.pop("tools", None)
-                fallback_model = "gemini-3.8-flash" if exc.code == 404 else GEMINI_MODEL
+                fallback_model = "gemini-4-argon" if exc.code == 404 else selected_model
                 fallback_req = Request(
                     "https://generativelanguage.googleapis.com/v1beta/models/" +
                     fallback_model + ":generateContent",
@@ -953,8 +970,8 @@ def auto_test_ai_providers():
     report = ["🩺 تقرير الاختبار التلقائي لمحركات الذكاء الاصطناعي",
               "الوقت: " + time.strftime("%Y-%m-%d %H:%M:%S UTC", time.gmtime())]
     for provider, key, model in (
-        ("openai", OPENAI_API_KEY, OPENAI_MODEL),
-        ("gemini", GEMINI_API_KEY, GEMINI_MODEL)
+        ("openai", OPENAI_API_KEY, OPENAI_MODEL if OPENAI_MODEL in [m for m, _ in OPENAI_MODELS] else OPENAI_MODELS[0][0]),
+        ("gemini", GEMINI_API_KEY, GEMINI_MODEL if GEMINI_MODEL in [m for m, _ in GEMINI_MODELS] else GEMINI_MODELS[0][0])
     ):
         label = "GPT / OpenAI" if provider == "openai" else "Gemini / Google"
         if not key:
