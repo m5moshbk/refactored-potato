@@ -15,7 +15,7 @@ ADMIN = os.getenv("TELEGRAM_ADMIN_CHAT_ID", "").strip()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "").strip()
 OPENAI_MODEL = os.getenv("OPENAI_MODEL", "chat-latest").strip()
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip()
-GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-4-argon").strip()
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.8-flash").strip()
 DEFAULT_AI_PROVIDER = os.getenv("NEXUS_AI_PROVIDER", "openai").strip().lower()
 if DEFAULT_AI_PROVIDER not in ("openai", "gemini"):
     DEFAULT_AI_PROVIDER = "openai"
@@ -906,11 +906,11 @@ def ask_gpt(user_text, chat_id=None):
 
         # Search grounding can be unavailable even when text generation works.
         # Retry Gemini once without the optional Google Search tool.
-        if provider == "gemini" and exc.code in (400, 404) and payload.get("tools"):
+        if provider == "gemini" and exc.code in (400, 404, 429) and payload.get("tools"):
             try:
                 fallback_payload = dict(payload)
                 fallback_payload.pop("tools", None)
-                fallback_model = "gemini-3.8-flash" if exc.code == 404 else selected_model
+                fallback_model = "gemini-3.8-flash" if (exc.code in (404, 429) or selected_model == "gemini-4-argon") else selected_model
                 fallback_payload["model"] = fallback_model
                 fallback_req = Request(
                     "https://generativelanguage.googleapis.com/v1beta/interactions",
@@ -1040,9 +1040,9 @@ def auto_test_ai_providers():
                 pass
             print("AI startup test failed:", provider, "HTTP", exc.code,
                   "message=" + details[:180], flush=True)
-            if provider == "gemini" and exc.code in (400, 404):
+            if provider == "gemini" and exc.code in (400, 404, 429):
                 try:
-                    fallback_model = "gemini-3.8-flash" if exc.code == 404 else model
+                    fallback_model = "gemini-3.8-flash" if (exc.code in (404, 429) or model == "gemini-4-argon") else model
                     fallback_payload = dict(payload)
                     fallback_payload.pop("tools", None)
                     fallback_payload["model"] = fallback_model
