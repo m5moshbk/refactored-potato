@@ -834,7 +834,6 @@ def ask_gpt(user_text, chat_id=None):
                 fallback_payload = dict(payload)
                 fallback_payload.pop("tools", None)
                 fallback_model = "gemini-3.8-flash" if exc.code == 404 else GEMINI_MODEL
-                fallback_payload["model"] = fallback_model
                 fallback_req = Request(
                     "https://generativelanguage.googleapis.com/v1beta/models/" +
                     fallback_model + ":generateContent",
