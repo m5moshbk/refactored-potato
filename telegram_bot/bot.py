@@ -10,6 +10,8 @@ with open(os.path.join(ROOT, "catalog.json"), encoding="utf-8") as f:
     CATALOG = json.load(f)
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
 ADMIN = os.getenv("TELEGRAM_ADMIN_CHAT_ID", "").strip()
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "").strip()
+OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1-mini").strip()
 PORT = int(os.getenv("PORT", "10000"))
 OFFSET = 0
 PAGE_SIZE = 6
@@ -207,6 +209,45 @@ def on_callback(chat_id, message_id, data):
              [[button("🏠 القائمة الرئيسية", "menu")]])
 
 
+
+def ask_gpt(user_text):
+    """Answer natural-language messages using OpenAI; no tools or external actions."""
+    if not OPENAI_API_KEY:
+        return "مساعد GPT غير مفعّل بعد: تحقق من وجود OPENAI_API_KEY في Render ثم أعد النشر."
+    payload = {
+        "model": OPENAI_MODEL,
+        "input": [
+            {"role": "system", "content": [
+                {"type": "input_text", "text":
+                 "أنت مساعد M5mOsH Nexus باللغة العربية. أجب بوضوح واختصار. "
+                 "أنت لا تملك أدوات تنفيذ أو وصولًا مباشرًا إلى GitHub أو Render أو ملفات الجهاز. "
+                 "لا تدّعِ أنك نفذت أو فحصت أو نشرت شيئًا. إذا طُلب إجراء خارجي، وضّح أن هذا الإصدار يجيب فقط ولا ينفذ الإجراء. "
+                 "بيانات الكتالوج ليست بالضرورة مباشرة أو محدثة."}
+            ]},
+            {"role": "user", "content": [{"type": "input_text", "text": user_text[:6000]}]}
+        ],
+        "max_output_tokens": 700
+    }
+    req = Request("https://api.openai.com/v1/responses",
+                  data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
+                  headers={"Authorization": "Bearer " + OPENAI_API_KEY,
+                           "Content-Type": "application/json"})
+    try:
+        with urlopen(req, timeout=40) as response:
+            result = json.loads(response.read().decode("utf-8"))
+        parts = []
+        for item in result.get("output", []):
+            if item.get("type") == "message":
+                for part in item.get("content", []):
+                    if part.get("type") == "output_text" and part.get("text"):
+                        parts.append(part["text"])
+        answer = "\\n".join(parts).strip()
+        return answer[:3900] if answer else "وصل رد فارغ من GPT. حاول مرة أخرى."
+    except Exception as exc:
+        print("OpenAI request error:", type(exc).__name__, flush=True)
+        return "تعذر الاتصال بـ GPT. تحقق من مفتاح OpenAI والرصيد/حدود الاستخدام في المنصة، ثم جرّب مجددًا."
+
+
 def handle_message(chat_id, text):
     if not ADMIN or str(chat_id) != ADMIN:
         send(chat_id, "هذا البوت خاص، ولم تُمنح هذه المحادثة صلاحية الاستخدام.")
@@ -245,7 +286,7 @@ def handle_message(chat_id, text):
             rows.append([button("🏠 القائمة الرئيسية", "menu")])
             send(chat_id, f"🔎 النتائج: {len(found)} — أعرض أول {min(18, len(found))}", rows)
     else:
-        send(chat_id, "استخدم /start لفتح القائمة التفاعلية، أو /search كلمة للبحث.")
+        send(chat_id, ask_gpt((text or "").strip()))
 
 
 def polling():
