@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """M5mOsH Nexus Telegram catalog with interactive inline navigation; read-only."""
-import json, os, time, threading, sqlite3, re, hashlib
+import json, os, time, threading, sqlite3, re
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
@@ -822,13 +822,60 @@ def ask_gpt(user_text, chat_id=None):
         try:
             body = json.loads(exc.read().decode("utf-8", errors="replace"))
             if isinstance(body, dict):
-                if provider == "openai":
-                    details = ((body.get("error") or {}).get("message") or "")                else:
-                    details = ((body.get("error") or {}).get("message") or "")
+                details = ((body.get("error") or {}).get("message") or "")
         except Exception:
             pass
         print(provider + " HTTP error: status=" + str(exc.code) + " message=" + details[:180], flush=True)
-        if exc.code == 401 or exc.code == 403:
+
+        # Search grounding can be unavailable even when text generation works.
+        # Retry Gemini once without the optional Google Search tool.
+        if provider == "gemini" and exc.code in (400, 404) and payload.get("tools"):
+            try:
+                fallback_payload = dict(payload)
+                fallback_payload.pop("tools", None)
+                fallback_req = Request(
+                    "https://generativelanguage.googleapis.com/v1beta/models/" +
+                    GEMINI_MODEL + ":generateContent",
+                    data=json.dumps(fallback_payload, ensure_ascii=False).encode("utf-8"),
+                    headers={"x-goog-api-key": GEMINI_API_KEY, "Content-Type": "application/json"}
+                )
+                with urlopen(fallback_req, timeout=45) as response:
+                    fallback_result = json.loads(response.read().decode("utf-8"))
+                fallback_candidates = fallback_result.get("candidates", [])
+                fallback_parts = [
+                    part.get("text", "")
+                    for candidate in fallback_candidates
+                    for part in (candidate.get("content") or {}).get("parts", [])
+                    if part.get("text")
+                ]
+                fallback_answer = "\\n".join(fallback_parts).strip()
+                if fallback_answer:
+                    print("Gemini fallback succeeded without Google Search grounding.", flush=True)
+                    return review_response(
+                        fallback_answer +
+                        "\\n\\nملاحظة: تعذّر تفعيل بحث Google في هذا الطلب؛ أُجيب دون بحث ويب."
+                    )
+                print("Gemini fallback returned no text.", flush=True)
+            except HTTPError as retry_exc:
+                retry_details = ""
+                try:
+                    retry_body = json.loads(retry_exc.read().decode("utf-8", errors="replace"))
+                    retry_details = ((retry_body.get("error") or {}).get("message") or "")
+                except Exception:
+                    pass
+                print("Gemini fallback HTTP error: status=" + str(retry_exc.code) +
+                      " message=" + retry_details[:180], flush=True)
+                if retry_exc.code == 429:
+                    return "Gemini رفض الطلب بسبب حد الاستخدام أو الحصة. تحقق من حدود وفوترة Google AI Studio."
+                if retry_exc.code in (400, 404):
+                    return ("Gemini لم يقبل النموذج أو صيغة الطلب حتى دون البحث (HTTP " +
+                            str(retry_exc.code) + "). تحقق من اسم النموذج وإتاحته لمفتاحك؛ راجع سجل Render.")
+                if retry_exc.code in (401, 403):
+                    return "تعذر توثيق Gemini. تحقق من صلاحية GEMINI_API_KEY وإعدادات المشروع في Google AI Studio."
+            except Exception as retry_exc:
+                print("Gemini fallback error:", type(retry_exc).__name__, flush=True)
+
+        if exc.code in (401, 403):
             return ("تعذر توثيق المحرك أو لا يملك صلاحية الطلب. تحقق من مفتاح " +
                     ("OPENAI_API_KEY" if provider == "openai" else "GEMINI_API_KEY") +
                     " وإعدادات المشروع في مزود الخدمة.")
@@ -837,7 +884,8 @@ def ask_gpt(user_text, chat_id=None):
                     ("OpenAI" if provider == "openai" else "Google AI Studio") + ".")
         if exc.code in (400, 404):
             return ("رفض " + ("OpenAI" if provider == "openai" else "Gemini") +
-                    " الطلب. تحقق من اسم النموذج وصيغة الطلب وتوفر أداة البحث في الحساب؛ راجع سجل Render لرمز الخطأ.")
+                    " الطلب (HTTP " + str(exc.code) +
+                    "). تحقق من اسم النموذج وصيغة الطلب؛ راجع سجل Render للتفاصيل.")
         return "تعذر الاتصال بالمحرك المحدد. راجع سجل Render لرمز الخطأ دون مشاركة المفاتيح."
     except URLError as exc:
         print(provider + " network error:", type(exc.reason).__name__, flush=True)
