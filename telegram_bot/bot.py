@@ -13,9 +13,9 @@ with open(os.path.join(ROOT, "catalog.json"), encoding="utf-8") as f:
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
 ADMIN = os.getenv("TELEGRAM_ADMIN_CHAT_ID", "").strip()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "").strip()
-OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1-mini").strip()
+OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-6-astra").strip()
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip()
-GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.8-flash").strip()
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-4-argon").strip()
 DEFAULT_AI_PROVIDER = os.getenv("NEXUS_AI_PROVIDER", "openai").strip().lower()
 if DEFAULT_AI_PROVIDER not in ("openai", "gemini"):
     DEFAULT_AI_PROVIDER = "openai"
@@ -72,34 +72,71 @@ def init_memory():
 
 
 
-def get_ai_provider(chat_id=None):
-    """Return the selected provider for this authorized chat, falling back to env default."""
+OPENAI_MODELS = [
+    ("gpt-6-astra", "GPT-6 Astra — الأقوى للمهام المعقدة"),
+    ("gpt-6.1-sol", "GPT-6.1 Sol — متوازن"),
+    ("gpt-6-luna", "GPT-6 Luna — اقتصادي وسريع"),
+]
+GEMINI_MODELS = [
+    ("gemini-4-argon", "Gemini 4 Argon — الأحدث"),
+    ("gemini-3.8-flash", "Gemini 3.8 Flash — سريع"),
+    ("gemini-3.1-pro-preview", "Gemini 3.1 Pro — معاينة"),
+]
+
+
+def _get_setting(chat_id, key, default):
     if chat_id is None:
-        return DEFAULT_AI_PROVIDER
+        return default
     try:
         with sqlite3.connect(MEMORY_DB, timeout=10) as db:
             row = db.execute(
-                "SELECT setting_value FROM nexus_settings WHERE chat_id=? AND setting_key='ai_provider'",
-                (str(chat_id),)
+                "SELECT setting_value FROM nexus_settings WHERE chat_id=? AND setting_key=?",
+                (str(chat_id), key)
             ).fetchone()
-        value = (row[0] if row else DEFAULT_AI_PROVIDER).strip().lower()
-        return value if value in ("openai", "gemini") else DEFAULT_AI_PROVIDER
+        return row[0] if row else default
     except Exception as exc:
-        print("AI provider preference read error:", type(exc).__name__, flush=True)
-        return DEFAULT_AI_PROVIDER
+        print("Nexus setting read error:", key, type(exc).__name__, flush=True)
+        return default
 
 
-def set_ai_provider(chat_id, provider):
-    if chat_id is None or provider not in ("openai", "gemini"):
+def _set_setting(chat_id, key, value):
+    if chat_id is None:
         return False
     with sqlite3.connect(MEMORY_DB, timeout=10) as db:
         db.execute("""
             INSERT INTO nexus_settings(chat_id, setting_key, setting_value, updated_at)
-            VALUES (?, 'ai_provider', ?, CURRENT_TIMESTAMP)
+            VALUES (?, ?, ?, CURRENT_TIMESTAMP)
             ON CONFLICT(chat_id, setting_key) DO UPDATE SET
                 setting_value=excluded.setting_value, updated_at=CURRENT_TIMESTAMP
-        """, (str(chat_id), provider))
+        """, (str(chat_id), key, value))
     return True
+
+
+def get_ai_provider(chat_id=None):
+    value = _get_setting(chat_id, "ai_provider", DEFAULT_AI_PROVIDER).strip().lower()
+    return value if value in ("openai", "gemini") else DEFAULT_AI_PROVIDER
+
+
+def set_ai_provider(chat_id, provider):
+    if provider not in ("openai", "gemini"):
+        return False
+    return _set_setting(chat_id, "ai_provider", provider)
+
+
+def get_ai_model(chat_id=None, provider=None):
+    provider = provider or get_ai_provider(chat_id)
+    options = OPENAI_MODELS if provider == "openai" else GEMINI_MODELS
+    env_default = OPENAI_MODEL if provider == "openai" else GEMINI_MODEL
+    fallback = env_default if any(model == env_default for model, _ in options) else options[0][0]
+    selected = _get_setting(chat_id, provider + "_model", fallback)
+    return selected if any(model == selected for model, _ in options) else fallback
+
+
+def set_ai_model(chat_id, provider, model):
+    options = OPENAI_MODELS if provider == "openai" else GEMINI_MODELS if provider == "gemini" else []
+    if not any(candidate == model for candidate, _ in options):
+        return False
+    return _set_setting(chat_id, provider + "_model", model)
 
 
 def provider_menu(chat_id=None):
@@ -108,15 +145,28 @@ def provider_menu(chat_id=None):
     gemini_label = ("✅ Gemini — Google" if selected == "gemini" else "✨ Gemini — Google")
     return [
         [button(gpt_label, "provider:openai"), button(gemini_label, "provider:gemini")],
+        [button("🧠 نماذج GPT", "models:openai"), button("✨ نماذج Gemini", "models:gemini")],
         [button("⚙️ حالة المحرّك والإعدادات", "provider:settings")]
     ]
+
+
+def model_menu(provider, chat_id=None):
+    options = OPENAI_MODELS if provider == "openai" else GEMINI_MODELS
+    selected = get_ai_model(chat_id, provider)
+    rows = []
+    for model, label in options:
+        prefix = "✅ " if model == selected else ""
+        rows.append([button(prefix + label, "model:" + provider + ":" + model)])
+    rows.append([button("⬅️ إعدادات المحركات", "provider:settings")])
+    rows.append([button("🏠 القائمة الرئيسية", "menu")])
+    return rows
 
 
 def provider_status(chat_id=None):
     selected = get_ai_provider(chat_id)
     key_ready = bool(OPENAI_API_KEY) if selected == "openai" else bool(GEMINI_API_KEY)
     provider_name = "GPT / OpenAI" if selected == "openai" else "Gemini / Google"
-    model_name = OPENAI_MODEL if selected == "openai" else GEMINI_MODEL
+    model_name = get_ai_model(chat_id, selected)
     return ("المحرّك المحدد: " + provider_name + "\n"
             + "النموذج: " + model_name + "\n"
             + "المفتاح في بيئة Render: " + ("موجود" if key_ready else "غير موجود") + "\n"
