@@ -28,6 +28,9 @@ def send(chat_id, text):
 def repos():
     return CATALOG.get("repositories", [])
 
+def services():
+    return CATALOG.get("services", [])
+
 def find_repo(term):
     term = term.strip().lower().replace("https://github.com/","").strip("/")
     return next((r for r in repos() if term in r["name"].lower() or term in r["full_name"].lower()), None)
@@ -62,13 +65,25 @@ def handle(chat_id, text):
     elif cmd in ("/unclassified","/غير_مصنف"):
         rs = [r for r in repos() if r.get("category")=="بحاجة للتصنيف"]
         send(chat_id, "تحتاج فحصًا:\n" + "\n".join("• "+r["name"]+" — "+r["url"] for r in rs))
+    elif cmd in ("/services","/خدمات"):
+        send(chat_id, "خدمات Render ("+str(len(services()))+"):\n" + "\n\n".join("• "+s["name"]+" — "+s["type"]+"\nالحالة: "+s["status"]+"\n"+s["url"] for s in services()))
+    elif cmd in ("/service","/خدمة"):
+        q = arg.strip().lower()
+        s = next((x for x in services() if q and (q in x["name"].lower() or q in x.get("url","").lower())), None)
+        send(chat_id, ("خدمة: "+s["name"]+"\nالنوع: "+s["type"]+"\nالغرض: "+s["purpose"]+"\nالحالة: "+s["status"]+"\nالمستودع: "+s["repo"]+"\nالفرع: "+s["branch"]+"\nالتشغيل: "+s["runtime"]+"\nالرابط: "+s["url"]+"\nلوحة Render: "+s["dashboard"]) if s else "لم أجد خدمة بهذا الاسم. استخدم /services.")
+    elif cmd in ("/projects","/المشاريع"):
+        names = ["SADA","Sawa-Play-Monitor","m5moshbk-Elite-Console-X","super-duper-octo-adventure","Tamara-Business-Site","refactored-potato","bizweb-platform","Crispy-Seeka"]
+        rs = [r for n in names for r in repos() if r["name"].lower()==n.lower()]
+        send(chat_id, "المشاريع الأساسية:\n" + "\n\n".join(card(r) for r in rs) + "\n\nخدمات Render: استخدم /services")
     elif cmd in ("/repo","/مستودع"):
         r = find_repo(arg)
         send(chat_id, card(r) if r else "لم أجد المستودع. استخدم /repos أو /search كلمة.")
     elif cmd in ("/search","/بحث"):
         q = arg.strip().lower()
         rs = [r for r in repos() if q and (q in r["name"].lower() or q in r["purpose"].lower() or q in r["category"].lower())]
-        send(chat_id, "النتائج:\n" + "\n\n".join(card(r) for r in rs[:8]) if rs else "لا توجد نتائج.")
+        ss = [s for s in services() if q and (q in s["name"].lower() or q in s["purpose"].lower() or q in s["url"].lower())]
+        parts = [card(r) for r in rs[:5]] + [("خدمة: "+s["name"]+" — "+s["status"]+"\n"+s["url"]) for s in ss[:5]]
+        send(chat_id, "نتائج البحث:\n" + "\n\n".join(parts) if parts else "لا توجد نتائج.")
     else:
         send(chat_id, "أمر غير معروف؛ استخدم /help.")
 
