@@ -48,7 +48,7 @@ def handle(chat_id, text):
     cmd, _, arg = (text or "").strip().partition(" ")
     cmd = cmd.split("@")[0].lower()
     if cmd in ("/start","/help","/مساعدة"):
-        send(chat_id, "M5mOsH Nexus — فهرس للقراءة فقط\n\n/start /help\n/sections — الأقسام\n/repos — كل المستودعات\n/stores — المتاجر\n/tools — الأدوات\n/unclassified — بحاجة للتصنيف\n/repo اسم — تفاصيل مستودع\n/search كلمة — بحث\n\nلا ينفذ البوت حذفًا أو نشرًا أو تغييرات.")
+        send(chat_id, "M5mOsH Nexus — فهرس موحّد للقراءة فقط\n\n/start /help\n/sections — الأقسام\n/repos — مستودعات GitHub\n/stores — المتاجر\n/tools — الأدوات\n/unclassified — بحاجة للتصنيف\n/services — خدمات Render\n/service اسم — تفاصيل خدمة\n/projects — المشاريع الأساسية والمحلية\n/repo اسم — تفاصيل مستودع\n/search كلمة — بحث في المستودعات والخدمات\n\nلا ينفذ البوت حذفًا أو نشرًا أو تغييرات.")
     elif cmd in ("/sections","/أقسام"):
         counts = {}
         for r in repos():
