@@ -644,9 +644,9 @@ def handle_message(chat_id, text, forwarded=False):
             send(chat_id, f"🔎 النتائج: {len(found)} — أعرض أول {min(18, len(found))}", rows)
     else:
         user_text = (text or "").strip()
-        remember_turn(chat_id, "user", user_text)
         answer = ask_gpt(user_text, chat_id=chat_id)
         send(chat_id, answer)
+        remember_turn(chat_id, "user", user_text)
         remember_turn(chat_id, "assistant", answer)
 
 
