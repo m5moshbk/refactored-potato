@@ -15,7 +15,7 @@ ADMIN = os.getenv("TELEGRAM_ADMIN_CHAT_ID", "").strip()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "").strip()
 OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1-mini").strip()
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip()
-GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash").strip()
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.8-flash").strip()
 DEFAULT_AI_PROVIDER = os.getenv("NEXUS_AI_PROVIDER", "openai").strip().lower()
 if DEFAULT_AI_PROVIDER not in ("openai", "gemini"):
     DEFAULT_AI_PROVIDER = "openai"
@@ -833,9 +833,11 @@ def ask_gpt(user_text, chat_id=None):
             try:
                 fallback_payload = dict(payload)
                 fallback_payload.pop("tools", None)
+                fallback_model = "gemini-3.8-flash" if exc.code == 404 else GEMINI_MODEL
+                fallback_payload["model"] = fallback_model
                 fallback_req = Request(
                     "https://generativelanguage.googleapis.com/v1beta/models/" +
-                    GEMINI_MODEL + ":generateContent",
+                    fallback_model + ":generateContent",
                     data=json.dumps(fallback_payload, ensure_ascii=False).encode("utf-8"),
                     headers={"x-goog-api-key": GEMINI_API_KEY, "Content-Type": "application/json"}
                 )
@@ -850,7 +852,7 @@ def ask_gpt(user_text, chat_id=None):
                 ]
                 fallback_answer = "\\n".join(fallback_parts).strip()
                 if fallback_answer:
-                    print("Gemini fallback succeeded without Google Search grounding.", flush=True)
+                    print("Gemini fallback succeeded without Google Search grounding; model=" + fallback_model, flush=True)
                     return review_response(
                         fallback_answer +
                         "\\n\\nملاحظة: تعذّر تفعيل بحث Google في هذا الطلب؛ أُجيب دون بحث ويب."
