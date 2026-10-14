@@ -418,6 +418,14 @@ def handle_message(chat_id, text):
         send(chat_id, f"☁️ خدمات Render المسجلة: {len(services())}\nهذه بيانات الكتالوج وليست فحصًا حيًا.", page_keyboard("service", 0, len(services())))
     elif cmd in ("/projects", "/المشاريع"):
         send(chat_id, project_summary(), [[button("🏠 القائمة الرئيسية", "menu")]])
+    elif cmd in ("/sitecheck",):
+        if not arg.strip():
+            send(chat_id, "أرسل رابط المتجر: /sitecheck https://example.com")
+        else:
+            try:
+                send(chat_id, audit_store(arg.strip()), [[button("🛍️ فحص متجر آخر", "store_audit_help")], [button("🏠 الرئيسية", "menu")]])
+            except ValueError as exc:
+                send(chat_id, "تعذر الفحص: " + str(exc))
     elif cmd in ("/inventory", "/الجرد"):
         refresh_live_inventory()
         send(chat_id, live_status_text(), [[button("🔄 إعادة المحاولة", "live_inventory_refresh")], [button("🏠 القائمة الرئيسية", "menu")]])
