@@ -11,8 +11,8 @@ with open(os.path.join(ROOT, "catalog.json"), encoding="utf-8") as f:
     CATALOG = json.load(f)
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
 ADMIN = os.getenv("TELEGRAM_ADMIN_CHAT_ID", "").strip()
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "").strip()
-OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1-mini").strip()
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip()
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash-lite").strip()
 PORT = int(os.getenv("PORT", "10000"))
 OFFSET = 0
 PAGE_SIZE = 6
@@ -212,59 +212,65 @@ def on_callback(chat_id, message_id, data):
 
 
 def ask_gpt(user_text):
-    """Answer natural-language messages using OpenAI; no tools or external actions."""
-    if not OPENAI_API_KEY:
-        return "مساعد GPT غير مفعّل بعد: تحقق من وجود OPENAI_API_KEY في Render ثم أعد النشر."
+    """Answer natural-language messages with Gemini; no tools or external actions."""
+    if not GEMINI_API_KEY:
+        return ("مساعد الذكاء الاصطناعي غير مفعّل: أضف GEMINI_API_KEY في Render Environment "
+                "ثم أعد النشر. لا ترسل المفتاح داخل تيليجرام.")
     payload = {
-        "model": OPENAI_MODEL,
-        "input": [
-            {"role": "system", "content": [
-                {"type": "input_text", "text":
-                 "أنت مساعد M5mOsH Nexus باللغة العربية. أجب بوضوح واختصار. "
-                 "أنت لا تملك أدوات تنفيذ أو وصولًا مباشرًا إلى GitHub أو Render أو ملفات الجهاز. "
-                 "لا تدّعِ أنك نفذت أو فحصت أو نشرت شيئًا. إذا طُلب إجراء خارجي، وضّح أن هذا الإصدار يجيب فقط ولا ينفذ الإجراء. "
-                 "بيانات الكتالوج ليست بالضرورة مباشرة أو محدثة."}
-            ]},
-            {"role": "user", "content": [{"type": "input_text", "text": user_text[:6000]}]}
-        ],
-        "max_output_tokens": 700
+        "systemInstruction": {"parts": [{"text":
+            "أنت مساعد M5mOsH Nexus باللغة العربية. أجب بوضوح واختصار. "
+            "أنت لا تملك أدوات تنفيذ أو وصولًا مباشرًا إلى GitHub أو Render أو ملفات الجهاز. "
+            "لا تدّعِ أنك نفذت أو فحصت أو نشرت شيئًا. إذا طُلب إجراء خارجي، وضّح أن هذا الإصدار يجيب فقط ولا ينفذ الإجراء. "
+            "بيانات الكتالوج ليست بالضرورة مباشرة أو محدثة."}]},
+        "contents": [{"role": "user", "parts": [{"text": user_text[:6000]}]}],
+        "generationConfig": {"maxOutputTokens": 700}
     }
-    req = Request("https://api.openai.com/v1/responses",
+    endpoint = "https://generativelanguage.googleapis.com/v1beta/models/" + GEMINI_MODEL + ":generateContent"
+    req = Request(endpoint,
                   data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
-                  headers={"Authorization": "Bearer " + OPENAI_API_KEY,
+                  headers={"x-goog-api-key": GEMINI_API_KEY,
                            "Content-Type": "application/json"})
     try:
         with urlopen(req, timeout=40) as response:
             result = json.loads(response.read().decode("utf-8"))
         parts = []
-        for item in result.get("output", []):
-            if item.get("type") == "message":
-                for part in item.get("content", []):
-                    if part.get("type") == "output_text" and part.get("text"):
-                        parts.append(part["text"])
+        for candidate in result.get("candidates", []):
+            content = candidate.get("content") or {}
+            for part in content.get("parts", []):
+                if part.get("text"):
+                    parts.append(part["text"])
+            if parts:
+                break
         answer = "\n".join(parts).strip()
-        return answer[:3900] if answer else "وصل رد فارغ من GPT. حاول مرة أخرى."
+        if not answer:
+            feedback = result.get("promptFeedback") or {}
+            reason = feedback.get("blockReason", "unknown")
+            print("Gemini empty response: block_reason=" + str(reason), flush=True)
+            return "لم يُرجع Gemini نصًا. جرّب صياغة أخرى أو تحقق من إعدادات النموذج."
+        return answer[:3900]
     except HTTPError as exc:
-        # Log only non-secret diagnostics; never log headers, request data, or the API key.
         details = {}
         try:
             body = json.loads(exc.read().decode("utf-8", errors="replace"))
             details = body.get("error", {}) if isinstance(body, dict) else {}
         except Exception:
             pass
-        print("OpenAI HTTP error:",
+        print("Gemini HTTP error:",
               "status=" + str(exc.code),
-              "type=" + str(details.get("type", "unknown")),
-              "code=" + str(details.get("code", "unknown")),
-              "param=" + str(details.get("param", "unknown")),
+              "status_text=" + str(details.get("status", "unknown")),
+              "message=" + str(details.get("message", "unknown"))[:180],
               flush=True)
-        return "تعذر الاتصال بـ GPT. راجع سجل Render لمعرفة رمز الخطأ، دون مشاركة المفتاح."
+        if exc.code == 429:
+            return "تجاوز البوت حد استخدام Gemini أو الحصة المتاحة. انتظر إعادة ضبط الحد أو تحقق من AI Studio."
+        if exc.code in (400, 403, 404):
+            return "تعذر استخدام Gemini: تحقق من صلاحية GEMINI_API_KEY واسم GEMINI_MODEL في Render."
+        return "تعذر الاتصال بـ Gemini. راجع سجل Render لرمز الخطأ دون مشاركة المفتاح."
     except URLError as exc:
-        print("OpenAI network error:", type(exc.reason).__name__, flush=True)
-        return "تعذر الوصول إلى خدمة GPT بسبب مشكلة اتصال. حاول لاحقًا."
+        print("Gemini network error:", type(exc.reason).__name__, flush=True)
+        return "تعذر الوصول إلى خدمة Gemini بسبب مشكلة اتصال. حاول لاحقًا."
     except Exception as exc:
-        print("OpenAI request error:", type(exc).__name__, flush=True)
-        return "تعذر الاتصال بـ GPT. راجع سجل Render لتشخيص الخطأ."
+        print("Gemini request error:", type(exc).__name__, flush=True)
+        return "تعذر الاتصال بـ Gemini. راجع سجل Render لتشخيص الخطأ."
 
 
 def handle_message(chat_id, text):
@@ -331,6 +337,22 @@ def polling():
                 msg = item.get("message") or item.get("edited_message")
                 if msg and msg.get("chat") and msg.get("text"):
                     handle_message(msg["chat"]["id"], msg["text"])
+        except HTTPError as exc:
+            # Never log the request URL: Telegram URLs contain the bot token.
+            details = {}
+            try:
+                body = json.loads(exc.read().decode("utf-8", errors="replace"))
+                details = body.get("description", "") if isinstance(body, dict) else ""
+            except Exception:
+                pass
+            description = str(details)[:180]
+            if exc.code == 409:
+                print("Telegram polling HTTP 409: conflict; another getUpdates poller may be active. " +
+                      description, flush=True)
+            else:
+                print("Telegram polling HTTP error: status=" + str(exc.code) +
+                      " description=" + description, flush=True)
+            time.sleep(8 if exc.code == 409 else 5)
         except Exception as exc:
             print("Telegram polling error:", type(exc).__name__, flush=True)
             time.sleep(5)
