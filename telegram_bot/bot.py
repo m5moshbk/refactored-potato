@@ -43,6 +43,7 @@ def menu():
     return [
         [button("📁 مستودعات GitHub", "repos:0")],
         [button("☁️ خدمات Render", "services:0")],
+        [button("🛍️ فحص متجر عميل", "store_audit_help")],
         [button("🧭 مشاريعي", "projects"), button("🗂️ تصنيف المجالات", "categories")],
         [button("🔎 بحث", "search_help"), button("📊 ملخص الفهرس", "overview")],
         [button("❔ المساعدة والأوامر", "help"), button("ℹ️ حول البوت", "about")],
@@ -296,6 +297,8 @@ def on_callback(chat_id, message_id, data):
             edit(chat_id, message_id, text, keyboard)
         except (ValueError, IndexError):
             edit(chat_id, message_id, "تعذر فتح التصنيف.", category_keyboard())
+    elif data == "store_audit_help":
+        edit(chat_id, message_id, "🛍️ فحص متجر عميل\\nأرسل رابط المتجر في هذه المحادثة مع طلب فحصه. تشمل المراجعة الظاهرة: الدفع، صفحات المنتجات، تجربة الجوال، الشحن والاسترجاع، التواصل، عناصر الثقة، SEO، والصور. الفحص الأولي لا يسجل الدخول ولا يختبر معاملة دفع.", [[button("🏠 القائمة الرئيسية", "menu")]])
     elif data == "overview":
         edit(chat_id, message_id, overview(), [[button("🏠 القائمة الرئيسية", "menu")]])
     elif data == "live_inventory":
