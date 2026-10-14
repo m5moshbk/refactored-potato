@@ -230,4 +230,4 @@ def audit_store(url, progress=None):
         "تم إعداد التقرير؛ لم يُختبر الدفع أو تسجيل الدخول"
     ]
     stage(100, "اكتمل الفحص", "تم إعداد التقرير الأولي")
-    return "\\n".join(report)[:3300]
+    return "\n".join(report)[:3300]
