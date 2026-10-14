@@ -13,7 +13,7 @@ with open(os.path.join(ROOT, "catalog.json"), encoding="utf-8") as f:
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
 ADMIN = os.getenv("TELEGRAM_ADMIN_CHAT_ID", "").strip()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "").strip()
-OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-6-astra").strip()
+OPENAI_MODEL = os.getenv("OPENAI_MODEL", "chat-latest").strip()
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip()
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-4-argon").strip()
 DEFAULT_AI_PROVIDER = os.getenv("NEXUS_AI_PROVIDER", "openai").strip().lower()
@@ -73,6 +73,7 @@ def init_memory():
 
 
 OPENAI_MODELS = [
+    ("chat-latest", "ChatGPT الأحدث — يتبع إصدار ChatGPT الحالي"),
     ("gpt-6-astra", "GPT-6 Astra — الأقوى للمهام المعقدة"),
     ("gpt-6.1-sol", "GPT-6.1 Sol — متوازن"),
     ("gpt-6-luna", "GPT-6 Luna — اقتصادي وسريع"),
@@ -819,21 +820,22 @@ def ask_gpt(user_text, chat_id=None):
                       headers={"Authorization": "Bearer " + OPENAI_API_KEY,
                                "Content-Type": "application/json"})
     else:
-        gemini_contents = []
-        for turn in memory:
-            gemini_contents.append({
-                "role": "model" if turn["role"] == "assistant" else "user",
-                "parts": [{"text": turn["content"][:3000]}]
-            })
-        gemini_contents.append({"role": "user", "parts": [{"text": current_context}]})
+        history_text = "\\n\\n".join(
+            ("المساعد: " if turn["role"] == "assistant" else "المستخدم: ") + turn["content"][:3000]
+            for turn in memory
+        )
+        interaction_input = (
+            ("سياق المحادثة السابق:\\n" + history_text + "\\n\\n") if history_text else ""
+        ) + current_context
         payload = {
-            "systemInstruction": {"parts": [{"text": system_text}]},
-            "contents": gemini_contents,
-            "generationConfig": {"maxOutputTokens": 1100},
-            "tools": [{"google_search": {}}]
+            "model": selected_model,
+            "input": interaction_input,
+            "system_instruction": system_text,
+            "tools": [{"type": "google_search"}],
+            "generation_config": {"max_output_tokens": 1100}
         }
         req = Request(
-            "https://generativelanguage.googleapis.com/v1beta/models/" + selected_model + ":generateContent",
+            "https://generativelanguage.googleapis.com/v1beta/interactions",
             data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
             headers={"x-goog-api-key": GEMINI_API_KEY, "Content-Type": "application/json"}
         )
@@ -856,21 +858,24 @@ def ask_gpt(user_text, chat_id=None):
                                 if url.startswith(("https://", "http://")) and url not in [x[1] for x in source_links]:
                                     source_links.append((title[:100], url))
         else:
-            candidates = result.get("candidates", [])
-            if candidates:
-                for part in (candidates[0].get("content") or {}).get("parts", []):
-                    if part.get("text"):
-                        parts.append(part["text"])
-                    for metadata in part.get("groundingMetadata", {}).get("groundingChunks", []):
-                        web = metadata.get("web") or {}
-                        url = web.get("uri", "")
-                        title = web.get("title") or url
-                        if url.startswith(("https://", "http://")) and url not in [x[1] for x in source_links]:
-                            source_links.append((title[:100], url))
-            # Gemini search citations are often returned on candidate-level grounding metadata.
-            if candidates:
-                for metadata in (candidates[0].get("groundingMetadata") or {}).get("groundingChunks", []):
-                    web = metadata.get("web") or {}
+            output_text = result.get("output_text", "")
+            if output_text:
+                parts.append(output_text)
+            for step in result.get("steps", []) or result.get("output", []) or []:
+                if not isinstance(step, dict):
+                    continue
+                content = step.get("content", step.get("text", ""))
+                if isinstance(content, str) and content and content not in parts:
+                    parts.append(content)
+                elif isinstance(content, list):
+                    for block in content:
+                        if isinstance(block, dict) and block.get("text") and block["text"] not in parts:
+                            parts.append(block["text"])
+                metadata_items = step.get("grounding_metadata", [])
+                if not metadata_items and isinstance(step.get("groundingMetadata"), dict):
+                    metadata_items = step["groundingMetadata"].get("groundingChunks", [])
+                for metadata in metadata_items or []:
+                    web = (metadata or {}).get("web") or {}
                     url = web.get("uri", "")
                     title = web.get("title") or url
                     if url.startswith(("https://", "http://")) and url not in [x[1] for x in source_links]:
@@ -880,7 +885,7 @@ def ask_gpt(user_text, chat_id=None):
             answer += "\n\nالمصادر:"
             answer += "".join("\n• " + title + " — " + url for title, url in source_links[:5])
         if not answer:
-            status = result.get("status", "unknown") if provider == "openai" else "no_candidate_text"
+            status = result.get("status", "unknown") if provider == "openai" else "no_interaction_text"
             print(provider + " empty response: status=" + str(status), flush=True)
             return "لم يُرجع المحرك المحدد نصًا. راجع سجلات Render دون مشاركة المفاتيح."
         return review_response(answer)
@@ -900,23 +905,27 @@ def ask_gpt(user_text, chat_id=None):
             try:
                 fallback_payload = dict(payload)
                 fallback_payload.pop("tools", None)
-                fallback_model = "gemini-4-argon" if exc.code == 404 else selected_model
+                fallback_model = "gemini-3.8-flash" if exc.code == 404 else selected_model
+                fallback_payload["model"] = fallback_model
                 fallback_req = Request(
-                    "https://generativelanguage.googleapis.com/v1beta/models/" +
-                    fallback_model + ":generateContent",
+                    "https://generativelanguage.googleapis.com/v1beta/interactions",
                     data=json.dumps(fallback_payload, ensure_ascii=False).encode("utf-8"),
                     headers={"x-goog-api-key": GEMINI_API_KEY, "Content-Type": "application/json"}
                 )
                 with urlopen(fallback_req, timeout=45) as response:
                     fallback_result = json.loads(response.read().decode("utf-8"))
-                fallback_candidates = fallback_result.get("candidates", [])
-                fallback_parts = [
-                    part.get("text", "")
-                    for candidate in fallback_candidates
-                    for part in (candidate.get("content") or {}).get("parts", [])
-                    if part.get("text")
-                ]
-                fallback_answer = "\n".join(fallback_parts).strip()
+                fallback_answer = (fallback_result.get("output_text") or "").strip()
+                if not fallback_answer:
+                    fallback_parts = []
+                    for step in fallback_result.get("steps", []) or fallback_result.get("output", []) or []:
+                        if isinstance(step, dict):
+                            content = step.get("content", step.get("text", ""))
+                            if isinstance(content, str) and content:
+                                fallback_parts.append(content)
+                            elif isinstance(content, list):
+                                fallback_parts.extend(block.get("text", "") for block in content
+                                                      if isinstance(block, dict) and block.get("text"))
+                    fallback_answer = "\\n".join(fallback_parts).strip()
                 if fallback_answer:
                     print("Gemini fallback succeeded without Google Search grounding; model=" + fallback_model, flush=True)
                     return review_response(
@@ -986,11 +995,10 @@ def auto_test_ai_providers():
                               headers={"Authorization": "Bearer " + key,
                                        "Content-Type": "application/json"})
             else:
-                payload = {"contents": [{"role": "user", "parts": [{"text": "Reply with exactly OK."}]}],
-                           "generationConfig": {"maxOutputTokens": 12},
-                           "tools": [{"google_search": {}}]}
-                req = Request("https://generativelanguage.googleapis.com/v1beta/models/" +
-                              model + ":generateContent",
+                payload = {"model": model, "input": "Reply with exactly OK.",
+                           "tools": [{"type": "google_search"}],
+                           "generation_config": {"max_output_tokens": 16}}
+                req = Request("https://generativelanguage.googleapis.com/v1beta/interactions",
                               data=json.dumps(payload).encode("utf-8"),
                               headers={"x-goog-api-key": key, "Content-Type": "application/json"})
             with urlopen(req, timeout=25) as response:
@@ -1002,9 +1010,16 @@ def auto_test_ai_providers():
                               if part.get("type") == "output_text"]
                 search_note = ""
             else:
-                text_parts = [part.get("text", "")
-                              for candidate in data.get("candidates", [])
-                              for part in (candidate.get("content") or {}).get("parts", [])]
+                text_parts = [data.get("output_text", "")]
+                if not any(t.strip() for t in text_parts):
+                    for step in data.get("steps", []) or data.get("output", []) or []:
+                        if isinstance(step, dict):
+                            content = step.get("content", step.get("text", ""))
+                            if isinstance(content, str):
+                                text_parts.append(content)
+                            elif isinstance(content, list):
+                                text_parts.extend(block.get("text", "") for block in content
+                                                  if isinstance(block, dict) and block.get("text"))
                 search_note = " + Google Search"
             if any(t.strip() for t in text_parts):
                 report.append("• " + label + ": نجح اختبار API" + search_note + " (" + model + ").")
@@ -1025,16 +1040,23 @@ def auto_test_ai_providers():
                     fallback_model = "gemini-3.8-flash" if exc.code == 404 else model
                     fallback_payload = dict(payload)
                     fallback_payload.pop("tools", None)
+                    fallback_payload["model"] = fallback_model
                     fallback_req = Request(
-                        "https://generativelanguage.googleapis.com/v1beta/models/" +
-                        fallback_model + ":generateContent",
+                        "https://generativelanguage.googleapis.com/v1beta/interactions",
                         data=json.dumps(fallback_payload).encode("utf-8"),
                         headers={"x-goog-api-key": key, "Content-Type": "application/json"})
                     with urlopen(fallback_req, timeout=25) as response:
                         fallback_data = json.loads(response.read().decode("utf-8"))
-                    fallback_parts = [part.get("text", "")
-                                      for candidate in fallback_data.get("candidates", [])
-                                      for part in (candidate.get("content") or {}).get("parts", [])]
+                    fallback_parts = [fallback_data.get("output_text", "")]
+                    if not any(t.strip() for t in fallback_parts):
+                        for step in fallback_data.get("steps", []) or fallback_data.get("output", []) or []:
+                            if isinstance(step, dict):
+                                content = step.get("content", step.get("text", ""))
+                                if isinstance(content, str):
+                                    fallback_parts.append(content)
+                                elif isinstance(content, list):
+                                    fallback_parts.extend(block.get("text", "") for block in content
+                                                          if isinstance(block, dict) and block.get("text"))
                     if any(t.strip() for t in fallback_parts):
                         report.append("• " + label + ": نجح توليد النص (" + fallback_model +
                                       ") لكن فشل بحث Google؛ يعمل دون البحث.")
