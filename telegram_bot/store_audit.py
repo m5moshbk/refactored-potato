@@ -117,7 +117,7 @@ def audit_store(url):
     if "text/html" not in content_type.lower():
         return "الرابط لم يُرجع صفحة HTML قابلة للفحص (Content-Type: " + (content_type or "غير معروف") + ")."
     charset = "utf-8"
-    m = re.search(r"charset=([\\w-]+)", content_type, re.I)
+    m = re.search("charset=([A-Za-z0-9_-]+)", content_type, re.I)
     if m:
         charset = m.group(1)
     try:
@@ -130,8 +130,8 @@ def audit_store(url):
     text = " ".join(text.split()).lower()
     title = " ".join("".join(parser.title_text).split())
     desc = parser.meta.get("description", "").strip()
-    canonical = bool(re.search(r'<link[^>]+rel=["\\']canonical["\\']', page, re.I))
-    robots = bool(re.search(r'<meta[^>]+name=["\\']robots["\\']', page, re.I))
+    canonical = bool(re.search("rel=.*canonical", page, re.I))
+    robots = bool(re.search("name=.*robots", page, re.I))
     mobile = parser.viewport
     h1 = [x for level, x in parser.headings if level == 1]
     link_text = " ".join((urlparse(h).path + " " + label) for h, label in parser.links).lower()
