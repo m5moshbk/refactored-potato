@@ -68,6 +68,128 @@ def edit(chat_id, message_id, text, keyboard=None):
             raise
 
 
+
+LIVE_STATUS = {
+    "github": "لم يُفحص بعد",
+    "render": "لم يُفحص بعد",
+    "last_refresh": None,
+    "errors": []
+}
+
+def _json_get(url, headers=None, timeout=15):
+    req = Request(url, headers={"User-Agent": "M5mOsH-Nexus-Live-Inventory/1.0",
+                                "Accept": "application/json", **(headers or {})})
+    with urlopen(req, timeout=timeout) as response:
+        return json.loads(response.read().decode("utf-8"))
+
+def refresh_live_inventory():
+    """Refresh in-memory catalog from live APIs. Read-only; never changes remote projects."""
+    errors = []
+    gh_token = os.getenv("GITHUB_TOKEN", "").strip()
+    render_key = os.getenv("RENDER_API_KEY", "").strip()
+    now = time.strftime("%Y-%m-%d %H:%M:%S UTC", time.gmtime())
+    if gh_token:
+        try:
+            found = []
+            for page in range(1, 6):
+                data = _json_get(
+                    "https://api.github.com/user/repos?per_page=100&page=" + str(page) +
+                    "&sort=updated&direction=desc",
+                    {"Authorization": "Bearer " + gh_token,
+                     "X-GitHub-Api-Version": "2022-11-28"})
+                if not isinstance(data, list):
+                    raise ValueError("Unexpected GitHub API response")
+                for r in data:
+                    owner = (r.get("owner") or {}).get("login", "")
+                    full_name = r.get("full_name", "")
+                    found.append({
+                        "name": r.get("name", full_name.rsplit("/", 1)[-1]),
+                        "full_name": full_name,
+                        "url": r.get("html_url", ""),
+                        "category": "بحاجة للتصنيف",
+                        "purpose": (r.get("description") or "الغرض غير موثق؛ يلزم فحص README والملفات."),
+                        "usage": "بيانات مستودع حية من GitHub؛ لم يُنفّذ الكود أو يُختبر.",
+                        "default_branch": r.get("default_branch", "غير معروف"),
+                        "private": bool(r.get("private", False)),
+                        "updated_at": r.get("updated_at", ""),
+                        "status": "بيانات GitHub مباشرة؛ لا تعني أن المشروع يعمل",
+                        "owner": owner
+                    })
+                if len(data) < 100:
+                    break
+            if found:
+                CATALOG["repositories"] = found
+                LIVE_STATUS["github"] = "مباشر: " + str(len(found)) + " مستودع"
+            else:
+                LIVE_STATUS["github"] = "نجح الاتصال؛ لا توجد مستودعات ظاهرة"
+        except Exception as exc:
+            LIVE_STATUS["github"] = "فشل التحديث"
+            errors.append("GitHub: " + type(exc).__name__)
+    else:
+        LIVE_STATUS["github"] = "يتطلب GITHUB_TOKEN في Render للوصول إلى المستودعات الخاصة"
+
+    if render_key:
+        try:
+            data = _json_get("https://api.render.com/v1/services?limit=100",
+                             {"Authorization": "Bearer " + render_key})
+            if not isinstance(data, list):
+                raise ValueError("Unexpected Render API response")
+            found = []
+            for entry in data:
+                s = entry.get("service", entry) if isinstance(entry, dict) else {}
+                if not isinstance(s, dict):
+                    continue
+                details = s.get("serviceDetails") or {}
+                env_details = details.get("envSpecificDetails") or {}
+                repo_url = s.get("repo", "") or ""
+                repo = repo_url.replace("https://github.com/", "").removesuffix(".git")
+                url = s.get("url", "")
+                suspended = s.get("suspended")
+                status = "معلّقة" if suspended else "غير معلّقة حسب Render؛ يلزم فحص التطبيق"
+                found.append({
+                    "name": s.get("name", "خدمة Render"),
+                    "type": s.get("type", "غير معروف"),
+                    "url": url,
+                    "repo": repo,
+                    "branch": s.get("branch", "غير معروف"),
+                    "runtime": details.get("runtime", s.get("type", "غير معروف")),
+                    "status": status,
+                    "purpose": "بيانات خدمة مباشرة من Render؛ الحالة لا تثبت صحة الوظائف.",
+                    "dashboard": s.get("dashboardUrl", ""),
+                    "service_id": s.get("id", ""),
+                    "updated_at": s.get("updatedAt", "")
+                })
+            CATALOG["services"] = found
+            LIVE_STATUS["render"] = "مباشر: " + str(len(found)) + " خدمة"
+        except Exception as exc:
+            LIVE_STATUS["render"] = "فشل التحديث"
+            errors.append("Render: " + type(exc).__name__)
+    else:
+        LIVE_STATUS["render"] = "يتطلب RENDER_API_KEY في Render"
+
+    LIVE_STATUS["last_refresh"] = now
+    LIVE_STATUS["errors"] = errors
+    print("Live inventory refresh:", "GitHub=" + LIVE_STATUS["github"],
+          "Render=" + LIVE_STATUS["render"], "errors=" + str(errors), flush=True)
+    return LIVE_STATUS
+
+def live_status_text():
+    return ("📡 حالة الجرد الحي — قراءة فقط\\n"
+            + "GitHub: " + LIVE_STATUS["github"] + "\\n"
+            + "Render: " + LIVE_STATUS["render"] + "\\n"
+            + "آخر محاولة: " + str(LIVE_STATUS["last_refresh"] or "لم تبدأ") + "\\n"
+            + ("ملاحظات: " + ", ".join(LIVE_STATUS["errors"]) if LIVE_STATUS["errors"] else
+               "لا توجد أخطاء مسجلة في آخر محاولة.")
+            + "\\n\\nلا تُعدّل هذه الميزة المستودعات أو الخدمات؛ إنها تقرأ بياناتها فقط.")
+
+def live_inventory_worker():
+    while True:
+        try:
+            refresh_live_inventory()
+        except Exception as exc:
+            print("Live inventory worker error:", type(exc).__name__, flush=True)
+        time.sleep(900)
+
 def repos():
     return CATALOG.get("repositories", [])
 
@@ -176,6 +298,11 @@ def on_callback(chat_id, message_id, data):
             edit(chat_id, message_id, "تعذر فتح التصنيف.", category_keyboard())
     elif data == "overview":
         edit(chat_id, message_id, overview(), [[button("🏠 القائمة الرئيسية", "menu")]])
+    elif data == "live_inventory":
+        edit(chat_id, message_id, live_status_text(), [[button("🔄 إعادة المحاولة", "live_inventory_refresh")], [button("🏠 القائمة الرئيسية", "menu")]])
+    elif data == "live_inventory_refresh":
+        refresh_live_inventory()
+        edit(chat_id, message_id, live_status_text(), [[button("🔄 إعادة المحاولة", "live_inventory_refresh")], [button("🏠 القائمة الرئيسية", "menu")]])
     elif data == "help":
         edit(chat_id, message_id,
              "❔ المساعدة\nيمكن استخدام الأزرار دون كتابة أوامر. الأوامر الاختيارية:\n/start أو /menu — القائمة الرئيسية\n/repos — المستودعات\n/services — خدمات Render\n/projects — المشاريع\n/search كلمة — البحث\n/help — المساعدة",
@@ -287,6 +414,9 @@ def handle_message(chat_id, text):
         send(chat_id, f"☁️ خدمات Render المسجلة: {len(services())}\nهذه بيانات الكتالوج وليست فحصًا حيًا.", page_keyboard("service", 0, len(services())))
     elif cmd in ("/projects", "/المشاريع"):
         send(chat_id, project_summary(), [[button("🏠 القائمة الرئيسية", "menu")]])
+    elif cmd in ("/inventory", "/الجرد"):
+        refresh_live_inventory()
+        send(chat_id, live_status_text(), [[button("🔄 إعادة المحاولة", "live_inventory_refresh")], [button("🏠 القائمة الرئيسية", "menu")]])
     elif cmd in ("/help", "/مساعدة"):
         send(chat_id, "الأوامر اختيارية؛ استخدم أزرار القائمة للتنقل.\n/start أو /menu، /repos، /services، /projects، /search كلمة، /help", menu())
     elif cmd in ("/search", "/بحث"):
@@ -385,6 +515,7 @@ class Handler(BaseHTTPRequestHandler):
 
 
 def main():
+    threading.Thread(target=live_inventory_worker, daemon=True).start()
     if TOKEN:
         threading.Thread(target=polling, daemon=True).start()
         print("Telegram polling started; inline menu enabled.", flush=True)
