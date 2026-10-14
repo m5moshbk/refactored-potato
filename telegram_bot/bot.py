@@ -20,6 +20,8 @@ DEFAULT_AI_PROVIDER = os.getenv("NEXUS_AI_PROVIDER", "openai").strip().lower()
 if DEFAULT_AI_PROVIDER not in ("openai", "gemini"):
     DEFAULT_AI_PROVIDER = "openai"
 PORT = int(os.getenv("PORT", "10000"))
+# Background inventory polling is paused by default to keep the free instance responsive.
+ENABLE_BACKGROUND_INVENTORY = os.getenv("NEXUS_BACKGROUND_INVENTORY", "0").strip().lower() in ("1", "true", "yes", "on")
 OFFSET = 0
 PAGE_SIZE = 6
 API = "https://api.telegram.org/bot"
@@ -846,7 +848,7 @@ def ask_gpt(user_text, chat_id=None):
         )
 
     try:
-        with urlopen(req, timeout=55) as response:
+        with urlopen(req, timeout=25) as response:
             result = json.loads(response.read().decode("utf-8"))
         parts = []
         source_links = []
@@ -913,7 +915,7 @@ def ask_gpt(user_text, chat_id=None):
 
         # Search grounding can be unavailable even when text generation works.
         # Retry Gemini once without the optional Google Search tool.
-        if provider == "gemini" and exc.code in (400, 404, 429) and payload.get("tools"):
+        if provider == "gemini" and exc.code in (400, 404) and payload.get("tools"):
             try:
                 fallback_payload = dict(payload)
                 fallback_payload.pop("tools", None)
@@ -924,7 +926,7 @@ def ask_gpt(user_text, chat_id=None):
                     data=json.dumps(fallback_payload, ensure_ascii=False).encode("utf-8"),
                     headers={"x-goog-api-key": GEMINI_API_KEY, "Content-Type": "application/json"}
                 )
-                with urlopen(fallback_req, timeout=45) as response:
+                with urlopen(fallback_req, timeout=15) as response:
                     fallback_result = json.loads(response.read().decode("utf-8"))
                 fallback_answer = (fallback_result.get("output_text") or "").strip()
                 if not fallback_answer:
@@ -1316,7 +1318,7 @@ def handle_message(chat_id, text, forwarded=False):
             send(chat_id, f"🔎 النتائج: {len(found)} — أعرض أول {min(18, len(found))}", rows)
     else:
         user_text = (text or "").strip()
-        answer = ask_gpt(user_text, chat_id=chat_id)
+        answer = ask_gpt_resilient(user_text, chat_id=chat_id)
         send(chat_id, answer)
         remember_turn(chat_id, "user", user_text)
         remember_turn(chat_id, "assistant", answer)
@@ -1397,7 +1399,11 @@ class Handler(BaseHTTPRequestHandler):
 def main():
     init_memory()
     print("Nexus conversation memory initialized; storage=" + MEMORY_DB, flush=True)
-    threading.Thread(target=live_inventory_worker, daemon=True).start()
+    if ENABLE_BACKGROUND_INVENTORY:
+        threading.Thread(target=live_inventory_worker, daemon=True).start()
+        print("Background inventory refresh enabled.", flush=True)
+    else:
+        print("Background inventory refresh paused; use /inventory when needed.", flush=True)
     if TOKEN:
         threading.Thread(target=polling, daemon=True).start()
         print("Telegram polling started; inline menu enabled; automatic free fallback enabled; startup AI calls disabled.", flush=True)
