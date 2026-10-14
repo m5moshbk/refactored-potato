@@ -74,7 +74,10 @@ def handle(chat_id, text):
     elif cmd in ("/projects","/المشاريع"):
         names = ["SADA","Sawa-Play-Monitor","m5moshbk-Elite-Console-X","super-duper-octo-adventure","Tamara-Business-Site","refactored-potato","bizweb-platform","Crispy-Seeka"]
         rs = [r for n in names for r in repos() if r["name"].lower()==n.lower()]
-        send(chat_id, "المشاريع الأساسية:\n" + "\n\n".join(card(r) for r in rs) + "\n\nخدمات Render: استخدم /services")
+        local = CATALOG.get("workspace_projects", [])
+        local_text = "\n\n".join("• "+p["name"]+" — "+p["category"]+"\nالغرض: "+p["purpose"]+"\nالحالة: "+p["status"] for p in local)
+        repo_text = "\n\n".join(card(r) for r in rs) if rs else "لا توجد مستودعات أساسية مطابقة في الكتالوج."
+        send(chat_id, "المشاريع الأساسية:\n" + repo_text + "\n\nمشاريع محلية/غير مرتبطة بمستودع:\n" + local_text + "\n\nخدمات Render: استخدم /services")
     elif cmd in ("/repo","/مستودع"):
         r = find_repo(arg)
         send(chat_id, card(r) if r else "لم أجد المستودع. استخدم /repos أو /search كلمة.")
