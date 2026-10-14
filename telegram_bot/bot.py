@@ -87,6 +87,12 @@ def polling():
             time.sleep(5)
 
 class Handler(BaseHTTPRequestHandler):
+    def do_HEAD(self):
+        if self.path not in ("/","/health","/healthz"):
+            self.send_response(404); self.end_headers(); return
+        body = json.dumps({"ok":True,"service":"m5mosh-nexus-telegram-catalog","bot_configured":bool(TOKEN),"repositories":len(repos())}).encode()
+        self.send_response(200); self.send_header("Content-Type","application/json; charset=utf-8")
+        self.send_header("Content-Length",str(len(body))); self.end_headers()
     def do_GET(self):
         if self.path not in ("/","/health","/healthz"):
             self.send_response(404); self.end_headers(); return
