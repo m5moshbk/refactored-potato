@@ -4,6 +4,7 @@ import json, os, time, threading
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
+from urllib.error import HTTPError, URLError
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 with open(os.path.join(ROOT, "catalog.json"), encoding="utf-8") as f:
@@ -241,11 +242,29 @@ def ask_gpt(user_text):
                 for part in item.get("content", []):
                     if part.get("type") == "output_text" and part.get("text"):
                         parts.append(part["text"])
-        answer = "\\n".join(parts).strip()
+        answer = "\n".join(parts).strip()
         return answer[:3900] if answer else "وصل رد فارغ من GPT. حاول مرة أخرى."
+    except HTTPError as exc:
+        # Log only non-secret diagnostics; never log headers, request data, or the API key.
+        details = {}
+        try:
+            body = json.loads(exc.read().decode("utf-8", errors="replace"))
+            details = body.get("error", {}) if isinstance(body, dict) else {}
+        except Exception:
+            pass
+        print("OpenAI HTTP error:",
+              "status=" + str(exc.code),
+              "type=" + str(details.get("type", "unknown")),
+              "code=" + str(details.get("code", "unknown")),
+              "param=" + str(details.get("param", "unknown")),
+              flush=True)
+        return "تعذر الاتصال بـ GPT. راجع سجل Render لمعرفة رمز الخطأ، دون مشاركة المفتاح."
+    except URLError as exc:
+        print("OpenAI network error:", type(exc.reason).__name__, flush=True)
+        return "تعذر الوصول إلى خدمة GPT بسبب مشكلة اتصال. حاول لاحقًا."
     except Exception as exc:
         print("OpenAI request error:", type(exc).__name__, flush=True)
-        return "تعذر الاتصال بـ GPT. تحقق من مفتاح OpenAI والرصيد/حدود الاستخدام في المنصة، ثم جرّب مجددًا."
+        return "تعذر الاتصال بـ GPT. راجع سجل Render لتشخيص الخطأ."
 
 
 def handle_message(chat_id, text):
