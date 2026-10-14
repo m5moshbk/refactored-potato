@@ -55,7 +55,22 @@ def send(chat_id, text, keyboard=None):
     params = {"chat_id": chat_id, "text": text[:3900], "disable_web_page_preview": "true"}
     if keyboard:
         params["reply_markup"] = {"inline_keyboard": keyboard}
-    api("sendMessage", params, 20)
+    return api("sendMessage", params, 20)
+
+
+def send_customer_draft(chat_id, draft):
+    """Send a concise client-ready draft with Telegram-native copy and delete buttons."""
+    draft = " ".join((draft or "").split()).strip()
+    if not draft:
+        draft = "شكرًا لك على التوضيح. خلّني أراجع التفاصيل وأرجع لك بالخيارات المناسبة."
+    # Telegram CopyTextButton limits the copied string to 256 characters.
+    if len(draft) > 250:
+        draft = draft[:247].rsplit(" ", 1)[0].rstrip("،؛,. ") + "…"
+    keyboard = [[
+        {"text": "📋 نسخ الرد", "copy_text": {"text": draft}},
+        button("🗑️ حذف المسودة", "draft_delete")
+    ]]
+    return send(chat_id, "✉️ مسودة رد جاهزة للمراجعة\n\n" + draft, keyboard)
 
 
 def edit(chat_id, message_id, text, keyboard=None):
@@ -287,7 +302,13 @@ def project_summary():
 
 
 def on_callback(chat_id, message_id, data):
-    if data == "menu":
+    if data == "draft_delete":
+        try:
+            api("deleteMessage", {"chat_id": chat_id, "message_id": message_id}, 15)
+        except Exception as exc:
+            print("Draft delete error:", type(exc).__name__, flush=True)
+            send(chat_id, "تعذر حذف المسودة تلقائيًا. يمكنك حذف الرسالة من تيليجرام يدويًا.")
+    elif data == "menu":
         edit(chat_id, message_id, "🧭 M5mOsH Nexus\nمركز موحّد لتصفح المشاريع والخدمات — وضع القراءة فقط.", menu())
     elif data == "categories":
         edit(chat_id, message_id, "🗂️ اختر مجالًا لعرض المستودعات التابعة له. التصنيف أولي وقد يحتاج مراجعة.", category_keyboard())
@@ -404,17 +425,44 @@ def ask_gpt(user_text):
         return "تعذر الاتصال بـ Gemini. راجع سجل Render لتشخيص الخطأ."
 
 
+def split_customer_analysis(answer):
+    """Separate internal notes from a concise client-facing reply."""
+    answer = (answer or "").strip()
+    marker = "مسودة الرد:"
+    if marker in answer:
+        internal, draft = answer.split(marker, 1)
+        internal = internal.replace("ملخص داخلي:", "").strip()
+        draft = draft.strip().strip("\\"'“”")
+        return (internal or "راجع الرسالة قبل الرد وتأكد من أي تفاصيل غير محسومة.",
+                draft or "شكرًا لك على التوضيح. خلّني أراجع التفاصيل وأرجع لك بالخيارات المناسبة." )
+    return ("تعذر فصل التحليل عن مسودة الرد تلقائيًا؛ راجع النص قبل إرساله.",
+            "شكرًا لك على التوضيح. خلّني أراجع التفاصيل وأرجع لك بالخيارات المناسبة.")
+
+
 def handle_message(chat_id, text, forwarded=False):
     if not ADMIN or str(chat_id) != ADMIN:
         send(chat_id, "هذا البوت خاص، ولم تُمنح هذه المحادثة صلاحية الاستخدام.")
         return
     raw_text = (text or "").strip()
     if forwarded and raw_text:
-        prompt = ("حلل رسالة أو محادثة عميل متجر إلكتروني لأجل مساعدتي في تقديم خدمة مهنية. " 
-                  "استخرج: احتياج العميل المؤكد، ما يحتاج سؤالًا توضيحيًا، فرص الخدمات المناسبة دون وعود غير مؤكدة، " 
-                  "ومسودة رد سعودي مهني قصيرة. لا تفترض معلومات غير مذكورة، ولا تكرر أرقام الهاتف أو البيانات الشخصية غير اللازمة. " 
-                  "النص المنقول من العميل:\\n" + raw_text[:5000])
-        send(chat_id, ask_gpt(prompt), [[button("🛍️ فحص متجر العميل", "store_audit_help")], [button("🏠 القائمة الرئيسية", "menu")]])
+        prompt = (
+            "حلل الرسالة المنقولة من عميل متجر إلكتروني. أجب بالعربية السعودية الطبيعية، "
+            "بأسلوب محادثة مهني ودافئ ومختصر، كأن موظف خدمة عملاء متمرس كتبها بنفسه: "
+            "بدون عبارات روبوتية أو مقدمات عامة أو تعداد مبالغ فيه أو رموز تعبيرية كثيرة. "
+            "لا تدّعِ معرفة أو تنفيذ شيء لم يذكره النص، ولا تخترع أسعارًا أو ضمانات أو مواعيد. "
+            "أخرج قسمين فقط بهذا التنسيق الحرفي:\\n"
+            "ملخص داخلي: احتياج مؤكد وما يلزم الاستيضاح عنه وفرصة خدمة مناسبة، في 2-3 جمل.\\n"
+            "مسودة الرد: رسالة سعودية طبيعية للعميل في جملة أو جملتين، وبحد أقصى 240 حرفًا؛ "
+            "لا تذكر الذكاء الاصطناعي ولا تكتب عنوانًا أو شرحًا داخل نص الرسالة نفسها. "
+            "اجعل الرد صادقًا ولا تزعم أن المرسل إنسان إذا سُئل عن ذلك. "
+            "لا تكرر بيانات شخصية غير لازمة.\\n\\nالنص المنقول:\\n" + raw_text[:5000]
+        )
+        analysis = ask_gpt(prompt)
+        internal, draft = split_customer_analysis(analysis)
+        send(chat_id, "🧩 تحليل داخلي للرسالة\\n\\n" + internal,
+             [[button("🛍️ فحص متجر العميل", "store_audit_help")],
+              [button("🏠 القائمة الرئيسية", "menu")]])
+        send_customer_draft(chat_id, draft)
         return
     cmd, _, arg = raw_text.partition(" ")
     cmd = cmd.split("@")[0].lower()
