@@ -1327,10 +1327,13 @@ def handle_message(chat_id, text, forwarded=False):
 
 def polling():
     global OFFSET
+    retry_delay = 3
+    max_retry_delay = 60
     while True:
         try:
             result = api("getUpdates", {"timeout": 25, "offset": OFFSET,
                                         "allowed_updates": ["message", "callback_query"]}, 35)
+            retry_delay = 3
             for item in result.get("result", []):
                 OFFSET = max(OFFSET, int(item.get("update_id", 0)) + 1)
                 callback = item.get("callback_query")
@@ -1364,10 +1367,15 @@ def polling():
             else:
                 print("Telegram polling HTTP error: status=" + str(exc.code) +
                       " description=" + description, flush=True)
-            time.sleep(8 if exc.code == 409 else 5)
+            delay = 30 if exc.code == 409 else retry_delay
+            print("Polling retry scheduled in " + str(delay) + " seconds.", flush=True)
+            time.sleep(delay)
+            retry_delay = min(max_retry_delay, max(6, retry_delay * 2))
         except Exception as exc:
-            print("Telegram polling error:", type(exc).__name__, flush=True)
-            time.sleep(5)
+            print("Telegram polling/network error:", type(exc).__name__, flush=True)
+            print("Retrying after " + str(retry_delay) + " seconds.", flush=True)
+            time.sleep(retry_delay)
+            retry_delay = min(max_retry_delay, max(6, retry_delay * 2))
 
 
 class Handler(BaseHTTPRequestHandler):
