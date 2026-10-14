@@ -984,6 +984,74 @@ def ask_gpt(user_text, chat_id=None):
         return "تعذر إكمال طلب المحرك المحدد. راجع سجل Render لتشخيص الخطأ."
 
 
+
+def _provider_failed(answer):
+    """Recognize only this bot's known provider-error responses."""
+    value = (answer or "").casefold()
+    markers = (
+        "تعذر الاتصال بالمحرك", "تعذر الوصول إلى المحرك",
+        "تعذر إكمال طلب المحرك", "وصل المحرك المحدد إلى حد الاستخدام",
+        "gemini رفض الطلب بسبب حد الاستخدام", "تعذر توثيق المحرك",
+        "رفض openai الطلب", "رفض gemini الطلب", "لم يُرجع المحرك المحدد نصًا",
+        "راجع سجلات render", "http 429", "http 503", "no credits remaining",
+        "resource_exhausted", "quota"
+    )
+    return any(marker in value for marker in markers)
+
+
+def local_free_fallback(user_text, reason=""):
+    """A deterministic offline response: never pretends an AI provider succeeded."""
+    value = (user_text or "").strip()
+    intent = classify_intent(value)
+    header = "🟢 وضع Nexus المجاني الاحتياطي\n"
+    status = ("تعذر الحصول على إجابة من مزوّد الذكاء الاصطناعي حاليًا؛ لم أستخدم رصيدًا مدفوعًا إضافيًا.\n"
+              "الأوامر والجرد المحلي/المتاح ما زالت تعمل، لكن هذا الرد محلي وليس توليدًا من نموذج AI.\n\n")
+    if intent == "technical" or any(k in value.casefold() for k in ("خطأ", "تعطل", "لا يعمل", "ما يشتغل", "error", "429", "503")):
+        steps = ("خطوات التشخيص الآمنة:\n"
+                 "1. استخدم /diagnostics لفحص حالة البوت والإعدادات دون إظهار المفاتيح.\n"
+                 "2. استخدم /inventory لتحديث جرد GitHub وRender.\n"
+                 "3. لا تعِد المحاولة بشكل متكرر عند 429؛ انتظر تجدد الحصة أو افحصها في لوحة المزوّد.\n"
+                 "4. إذا فشل Gemini أيضًا، سيبقى Nexus في الوضع المحلي حتى تتاح الحصة المجانية.\n"
+                 "5. لا ترسل مفاتيح API أو كلمات المرور في المحادثة.")
+    elif intent == "writing":
+        steps = ("أرسل نوع النص والجمهور والنبرة المطلوبة، وسأحاول مساعدتك بقالب محلي محدود؛ "
+                 "لصياغة مفتوحة ودقيقة يلزم توفر أحد مزوّدي AI.")
+    elif intent == "planning":
+        steps = ("للمتابعة دون AI: حدّد هدفًا واحدًا، ثم نفّذ خطوة قابلة للتحقق، وسجّل النتيجة قبل الانتقال للخطوة التالية. "
+                 "استخدم /projects و /notes لمراجعة معلومات المشاريع المحفوظة.")
+    else:
+        steps = ("جرّب /help للأوامر المتاحة، أو /inventory للجرد، أو /projects للمشاريع، أو /notes للملاحظات. "
+                 "يمكنك إعادة السؤال لاحقًا؛ سيحاول Nexus الرجوع تلقائيًا إلى Gemini عند توافر الحصة.")
+    return header + status + steps
+
+
+def ask_gpt_resilient(user_text, chat_id=None):
+    """Prefer the chosen engine; on failure, switch to Gemini once, then use offline mode."""
+    provider = get_ai_provider(chat_id)
+    first_answer = ask_gpt_resilient(user_text, chat_id=chat_id)
+    if not _provider_failed(first_answer):
+        return first_answer
+
+    # Only fall back from OpenAI to the free-tier Gemini route; never switch from
+    # a failed free Gemini request to a potentially billable OpenAI API request.
+    if provider == "openai" and GEMINI_API_KEY:
+        try:
+            set_ai_provider(chat_id, "gemini")
+            print("Nexus automatic fallback: OpenAI failed; switched chat to Gemini.", flush=True)
+            second_answer = ask_gpt(user_text, chat_id=chat_id)
+            if not _provider_failed(second_answer):
+                return ("🔄 تم التحويل تلقائيًا إلى Gemini بعد تعذّر OpenAI.\n\n" +
+                        second_answer)
+            print("Nexus free-provider fallback unavailable; entering local mode.", flush=True)
+            return local_free_fallback(user_text, "gemini_unavailable")
+        except Exception as exc:
+            print("Nexus automatic fallback error:", type(exc).__name__, flush=True)
+            return local_free_fallback(user_text, "fallback_exception")
+
+    # A failed Gemini/free request must not trigger a paid OpenAI request.
+    print("Nexus free mode: selected provider unavailable; using local fallback.", flush=True)
+    return local_free_fallback(user_text, "free_provider_unavailable")
+
 def auto_test_ai_providers():
     """Test provider generation and Gemini search grounding, then notify the admin."""
     if not ADMIN or not TOKEN:
@@ -1133,7 +1201,7 @@ def handle_message(chat_id, text, forwarded=False):
             "اجعل الرد صادقًا ولا تزعم أن المرسل إنسان إذا سُئل عن ذلك. "
             "لا تكرر بيانات شخصية غير لازمة.\n\nالنص المنقول:\n" + raw_text[:5000]
         )
-        analysis = ask_gpt(prompt, chat_id=chat_id)
+        analysis = ask_gpt_resilient(prompt, chat_id=chat_id)
         internal, draft = split_customer_analysis(analysis)
         send(chat_id, "🧩 تحليل داخلي للرسالة\n\n" + internal,
              [[button("🛍️ فحص متجر العميل", "store_audit_help")],
@@ -1217,7 +1285,7 @@ def handle_message(chat_id, text, forwarded=False):
             send(chat_id, "اكتب سؤال البحث بعد الأمر، مثال: /web آخر تحديثات Python 3.14", [[button("🌐 إرشادات بحث الويب", "web_help")], [button("🏠 القائمة الرئيسية", "menu")]])
         else:
             question = "ابحث في الويب عن السؤال التالي باستخدام أداة web_search المدمجة. أعط خلاصة عملية، وميّز تاريخ النشر عن تاريخ الحدث، وأرفق الروابط التي تعيدها أداة البحث فقط. إذا لم تتوفر نتائج موثقة، قل ذلك بوضوح ولا تخترع مصادر.\n\nسؤال المستخدم: " + arg.strip()
-            answer = ask_gpt(question, chat_id=chat_id)
+            answer = ask_gpt_resilient(question, chat_id=chat_id)
             send(chat_id, answer, [[button("🌐 سؤال ويب آخر", "web_help")], [button("🏠 القائمة الرئيسية", "menu")]])
             remember_turn(chat_id, "user", raw_text)
             remember_turn(chat_id, "assistant", answer)
@@ -1332,8 +1400,7 @@ def main():
     threading.Thread(target=live_inventory_worker, daemon=True).start()
     if TOKEN:
         threading.Thread(target=polling, daemon=True).start()
-        threading.Thread(target=auto_test_ai_providers, daemon=True).start()
-        print("Telegram polling started; inline menu enabled; AI self-test scheduled.", flush=True)
+        print("Telegram polling started; inline menu enabled; automatic free fallback enabled; startup AI calls disabled.", flush=True)
     else:
         print("TELEGRAM_BOT_TOKEN missing; health only until configured.", flush=True)
     HTTPServer(("0.0.0.0", PORT), Handler).serve_forever()
