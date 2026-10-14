@@ -169,8 +169,8 @@ def on_callback(chat_id, message_id, data):
 
 
 def handle_message(chat_id, text):
-    if ADMIN and str(chat_id) != ADMIN:
-        send(chat_id, "هذا البوت مقيّد بالمحادثة الإدارية المحددة.")
+    if not ADMIN or str(chat_id) != ADMIN:
+        send(chat_id, "هذا البوت خاص، ولم تُمنح هذه المحادثة صلاحية الاستخدام.")
         return
     cmd, _, arg = (text or "").strip().partition(" ")
     cmd = cmd.split("@")[0].lower()
@@ -197,8 +197,10 @@ def handle_message(chat_id, text):
         if not found:
             send(chat_id, "لم أجد نتائج لهذه الكلمة.")
         else:
-            rows = [[button(("📦 " if k == "repo" else "☁️ ") + name[:48], k + ":" + str(idx))
-                     for k, idx, name in found[:18]]
+            rows = [
+                [button(("📦 " if k == "repo" else "☁️ ") + name[:48], k + ":" + str(idx))]
+                for k, idx, name in found[:18]
+            ]
             rows.append([button("🏠 القائمة الرئيسية", "menu")])
             send(chat_id, f"🔎 النتائج: {len(found)} — أعرض أول {min(18, len(found))}", rows)
     else:
@@ -220,7 +222,7 @@ def polling():
                         msg = callback.get("message") or {}
                         chat = msg.get("chat") or {}
                         if chat.get("id") is not None and callback.get("data"):
-                            if not ADMIN or str(chat["id"]) == ADMIN:
+                            if ADMIN and str(chat["id"]) == ADMIN:
                                 on_callback(chat["id"], msg.get("message_id"), callback["data"])
                     except Exception as exc:
                         print("Telegram callback error:", type(exc).__name__, flush=True)
