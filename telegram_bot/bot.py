@@ -913,7 +913,7 @@ def auto_test_ai_providers():
         try:
             if provider == "openai":
                 payload = {"model": model, "instructions": "Connection test. Reply only OK.",
-                           "input": "Reply with exactly OK.", "max_output_tokens": 12}
+                           "input": "Reply with exactly OK.", "max_output_tokens": 16}
                 req = Request("https://api.openai.com/v1/responses",
                               data=json.dumps(payload).encode("utf-8"),
                               headers={"Authorization": "Bearer " + key,
