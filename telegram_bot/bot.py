@@ -38,9 +38,11 @@ def button(label, data):
 
 def menu():
     return [
-        [button("📦 المستودعات", "repos:0"), button("🧩 الأقسام", "categories")],
-        [button("☁️ خدمات Render", "services:0"), button("🚀 المشاريع", "projects")],
-        [button("🔎 البحث", "search_help"), button("ℹ️ حول Nexus", "about")],
+        [button("📁 مستودعات GitHub", "repos:0")],
+        [button("☁️ خدمات Render", "services:0")],
+        [button("🧭 مشاريعي", "projects"), button("🗂️ تصنيف المجالات", "categories")],
+        [button("🔎 بحث", "search_help"), button("📊 ملخص الفهرس", "overview")],
+        [button("❔ المساعدة والأوامر", "help"), button("ℹ️ حول البوت", "about")],
     ]
 
 
@@ -109,13 +111,38 @@ def page_keyboard(kind, page, total):
     return rows
 
 
-def category_summary():
-    counts = {}
-    for r in repos():
-        category = r.get("category", "بحاجة للتصنيف")
-        counts[category] = counts.get(category, 0) + 1
-    return "🧩 أقسام الكتالوج\n\n" + "\n".join(
-        "• " + k + ": " + str(v) for k, v in sorted(counts.items()))
+def category_list():
+    return sorted({r.get("category", "بحاجة للتصنيف") for r in repos()})
+
+def category_keyboard():
+    rows = []
+    for idx, category in enumerate(category_list()):
+        count = sum(1 for r in repos() if r.get("category", "بحاجة للتصنيف") == category)
+        rows.append([button(f"{category} ({count})"[:48], "category:" + str(idx))])
+    rows.append([button("🏠 القائمة الرئيسية", "menu")])
+    return rows
+
+def category_repositories(index):
+    categories = category_list()
+    if not 0 <= index < len(categories):
+        return "هذا التصنيف غير متاح.", [[button("🗂️ التصنيفات", "categories")]]
+    category = categories[index]
+    selected = [(i, r) for i, r in enumerate(repos())
+                if r.get("category", "بحاجة للتصنيف") == category]
+    rows = [[button(r.get("name", "مستودع")[:48], "repo:" + str(i))]
+            for i, r in selected[:30]]
+    rows.append([button("⬅️ التصنيفات", "categories"), button("🏠 الرئيسية", "menu")])
+    return f"🗂️ المجال: {category}\nالمستودعات المسجلة: {len(selected)}", rows
+
+def overview():
+    categories = category_list()
+    counts = []
+    for category in categories:
+        count = sum(1 for r in repos() if r.get("category", "بحاجة للتصنيف") == category)
+        counts.append(f"• {category}: {count}")
+    return ("📊 ملخص الفهرس (بيانات مسجلة وليست فحصًا حيًا)\n"
+            f"مستودعات GitHub: {len(repos())}\nخدمات Render المسجلة: {len(services())}\n\n"
+            + "\n".join(counts))
 
 
 def project_summary():
@@ -136,8 +163,20 @@ def on_callback(chat_id, message_id, data):
     if data == "menu":
         edit(chat_id, message_id, "🧭 M5mOsH Nexus\nمركز موحّد لتصفح المشاريع والخدمات — وضع القراءة فقط.", menu())
     elif data == "categories":
-        edit(chat_id, message_id, category_summary(), [
-            [button("📦 المستودعات", "repos:0")], [button("🏠 القائمة الرئيسية", "menu")]])
+        edit(chat_id, message_id, "🗂️ اختر مجالًا لعرض المستودعات التابعة له. التصنيف أولي وقد يحتاج مراجعة.", category_keyboard())
+    elif data.startswith("category:"):
+        try:
+            idx = int(data.split(":", 1)[1])
+            text, keyboard = category_repositories(idx)
+            edit(chat_id, message_id, text, keyboard)
+        except (ValueError, IndexError):
+            edit(chat_id, message_id, "تعذر فتح التصنيف.", category_keyboard())
+    elif data == "overview":
+        edit(chat_id, message_id, overview(), [[button("🏠 القائمة الرئيسية", "menu")]])
+    elif data == "help":
+        edit(chat_id, message_id,
+             "❔ المساعدة\nيمكن استخدام الأزرار دون كتابة أوامر. الأوامر الاختيارية:\n/start أو /menu — القائمة الرئيسية\n/repos — المستودعات\n/services — خدمات Render\n/projects — المشاريع\n/search كلمة — البحث\n/help — المساعدة",
+             [[button("🏠 القائمة الرئيسية", "menu")]])
     elif data.startswith("repos:"):
         page = max(0, int(data.split(":", 1)[1]))
         edit(chat_id, message_id, f"📦 مستودعات GitHub المسجلة: {len(repos())}\nاختر مستودعًا لعرض التفاصيل.",
@@ -175,13 +214,15 @@ def handle_message(chat_id, text):
     cmd, _, arg = (text or "").strip().partition(" ")
     cmd = cmd.split("@")[0].lower()
     if cmd in ("/start", "/help", "/مساعدة", "/menu"):
-        send(chat_id, "🧭 أهلًا بك في M5mOsH Nexus\nاختر من القائمة التفاعلية بدل كتابة الأوامر يدويًا.\n\nاختصارات: /repos /services /projects /search كلمة", menu())
+        send(chat_id, "🧭 M5mOsH Nexus\nاختر المجال من الأزرار. كتابة الأوامر اختيارية وليست مطلوبة للتنقل.", menu())
     elif cmd in ("/repos", "/المستودعات"):
         send(chat_id, f"📦 المستودعات المسجلة: {len(repos())}", page_keyboard("repo", 0, len(repos())))
     elif cmd in ("/services", "/خدمات"):
         send(chat_id, f"☁️ خدمات Render المسجلة: {len(services())}\nهذه بيانات الكتالوج وليست فحصًا حيًا.", page_keyboard("service", 0, len(services())))
     elif cmd in ("/projects", "/المشاريع"):
         send(chat_id, project_summary(), [[button("🏠 القائمة الرئيسية", "menu")]])
+    elif cmd in ("/help", "/مساعدة"):
+        send(chat_id, "الأوامر اختيارية؛ استخدم أزرار القائمة للتنقل.\n/start أو /menu، /repos، /services، /projects، /search كلمة، /help", menu())
     elif cmd in ("/search", "/بحث"):
         q = arg.strip().casefold()
         if not q:
