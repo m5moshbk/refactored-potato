@@ -302,12 +302,12 @@ def project_summary():
 
 
 def on_callback(chat_id, message_id, data):
-    if data == "draft_delete":
+    if data in ("draft_delete", "audit_delete"):
         try:
             api("deleteMessage", {"chat_id": chat_id, "message_id": message_id}, 15)
         except Exception as exc:
-            print("Draft delete error:", type(exc).__name__, flush=True)
-            send(chat_id, "تعذر حذف المسودة تلقائيًا. يمكنك حذف الرسالة من تيليجرام يدويًا.")
+            print("Message delete error:", type(exc).__name__, flush=True)
+            send(chat_id, "تعذر حذف الرسالة تلقائيًا. يمكنك حذفها من تيليجرام يدويًا.")
     elif data == "menu":
         edit(chat_id, message_id, "🧭 M5mOsH Nexus\nمركز موحّد لتصفح المشاريع والخدمات — وضع القراءة فقط.", menu())
     elif data == "categories":
@@ -478,8 +478,36 @@ def handle_message(chat_id, text, forwarded=False):
         if not arg.strip():
             send(chat_id, "أرسل رابط المتجر: /sitecheck https://example.com")
         else:
+            def progress_text(percent, label, detail=""):
+                filled = max(0, min(10, percent // 10))
+                bar = "█" * filled + "░" * (10 - filled)
+                return ("🔎 M5mOsH Nexus | فحص المتجر\\n"
+                        + "[" + bar + "] " + str(percent) + "%\\n"
+                        + "الحالة: " + label + "\\n"
+                        + detail + "\\n\\n"
+                        + "🛡️ قراءة فقط • لا تسجيل دخول ولا شراء ولا تغيير إعدادات")
             try:
-                send(chat_id, audit_store(arg.strip()), [[button("🛍️ فحص متجر آخر", "store_audit_help")], [button("🏠 الرئيسية", "menu")]])
+                started = send(chat_id, progress_text(1, "تهيئة الفحص", "جاري التحقق من الرابط العام..."))
+                message_id = (started.get("result") or {}).get("message_id")
+                def update_progress(percent, label, detail=""):
+                    if message_id:
+                        try:
+                            edit(chat_id, message_id, progress_text(percent, label, detail))
+                        except Exception as exc:
+                            print("Audit progress update error:", type(exc).__name__, flush=True)
+                report = audit_store(arg.strip(), progress=update_progress)
+                draft_marker = "مسودة رسالة للعميل:\\n"
+                draft = report.split(draft_marker, 1)[1].strip() if draft_marker in report else ""
+                keyboard = []
+                if draft and len(draft) <= 256:
+                    keyboard.append([{"text": "📋 نسخ رسالة العميل", "copy_text": {"text": draft}}])
+                keyboard.extend([[button("🗑️ حذف التقرير", "audit_delete")],
+                                 [button("🛍️ فحص متجر آخر", "store_audit_help")],
+                                 [button("🏠 الرئيسية", "menu")]])
+                if message_id:
+                    edit(chat_id, message_id, report, keyboard)
+                else:
+                    send(chat_id, report, keyboard)
             except ValueError as exc:
                 send(chat_id, "تعذر الفحص: " + str(exc))
     elif cmd in ("/inventory", "/الجرد"):
