@@ -3,6 +3,7 @@ import html
 import ipaddress
 import re
 import socket
+import time
 from html.parser import HTMLParser
 from urllib.parse import urljoin, urlparse
 from urllib.error import HTTPError, URLError
@@ -116,31 +117,48 @@ def audit_store(url, progress=None):
     req = Request(url, headers={"User-Agent": "Mozilla/5.0 (compatible; M5mOsHStoreAudit/1.0)", "Accept": "text/html"})
     opener = build_opener(_SafeRedirect())
     try:
-        with opener.open(req, timeout=18) as resp:
-            final_url = resp.geturl()
-            _public_http_url(final_url)
-            status = resp.status
-            content_type = resp.headers.get("Content-Type", "")
-            raw = resp.read(1_500_000)
-    except HTTPError as exc:
-        code = exc.code
-        messages = {
-            400: "الرابط أو الطلب غير مقبول (400).",
-            401: "الموقع يطلب مصادقة (401)؛ الفحص لا يسجل الدخول.",
-            403: "الموقع رفض الطلب (403)، وقد يمنع أدوات الفحص الآلية.",
-            404: "الصفحة غير موجودة (404). تحقق من الرابط.",
-            408: "انتهت مهلة طلب الموقع (408).",
-            429: "الموقع حدّ من الطلبات (429). انتظر قليلًا ثم أعد المحاولة.",
-        }
-        if code in messages:
-            detail = messages[code]
-        elif 300 <= code < 400:
-            detail = "تعذر إكمال إعادة التوجيه (HTTP " + str(code) + ")."
-        elif 500 <= code < 600:
-            detail = "حدث خطأ من خادم الموقع (HTTP " + str(code) + ")."
-        else:
-            detail = "أعاد الموقع استجابة HTTP " + str(code) + "."
-        return "تعذر فحص الصفحة العامة: " + detail + " لن نحاول تجاوز الحماية أو تسجيل الدخول."
+        transient_statuses = {408, 425, 429, 500, 502, 503, 504}
+        for attempt in range(3):
+            try:
+                with opener.open(req, timeout=18) as resp:
+                    final_url = resp.geturl()
+                    _public_http_url(final_url)
+                    status = resp.status
+                    content_type = resp.headers.get("Content-Type", "")
+                    raw = resp.read(1_500_000)
+                break
+            except HTTPError as exc:
+                code = exc.code
+                if code in transient_statuses and attempt < 2:
+                    retry_after = exc.headers.get("Retry-After", "")
+                    try:
+                        delay = max(1, min(8, int(retry_after)))
+                    except (TypeError, ValueError):
+                        delay = 1 + attempt
+                    stage(22, "إعادة محاولة الاتصال", "استجابة مؤقتة HTTP " + str(code) +
+                          "؛ إعادة المحاولة " + str(attempt + 2) + " من 3")
+                    time.sleep(delay)
+                    continue
+                messages = {
+                    400: "الرابط أو الطلب غير مقبول (400).",
+                    401: "الموقع يطلب مصادقة (401)؛ الفحص لا يسجل الدخول.",
+                    403: "الموقع رفض الطلب (403)، وقد يمنع أدوات الفحص الآلية.",
+                    404: "الصفحة غير موجودة (404). تحقق من الرابط.",
+                    408: "انتهت مهلة طلب الموقع (408).",
+                    425: "الموقع طلب إعادة المحاولة لاحقًا (425).",
+                    429: "الموقع حدّ من الطلبات (429). انتظر قليلًا ثم أعد المحاولة.",
+                    500: "خطأ داخلي في خادم الموقع (500).",
+                    502: "بوابة الموقع تلقت استجابة غير صالحة (502).",
+                    503: "خادم الموقع غير متاح مؤقتًا (503).",
+                    504: "انتهت مهلة البوابة أثناء انتظار الخادم (504).",
+                }
+                if code in messages:
+                    detail = messages[code]
+                elif 300 <= code < 400:
+                    detail = "تعذر إكمال إعادة التوجيه (HTTP " + str(code) + ")."
+                else:
+                    detail = "أعاد الموقع استجابة HTTP " + str(code) + " (" + str(exc.reason) + ")."
+                return "تعذر فحص الصفحة العامة: " + detail + " لن نحاول تجاوز الحماية أو تسجيل الدخول."
     except URLError as exc:
         reason = getattr(exc, "reason", None)
         if isinstance(reason, (TimeoutError,)):
