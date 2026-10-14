@@ -898,7 +898,7 @@ def ask_gpt(user_text, chat_id=None):
 
 
 def auto_test_ai_providers():
-    """Run a tiny connectivity check at startup and send a factual report."""
+    """Test provider generation and Gemini search grounding, then notify the admin."""
     if not ADMIN or not TOKEN:
         return
     report = ["🩺 تقرير الاختبار التلقائي لمحركات الذكاء الاصطناعي",
@@ -921,7 +921,8 @@ def auto_test_ai_providers():
                                        "Content-Type": "application/json"})
             else:
                 payload = {"contents": [{"role": "user", "parts": [{"text": "Reply with exactly OK."}]}],
-                           "generationConfig": {"maxOutputTokens": 12}}
+                           "generationConfig": {"maxOutputTokens": 12},
+                           "tools": [{"google_search": {}}]}
                 req = Request("https://generativelanguage.googleapis.com/v1beta/models/" +
                               model + ":generateContent",
                               data=json.dumps(payload).encode("utf-8"),
@@ -933,21 +934,66 @@ def auto_test_ai_providers():
                               if item.get("type") == "message"
                               for part in item.get("content", [])
                               if part.get("type") == "output_text"]
+                search_note = ""
             else:
                 text_parts = [part.get("text", "")
                               for candidate in data.get("candidates", [])
                               for part in (candidate.get("content") or {}).get("parts", [])]
+                search_note = " + Google Search"
             if any(t.strip() for t in text_parts):
-                report.append("• " + label + ": نجح اختبار API (" + model + ").")
+                report.append("• " + label + ": نجح اختبار API" + search_note + " (" + model + ").")
+                print("AI startup test passed:", provider, "model=" + model, flush=True)
             else:
                 report.append("• " + label + ": وصل الطلب لكن لم يُرجع نصًا؛ راجع سجلات Render.")
         except HTTPError as exc:
+            details = ""
+            try:
+                body = json.loads(exc.read().decode("utf-8", errors="replace"))
+                details = ((body.get("error") or {}).get("message") or "")
+            except Exception:
+                pass
+            print("AI startup test failed:", provider, "HTTP", exc.code,
+                  "message=" + details[:180], flush=True)
+            if provider == "gemini" and exc.code in (400, 404):
+                try:
+                    fallback_model = "gemini-3.8-flash" if exc.code == 404 else model
+                    fallback_payload = dict(payload)
+                    fallback_payload.pop("tools", None)
+                    fallback_req = Request(
+                        "https://generativelanguage.googleapis.com/v1beta/models/" +
+                        fallback_model + ":generateContent",
+                        data=json.dumps(fallback_payload).encode("utf-8"),
+                        headers={"x-goog-api-key": key, "Content-Type": "application/json"})
+                    with urlopen(fallback_req, timeout=25) as response:
+                        fallback_data = json.loads(response.read().decode("utf-8"))
+                    fallback_parts = [part.get("text", "")
+                                      for candidate in fallback_data.get("candidates", [])
+                                      for part in (candidate.get("content") or {}).get("parts", [])]
+                    if any(t.strip() for t in fallback_parts):
+                        report.append("• " + label + ": نجح توليد النص (" + fallback_model +
+                                      ") لكن فشل بحث Google؛ يعمل دون البحث.")
+                        print("AI startup fallback passed: gemini model=" + fallback_model +
+                              " search=unavailable", flush=True)
+                        continue
+                except HTTPError as retry_exc:
+                    retry_details = ""
+                    try:
+                        retry_body = json.loads(retry_exc.read().decode("utf-8", errors="replace"))
+                        retry_details = ((retry_body.get("error") or {}).get("message") or "")
+                    except Exception:
+                        pass
+                    print("AI startup fallback failed: gemini HTTP", retry_exc.code,
+                          "message=" + retry_details[:180], flush=True)
+                    report.append("• " + label + ": فشل API أيضًا دون البحث — HTTP " +
+                                  str(retry_exc.code) + ".")
+                    continue
+                except Exception as retry_exc:
+                    print("AI startup fallback error:", type(retry_exc).__name__, flush=True)
             report.append("• " + label + ": فشل اختبار API — HTTP " + str(exc.code) + ".")
-            print("AI startup test failed:", provider, "HTTP", exc.code, flush=True)
         except Exception as exc:
             report.append("• " + label + ": فشل اختبار الاتصال (" + type(exc).__name__ + ").")
             print("AI startup test failed:", provider, type(exc).__name__, flush=True)
-    report.append("\nاختبار اتصال محدود فقط؛ لا يضمن توفر الحصة لاحقًا. لم تُعرض المفاتيح.")
+    report.append("\nاختبار فعلي عند بدء الخدمة؛ لا يضمن توفر الحصة لاحقًا. لم تُعرض المفاتيح.")
     try:
         send(ADMIN, "\n".join(report), [[button("⚙️ إعدادات المحركات", "provider:settings")],
                                          [button("🏠 القائمة الرئيسية", "menu")]])
