@@ -135,9 +135,11 @@ def menu():
         [button("📁 مستودعات GitHub", "repos:0")],
         [button("☁️ خدمات Render", "services:0")],
         [button("🛍️ فحص متجر عميل", "store_audit_help")],
+        [button("📡 الجرد الحي", "live_inventory"), button("🩺 تشخيص البوت", "diagnostics")],
         [button("🧭 مشاريعي", "projects"), button("🗂️ تصنيف المجالات", "categories")],
-        [button("🔎 بحث", "search_help"), button("📊 ملخص الفهرس", "overview")],
-        [button("❔ المساعدة والأوامر", "help"), button("ℹ️ حول البوت", "about")],
+        [button("🔎 بحث الفهرس", "search_help"), button("🌐 بحث الويب", "web_help")],
+        [button("📊 ملخص الفهرس", "overview"), button("🧠 الذاكرة", "memory_help")],
+        [button("⌨️ الأوامر", "commands"), button("ℹ️ حول البوت", "about")],
     ]
 
 
@@ -420,8 +422,34 @@ def on_callback(chat_id, message_id, data):
         edit(chat_id, message_id, live_status_text(), [[button("🔄 إعادة المحاولة", "live_inventory_refresh")], [button("🏠 القائمة الرئيسية", "menu")]])
     elif data == "help":
         edit(chat_id, message_id,
-             "❔ المساعدة\nيمكن استخدام الأزرار دون كتابة أوامر. الأوامر الاختيارية:\n/start أو /menu — القائمة الرئيسية\n/repos — المستودعات\n/services — خدمات Render\n/projects — المشاريع\n/search كلمة — البحث\n/help — المساعدة",
-             [[button("🏠 القائمة الرئيسية", "menu")]])
+             "❔ المساعدة\nيمكن استخدام الأزرار دون كتابة أوامر. افتح «⌨️ الأوامر» لرؤية القائمة الكاملة.\nتنبيه: البحث العام يعتمد على دعم Google Search في Gemini، ويجب أن تظهر مصادر فعلية كي نعدّه بحثًا موثقًا.",
+             [[button("⌨️ الأوامر", "commands")], [button("🏠 القائمة الرئيسية", "menu")]])
+    elif data == "commands":
+        edit(chat_id, message_id,
+             "⌨️ أوامر Nexus\n/start أو /menu — القائمة\n/repos — مستودعات GitHub\n/services — خدمات Render\n/projects — مشاريعي\n/inventory أو /status — تحديث الجرد الحي\n/refresh — إعادة تحديث الجرد\n/search كلمة — البحث في الفهرس\n/web سؤالك — سؤال يحتاج بحث ويب\n/sitecheck https://example.com — فحص HTML عام لمتجر\n/memory — حالة الذاكرة\n/memory_clear — مسح ذاكرة المحادثة\n/help — المساعدة\n\nتغييرات GitHub/Render والنشر ليست أوامر مفتوحة؛ تحتاج أداة وصلاحية وموافقة صريحة.",
+             [[button("🌐 بحث الويب", "web_help")], [button("📡 الجرد الحي", "live_inventory")], [button("🏠 القائمة الرئيسية", "menu")]])
+    elif data == "web_help":
+        edit(chat_id, message_id,
+             "🌐 بحث الويب\nاكتب سؤالك مباشرة أو استخدم الأمر:\n/web آخر تحديثات مشروع معين\nسيحاول Gemini استخدام Google Search. إذا لم يعرض مصادر، فلا تعتبر النتيجة تحققًا من الويب.",
+             [[button("⌨️ الأوامر", "commands")], [button("🏠 القائمة الرئيسية", "menu")]])
+    elif data == "diagnostics":
+        edit(chat_id, message_id,
+             "🩺 تشخيص مختصر\nالخدمة: " + "Render Web Service" + "\nالجرد: " + live_status_text().replace("\\n", "\n") + "\n\nفحص الصحة الخارجي: افتح رابط الخدمة. هذا لا يثبت أن Telegram أو Gemini يعملان بالكامل. إذا لم يستجب البوت، راجع سجلات Render.",
+             [[button("📡 تحديث الجرد", "live_inventory_refresh")], [button("⌨️ الأوامر", "commands")], [button("🏠 القائمة الرئيسية", "menu")]])
+    elif data == "memory_help":
+        edit(chat_id, message_id,
+             "🧠 ذاكرة المحادثة\nيحفظ البوت آخر الرسائل النصية لكل محادثة في SQLite. على قرص Render المؤقت قد تضيع البيانات عند إعادة النشر؛ الذاكرة الدائمة تحتاج قاعدة بيانات/قرصًا دائمًا.\nيمكنك عرض الحالة أو مسح الذاكرة بالأوامر.",
+             [[button("📋 حالة الذاكرة", "memory_status")], [button("🗑️ مسح الذاكرة", "memory_clear_confirm")], [button("🏠 القائمة الرئيسية", "menu")]])
+    elif data == "memory_status":
+        turns = len(get_memory(chat_id))
+        edit(chat_id, message_id, "🧠 ذاكرة هذه المحادثة: " + str(turns) + " رسالة محفوظة ضمن نافذة السياق الحالية.\nالمسار: " + MEMORY_DB + "\nملاحظة: التخزين على Render قد يكون مؤقتًا ما لم يُضبط تخزين دائم.",
+             [[button("🗑️ مسح الذاكرة", "memory_clear_confirm")], [button("🏠 القائمة الرئيسية", "menu")]])
+    elif data == "memory_clear_confirm":
+        edit(chat_id, message_id, "هل تريد مسح ذاكرة هذه المحادثة النصية؟ لا يمكن التراجع عن ذلك.",
+             [[button("نعم، امسحها", "memory_clear_yes"), button("إلغاء", "memory_help")]])
+    elif data == "memory_clear_yes":
+        clear_memory(chat_id)
+        edit(chat_id, message_id, "تم مسح ذاكرة هذه المحادثة.", [[button("🏠 القائمة الرئيسية", "menu")]])
     elif data.startswith("repos:"):
         page = max(0, int(data.split(":", 1)[1]))
         edit(chat_id, message_id, f"📦 مستودعات GitHub المسجلة: {len(repos())}\nاختر مستودعًا لعرض التفاصيل.",
@@ -629,9 +657,20 @@ def handle_message(chat_id, text, forwarded=False):
     elif cmd in ("/memory_clear", "/مسح_الذاكرة"):
         clear_memory(chat_id)
         send(chat_id, "تم مسح ذاكرة هذه المحادثة من قاعدة بيانات البوت المحلية.")
-    elif cmd in ("/inventory", "/الجرد"):
+    elif cmd in ("/inventory", "/الجرد", "/status", "/refresh"):
         refresh_live_inventory()
-        send(chat_id, live_status_text(), [[button("🔄 إعادة المحاولة", "live_inventory_refresh")], [button("🏠 القائمة الرئيسية", "menu")]])
+        send(chat_id, live_status_text(), [[button("🔄 إعادة المحاولة", "live_inventory_refresh")], [button("🩺 تشخيص البوت", "diagnostics")], [button("🏠 القائمة الرئيسية", "menu")]])
+    elif cmd in ("/web", "/ويب"):
+        if not arg.strip():
+            send(chat_id, "اكتب سؤال البحث بعد الأمر، مثال: /web آخر تحديثات Python 3.14", [[button("🌐 إرشادات بحث الويب", "web_help")], [button("🏠 القائمة الرئيسية", "menu")]])
+        else:
+            question = "ابحث في الويب عن السؤال التالي باستخدام أداة Google Search المدمجة. أعط خلاصة عملية، وميّز تاريخ النشر عن تاريخ الحدث، وأرفق الروابط التي تعيدها أداة البحث فقط. إذا لم تتوفر نتائج موثقة، قل ذلك بوضوح ولا تخترع مصادر.\n\nسؤال المستخدم: " + arg.strip()
+            answer = ask_gpt(question, chat_id=chat_id)
+            send(chat_id, answer, [[button("🌐 سؤال ويب آخر", "web_help")], [button("🏠 القائمة الرئيسية", "menu")]])
+            remember_turn(chat_id, "user", raw_text)
+            remember_turn(chat_id, "assistant", answer)
+    elif cmd == "/memory":
+        send(chat_id, "🧠 عدد الرسائل في نافذة الذاكرة: " + str(len(get_memory(chat_id))) + "\nالمسار: " + MEMORY_DB + "\nالتخزين على Render قد يكون مؤقتًا دون قرص دائم.", [[button("🗑️ مسح الذاكرة", "memory_clear_confirm")], [button("🏠 القائمة الرئيسية", "menu")]])
     elif cmd in ("/help", "/مساعدة"):
         send(chat_id, "الأوامر اختيارية؛ استخدم أزرار القائمة للتنقل.\n/start أو /menu، /repos، /services، /projects، /search كلمة، /help", menu())
     elif cmd in ("/search", "/بحث"):
