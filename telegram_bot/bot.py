@@ -877,10 +877,17 @@ def ask_gpt(user_text, chat_id=None):
                         if isinstance(block, dict) and block.get("text") and block["text"] not in parts:
                             parts.append(block["text"])
                 metadata_items = step.get("grounding_metadata", [])
+                if isinstance(metadata_items, dict):
+                    metadata_items = (metadata_items.get("grounding_chunks") or
+                                      metadata_items.get("groundingChunks") or [])
                 if not metadata_items and isinstance(step.get("groundingMetadata"), dict):
                     metadata_items = step["groundingMetadata"].get("groundingChunks", [])
-                for metadata in metadata_items or []:
-                    web = (metadata or {}).get("web") or {}
+                if not isinstance(metadata_items, list):
+                    metadata_items = []
+                for metadata in metadata_items:
+                    if not isinstance(metadata, dict):
+                        continue
+                    web = metadata.get("web") or {}
                     url = web.get("uri", "")
                     title = web.get("title") or url
                     if url.startswith(("https://", "http://")) and url not in [x[1] for x in source_links]:
