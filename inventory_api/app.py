@@ -63,6 +63,17 @@ def cors(response):
 def add_headers(response):
     return cors(response)
 
+@app.route("/", methods=["GET"])
+def root():
+    # A lightweight root response avoids an unnecessary 404 when a host or
+    # operator checks the service URL directly. Detailed health remains at /healthz.
+    return jsonify({
+        "ok": True,
+        "service": "M5mOsH Nexus code inventory API",
+        "health": "/healthz",
+        "status": "/api/v1/status"
+    })
+
 @app.route("/healthz", methods=["GET"])
 def healthz():
     return jsonify({"ok": True, "service": "M5mOsH Nexus code inventory API"})
