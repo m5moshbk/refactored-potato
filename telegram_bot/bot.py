@@ -561,10 +561,10 @@ def report_inventory_changes():
         if not changes:
             return
 
-        report = ("📋 تقرير تلقائي — رصد Nexus\\n"
+        report = ("📋 تقرير تلقائي — رصد Nexus\n"
                   + "الوقت: " + time.strftime("%Y-%m-%d %H:%M:%S UTC", time.gmtime())
-                  + "\\n\\n" + "\\n".join("• " + item for item in changes)
-                  + "\\n\\nالمصدر: GitHub وRender مباشرة. الرصد للقراءة فقط؛ لم يُجرَ أي تغيير.")
+                  + "\n\n" + "\n".join("• " + item for item in changes)
+                  + "\n\nالمصدر: GitHub وRender مباشرة. الرصد للقراءة فقط؛ لم يُجرَ أي تغيير.")
         # Only advance the baseline after Telegram confirms delivery. If send() fails,
         # the next monitoring cycle will compare against the previous snapshot and retry.
         send(ADMIN, report, [[button("📡 عرض الجرد", "live_inventory")],
