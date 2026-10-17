@@ -493,9 +493,10 @@ def live_status_text():
             + "\n\nلا تُعدّل هذه الميزة المستودعات أو الخدمات؛ إنها تقرأ بياناتها فقط.")
 
 def report_inventory_changes():
-    """Persist a read-only inventory snapshot and notify the admin only on real diffs."""
+    """Persist a read-only inventory snapshot; retain pending diffs if Telegram delivery fails."""
     if not ADMIN:
         return
+
     def repo_rows():
         return {
             (r.get("full_name") or r.get("name") or "مستودع"): {
@@ -505,6 +506,7 @@ def report_inventory_changes():
             }
             for r in repos()
         }
+
     def service_rows():
         return {
             (s.get("service_id") or s.get("name") or "خدمة"): {
@@ -515,22 +517,28 @@ def report_inventory_changes():
             }
             for s in services()
         }
-    snapshot = json.dumps({"repositories": repo_rows(), "services": service_rows()},
-                          ensure_ascii=False, sort_keys=True)
+
+    snapshot = json.dumps(
+        {"repositories": repo_rows(), "services": service_rows()},
+        ensure_ascii=False, sort_keys=True
+    )
     with sqlite3.connect(MEMORY_DB, timeout=10) as db:
         row = db.execute(
             "SELECT state_value FROM nexus_monitor_state WHERE state_key='inventory_snapshot'"
         ).fetchone()
         previous = row[0] if row else None
-        db.execute("""
-            INSERT INTO nexus_monitor_state(state_key, state_value, updated_at)
-            VALUES ('inventory_snapshot', ?, CURRENT_TIMESTAMP)
-            ON CONFLICT(state_key) DO UPDATE SET
-                state_value=excluded.state_value, updated_at=CURRENT_TIMESTAMP
-        """, (snapshot,))
+
     if not previous:
+        with sqlite3.connect(MEMORY_DB, timeout=10) as db:
+            db.execute("""
+                INSERT INTO nexus_monitor_state(state_key, state_value, updated_at)
+                VALUES ('inventory_snapshot', ?, CURRENT_TIMESTAMP)
+                ON CONFLICT(state_key) DO UPDATE SET
+                    state_value=excluded.state_value, updated_at=CURRENT_TIMESTAMP
+            """, (snapshot,))
         print("Nexus monitor baseline recorded; no change alert sent.", flush=True)
         return
+
     try:
         old = json.loads(previous)
         new = json.loads(snapshot)
@@ -549,17 +557,29 @@ def report_inventory_changes():
             if changed:
                 changes.append("تغير في " + label + ": " + "، ".join(changed[:6]) +
                                ("، وغيرها" if len(changed) > 6 else ""))
-        if changes:
-            report = ("📋 تقرير تلقائي — رصد Nexus\n"
-                      + "الوقت: " + time.strftime("%Y-%m-%d %H:%M:%S UTC", time.gmtime())
-                      + "\n\n" + "\n".join("• " + item for item in changes)
-                      + "\n\nالمصدر: GitHub وRender مباشرة. الرصد للقراءة فقط؛ لم يُجرَ أي تغيير.")
-            send(ADMIN, report, [[button("📡 عرض الجرد", "live_inventory")],
-                                 [button("🏠 القائمة الرئيسية", "menu")]])
-            print("Nexus inventory change report sent.", flush=True)
-    except Exception as exc:
-        print("Nexus change report error:", type(exc).__name__, flush=True)
 
+        if not changes:
+            return
+
+        report = ("📋 تقرير تلقائي — رصد Nexus\\n"
+                  + "الوقت: " + time.strftime("%Y-%m-%d %H:%M:%S UTC", time.gmtime())
+                  + "\\n\\n" + "\\n".join("• " + item for item in changes)
+                  + "\\n\\nالمصدر: GitHub وRender مباشرة. الرصد للقراءة فقط؛ لم يُجرَ أي تغيير.")
+        # Only advance the baseline after Telegram confirms delivery. If send() fails,
+        # the next monitoring cycle will compare against the previous snapshot and retry.
+        send(ADMIN, report, [[button("📡 عرض الجرد", "live_inventory")],
+                             [button("🏠 القائمة الرئيسية", "menu")]])
+        with sqlite3.connect(MEMORY_DB, timeout=10) as db:
+            db.execute("""
+                INSERT INTO nexus_monitor_state(state_key, state_value, updated_at)
+                VALUES ('inventory_snapshot', ?, CURRENT_TIMESTAMP)
+                ON CONFLICT(state_key) DO UPDATE SET
+                    state_value=excluded.state_value, updated_at=CURRENT_TIMESTAMP
+            """, (snapshot,))
+        print("Nexus inventory change report sent.", flush=True)
+    except Exception as exc:
+        # Keep the old snapshot so failed notifications can be retried next cycle.
+        print("Nexus change report error:", type(exc).__name__, flush=True)
 
 def live_inventory_worker():
     while True:
