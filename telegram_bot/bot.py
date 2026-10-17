@@ -1429,49 +1429,116 @@ def polling():
 
 
 class Handler(BaseHTTPRequestHandler):
+    def _send(self, status, body, content_type):
+        encoded = body.encode("utf-8")
+        self.send_response(status)
+        self.send_header("Content-Type", content_type)
+        self.send_header("Content-Length", str(len(encoded)))
+        self.send_header("Cache-Control", "no-store")
+        self.send_header("X-Content-Type-Options", "nosniff")
+        self.end_headers()
+        if getattr(self, "_body_enabled", True):
+            self.wfile.write(encoded)
+
     def _respond(self, body_enabled):
+        self._body_enabled = body_enabled
         path = self.path.split("?", 1)[0]
         if path in ("/health", "/healthz"):
-            body = json.dumps({"ok": True, "service": "m5mosh-nexus-telegram-catalog",
-                               "bot_configured": bool(TOKEN), "repositories": len(repos()),
-                               "services": len(services()), "interface": "telegram-bot"}).encode()
-            self.send_response(200)
-            self.send_header("Content-Type", "application/json; charset=utf-8")
-            self.send_header("Content-Length", str(len(body)))
-            self.end_headers()
-            if body_enabled:
-                self.wfile.write(body)
+            body = json.dumps({
+                "ok": True,
+                "service": "m5mosh-nexus-telegram-catalog",
+                "bot_configured": bool(TOKEN),
+                "repositories": len(repos()),
+                "services": len(services()),
+                "interface": "telegram-bot"
+            }, ensure_ascii=False)
+            self._send(200, body, "application/json; charset=utf-8")
             return
         if path != "/":
-            self.send_response(404)
-            self.end_headers()
+            self._send(404, "<!doctype html><html lang='ar' dir='rtl'><meta charset='utf-8'><title>404</title><body style='font-family:system-ui;background:#0b1020;color:#eef4ff;padding:48px'><h1>الصفحة غير موجودة</h1><a style='color:#8bd5ff' href='/'>العودة إلى Nexus</a></body></html>", "text/html; charset=utf-8")
             return
-        status = "مُهيّأ" if TOKEN else "يحتاج إعداد رمز البوت"
-        page = """<!doctype html>
+
+        page = r"""<!doctype html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#101827">
-<title>M5mOsH Nexus</title>
+<meta name="theme-color" content="#090d18">
+<meta name="description" content="M5mOsH Nexus — مركز متابعة مشاريع ومستودعات وخدمات M5mOsH">
+<title>M5mOsH Nexus | مركز المشاريع</title>
 <style>
-*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;background:radial-gradient(circle at top,#203b58,#0b1020 65%);color:#eef4ff;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
-main{width:min(680px,100%);padding:30px;border:1px solid #ffffff24;border-radius:24px;background:#111a2bdd;box-shadow:0 24px 80px #0006}
-.logo{font-size:13px;letter-spacing:3px;color:#8dc8ff}h1{font-size:clamp(30px,6vw,46px);margin:12px 0}p{line-height:1.9;color:#c5d2e5}.status{display:flex;align-items:center;gap:10px;padding:14px;border-radius:14px;background:#173d35;margin:22px 0}.dot{width:10px;height:10px;border-radius:50%;background:#65e6a2;box-shadow:0 0 16px #65e6a2}.links{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px}a{color:#fff;text-decoration:none;background:#2563eb;padding:12px 16px;border-radius:12px}a.secondary{background:#26354a}small{display:block;margin-top:20px;color:#91a2ba}
-</style></head>
-<body><main><div class="logo">M5mOsH • NEXUS</div><h1>مرحبًا بك في Nexus</h1>
-<p>خدمة Nexus تعمل على Render. واجهة التحكم الأساسية للبوت موجودة داخل تيليجرام؛ هذه الصفحة تعرض حالة الخدمة وليست لوحة تحكم ويب كاملة.</p>
-<div class="status"><span class="dot"></span><div><strong>الخادم يستجيب</strong><br><span>حالة إعداد البوت: """ + status + """</span></div></div>
-<p>من تيليجرام افتح محادثة البوت وأرسل <b>/start</b> لعرض القائمة. إذا لم يستجب البوت، فالمشكلة في اتصال تيليجرام وليست في فتح هذه الصفحة.</p>
-<div class="links"><a href="/health">فحص حالة الخدمة</a><a class="secondary" href="https://github.com/m5moshbk/refactored-potato">مستودع GitHub</a></div>
-<small>مراقبة قراءة فقط • لا تنفّذ الصفحة تغييرات في مشاريعك</small></main></body></html>"""
-        body = page.encode("utf-8")
-        self.send_response(200)
-        self.send_header("Content-Type", "text/html; charset=utf-8")
-        self.send_header("Content-Length", str(len(body)))
-        self.send_header("Cache-Control", "no-store")
-        self.end_headers()
-        if body_enabled:
-            self.wfile.write(body)
+:root{color-scheme:dark;--bg:#090d18;--panel:#111827;--line:#26334a;--muted:#9aa9c0;--text:#eef4ff;--blue:#79aaff;--mint:#75e5c1;--violet:#b7a1ff}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(ellipse at 85% -10%,#20365a 0,transparent 42%),radial-gradient(ellipse at 0 35%,#182443 0,transparent 35%),var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;line-height:1.65}
+a{color:inherit;text-decoration:none}button,input{font:inherit}.wrap{width:min(1180px,calc(100% - 32px));margin:auto}.top{display:flex;justify-content:space-between;align-items:center;padding:23px 0;border-bottom:1px solid #ffffff12}.brand{display:flex;align-items:center;gap:12px;font-weight:800;letter-spacing:.4px}.mark{display:grid;place-items:center;width:44px;height:44px;border-radius:15px;background:linear-gradient(135deg,#8bbcff,#8a78f8);color:#0a1020;font-weight:950;box-shadow:0 8px 32px #617ffb44}.brand small{display:block;font-weight:500;letter-spacing:2px;font-size:10px;color:var(--muted)}.nav{display:flex;gap:9px;align-items:center}.nav a,.btn{border:1px solid var(--line);padding:9px 14px;border-radius:12px;background:#ffffff06;font-size:13px}.nav a:hover,.btn:hover{border-color:#7aa7ff88;background:#ffffff0c}.hero{padding:64px 0 38px;display:grid;grid-template-columns:1.4fr .8fr;gap:28px;align-items:center}.eyebrow{color:var(--mint);font-size:12px;font-weight:800;letter-spacing:1.7px}.hero h1{font-size:clamp(36px,6vw,68px);line-height:1.12;margin:15px 0 18px;letter-spacing:-1.5px}.grad{background:linear-gradient(100deg,#fff 5%,#a9caff 48%,#b9a4ff);-webkit-background-clip:text;background-clip:text;color:transparent}.lead{max-width:650px;color:#b5c2d7;font-size:17px;line-height:1.95}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:25px}.primary{background:linear-gradient(110deg,#83b6ff,#a79aff);color:#08101e;border:0;font-weight:800}.hero-card,.panel,.project{background:linear-gradient(145deg,#151f32e8,#0e1524e8);border:1px solid #ffffff14;border-radius:23px;box-shadow:0 18px 60px #0002}.hero-card{padding:23px;position:relative;overflow:hidden}.hero-card:before{content:"";position:absolute;width:170px;height:170px;left:-65px;top:-65px;background:#897dff18;filter:blur(3px);border-radius:50%}.card-top{display:flex;justify-content:space-between;align-items:center;gap:10px}.label{font-size:12px;color:var(--muted)}.pill{font-size:11px;border:1px solid #ffffff18;border-radius:999px;padding:5px 9px;color:#c8d5e9}.bigstatus{font-size:25px;font-weight:800;margin:18px 0 4px}.substatus{font-size:13px;color:var(--muted)}.line{height:1px;background:#ffffff12;margin:18px 0}.mini{display:flex;justify-content:space-between;gap:12px;font-size:13px;margin:10px 0}.mini strong{font-weight:700}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#8998ad;margin-left:7px}.dot.ok{background:var(--mint);box-shadow:0 0 12px #75e5c188}.dot.wait{background:#f4c879}.section{padding:24px 0 18px}.section-head{display:flex;justify-content:space-between;gap:16px;align-items:end;margin-bottom:18px}.section h2{font-size:25px;margin:0}.section-head p{margin:5px 0 0;color:var(--muted);font-size:13px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}.stat{padding:20px;border:1px solid #ffffff12;border-radius:18px;background:#ffffff04}.stat .num{font-size:30px;font-weight:850;letter-spacing:-1px}.stat .desc{font-size:12px;color:var(--muted)}.projects{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.project{padding:20px;transition:transform .2s,border-color .2s;min-height:195px}.project:hover{transform:translateY(-3px);border-color:#8ab4ff66}.project-head{display:flex;align-items:center;justify-content:space-between;gap:12px}.picon{width:42px;height:42px;display:grid;place-items:center;border-radius:14px;background:#8bbcff15;border:1px solid #8bbcff24;font-size:20px}.project h3{font-size:17px;margin:14px 0 6px}.project p{font-size:13px;color:var(--muted);margin:0 0 16px}.plink{font-size:12px;color:#a9caff;font-weight:700}.search{width:min(330px,100%);border:1px solid var(--line);border-radius:12px;padding:10px 13px;background:#0a1020;color:var(--text);outline:none}.search:focus{border-color:#83b6ff}.lower{display:grid;grid-template-columns:1fr 1fr;gap:14px}.panel{padding:22px}.panel h3{margin:0 0 10px;font-size:17px}.panel p,.panel li{font-size:13px;color:var(--muted)}.panel ul{padding-right:20px;margin:8px 0}.tag{display:inline-block;padding:5px 9px;border-radius:9px;background:#ffffff08;border:1px solid #ffffff12;font-size:11px;color:#c6d3e8;margin:4px 3px 0 0}.foot{border-top:1px solid #ffffff12;margin-top:42px;padding:24px 0 34px;color:var(--muted);font-size:12px;display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap}.empty{display:none;color:var(--muted);padding:20px}.pulse{animation:pulse 2.4s ease-in-out infinite}@keyframes pulse{0%,100%{opacity:1}50%{opacity:.65}}@media(max-width:850px){.hero{grid-template-columns:1fr;padding-top:42px}.projects{grid-template-columns:repeat(2,1fr)}.stats{grid-template-columns:repeat(3,1fr)}}@media(max-width:560px){.nav a:not(.show-mobile){display:none}.projects,.stats,.lower{grid-template-columns:1fr}.hero h1{font-size:42px}.section-head{align-items:stretch;flex-direction:column}.search{width:100%}.stat{display:flex;align-items:center;justify-content:space-between}.stat .num{font-size:25px}.wrap{width:min(100% - 24px,1180px)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+<a class="brand" href="/"><span class="mark">N</span><span>M5mOsH <small>N E X U S</small></span></a>
+<nav class="nav"><a href="#projects">المشاريع</a><a href="#status">الحالة</a><a class="show-mobile" href="https://github.com/m5moshbk/refactored-potato" target="_blank" rel="noreferrer">GitHub ↗</a></nav>
+</header>
+<main>
+<section class="hero">
+<div><div class="eyebrow">مركز القيادة • PROJECT CONTROL HUB</div>
+<h1><span class="grad">كل مشاريعك.</span><br>رؤية واحدة.</h1>
+<p class="lead">مركز موحّد لمتابعة منظومة M5mOsH، واستكشاف المستودعات والخدمات، ومعرفة ما تم التحقق منه فعلًا وما زال يحتاج إلى مراجعة — بوضوح، بدون حالات وهمية أو تغييرات مخفية.</p>
+<div class="actions"><a class="btn primary" href="#projects">استكشف المشاريع <span>←</span></a><a class="btn" href="https://github.com/m5moshbk/refactored-potato" target="_blank" rel="noreferrer">فتح مستودع Nexus ↗</a></div>
+</div>
+<aside class="hero-card" id="status">
+<div class="card-top"><span class="label">حالة خدمة Nexus</span><span class="pill">LIVE CHECK</span></div>
+<div class="bigstatus"><span class="dot pulse" id="status-dot"></span><span id="status-title">جارٍ التحقق…</span></div>
+<div class="substatus" id="status-detail">نطلب بيانات الحالة الفعلية من /health</div>
+<div class="line"></div>
+<div class="mini"><span class="label">واجهة الموقع</span><strong>نشطة</strong></div>
+<div class="mini"><span class="label">البوت</span><strong id="bot-status">جارٍ التحقق</strong></div>
+<div class="mini"><span class="label">آخر فحص</span><strong id="last-check">—</strong></div>
+</aside>
+</section>
+<section class="section">
+<div class="section-head"><div><h2>نظرة عامة</h2><p>الأرقام تتحدث من استجابة فحص الخدمة، وليست تقييمًا لاكتمال كل مشروع.</p></div></div>
+<div class="stats">
+<div class="stat"><div><div class="desc">مستودعات GitHub في الفهرس</div><div class="num" id="repo-count">—</div></div><span class="tag">CATALOG</span></div>
+<div class="stat"><div><div class="desc">خدمات Render في الفهرس</div><div class="num" id="service-count">—</div></div><span class="tag">CATALOG</span></div>
+<div class="stat"><div><div class="desc">نطاق التحكم</div><div class="num">01</div></div><span class="tag">READ ONLY</span></div>
+</div>
+</section>
+<section class="section" id="projects">
+<div class="section-head"><div><h2>المشاريع الرئيسية</h2><p>روابط مباشرة للمستودعات — فتح الرابط لا يعني أن كل وظيفة منشورة أو مكتملة.</p></div><input id="project-search" class="search" type="search" placeholder="ابحث عن مشروع…" aria-label="ابحث عن مشروع"></div>
+<div class="projects" id="project-grid">
+<a class="project" data-search="nexus مركز المشاريع github render telegram" href="https://github.com/m5moshbk/refactored-potato" target="_blank" rel="noreferrer"><div class="project-head"><span class="picon">⌘</span><span class="pill">المركز الحالي</span></div><h3>M5mOsH Nexus</h3><p>فهرس المستودعات وخدمات Render وواجهة بوت تيليجرام.</p><span class="plink">فتح المستودع ↗</span></a>
+<a class="project" data-search="sada صدى ذاكرة مساعد pythonista" href="https://github.com/m5moshbk/SADA" target="_blank" rel="noreferrer"><div class="project-head"><span class="picon">◉</span><span class="pill">مساعد ذكي</span></div><h3>صَدَى · SADA</h3><p>مشروع مساعد وأدوات تشخيص؛ استمرارية الذاكرة تحتاج تحققًا منفصلًا.</p><span class="plink">فتح المستودع ↗</span></a>
+<a class="project" data-search="sada store متجر تجارة دفع" href="https://github.com/m5moshbk" target="_blank" rel="noreferrer"><div class="project-head"><span class="picon">▣</span><span class="pill">تجارة رقمية</span></div><h3>SADA STORE</h3><p>مسار المتجر الرقمي؛ راجع المستودع والنشر قبل اعتماد حالة الدفع.</p><span class="plink">عرض مستودعات المالك ↗</span></a>
+<a class="project" data-search="elite console x لوحة ادارة" href="https://github.com/m5moshbk/m5moshbk-Elite-Console-X" target="_blank" rel="noreferrer"><div class="project-head"><span class="picon">▤</span><span class="pill">لوحة أدوات</span></div><h3>Elite Console X</h3><p>لوحة إدارة؛ يلزم فحص المصادقة والإعدادات قبل اعتبارها جاهزة للإنتاج.</p><span class="plink">فتح المستودع ↗</span></a>
+<a class="project" data-search="sawa play monitor مراقبة تقارير" href="https://github.com/m5moshbk/Sawa-Play-Monitor" target="_blank" rel="noreferrer"><div class="project-head"><span class="picon">⌁</span><span class="pill">مراقبة</span></div><h3>Sawa Play Monitor</h3><p>لوحة أحداث وتقارير؛ صحة الموقع لا تثبت اتصال المصدر الخارجي.</p><span class="plink">فتح المستودع ↗</span></a>
+<a class="project" data-search="tamara tabby mailer inbox تسويق اعمال" href="https://github.com/m5moshbk" target="_blank" rel="noreferrer"><div class="project-head"><span class="picon">✳</span><span class="pill">خدمات الأعمال</span></div><h3>Mailer Inbox · Tamara · Tabby</h3><p>مسارات تسويق وتكاملات أعمال؛ حالة كل تكامل تُراجع على حدة.</p><span class="plink">عرض مستودعات المالك ↗</span></a>
+</div><div class="empty" id="empty-state">ما لقينا مشروعًا بهذا الاسم.</div>
+</section>
+<section class="section"><div class="lower">
+<div class="panel"><h3>كيف نقرأ الحالة؟</h3><ul><li>أخضر: فحص الخدمة أجاب بنجاح في هذه اللحظة.</li><li>الأرقام: عدد العناصر المسجلة في الفهرس، لا عدد المشاريع المكتملة.</li><li>كل تكامل خارجي يحتاج اختبارًا مستقلًا قبل وصفه بأنه يعمل.</li></ul></div>
+<div class="panel"><h3>مبادئ Nexus</h3><p>شفافية الحالة، وروابط مباشرة، ومراجعة قبل أي تغيير. هذه الصفحة للعرض والتنقل فقط؛ لا تمنح تحكمًا عن بُعد ولا تنفذ تعديلات في المستودعات.</p><span class="tag">شفافية</span><span class="tag">قراءة فقط</span><span class="tag">تحقق فعلي</span></div>
+</div></section>
+</main>
+<footer class="foot"><span>© M5mOsH [5810] — حقوق التطوير محفوظة</span><span>Built for clarity · Arabic RTL · Nexus</span></footer>
+</div>
+<script>
+(async function(){
+ const dot=document.getElementById('status-dot'),title=document.getElementById('status-title'),detail=document.getElementById('status-detail');
+ try{
+  const r=await fetch('/health',{cache:'no-store'}); if(!r.ok) throw new Error('HTTP '+r.status);
+  const d=await r.json(); if(!d.ok) throw new Error('Health check failed');
+  dot.classList.add('ok');dot.classList.remove('pulse');title.textContent='الخدمة تستجيب';
+  detail.textContent='تم جلب حالة الخدمة من الخادم بنجاح';
+  document.getElementById('repo-count').textContent=String(d.repositories);
+  document.getElementById('service-count').textContent=String(d.services);
+  document.getElementById('bot-status').textContent=d.bot_configured?'الرمز مضبوط':'يحتاج إعدادًا';
+ }catch(e){dot.classList.add('wait');dot.classList.remove('pulse');title.textContent='تعذّر تأكيد الحالة';detail.textContent='تعذر جلب /health؛ جرّب تحديث الصفحة.';document.getElementById('bot-status').textContent='غير متحقق';}
+ document.getElementById('last-check').textContent=new Date().toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'});
+})();
+const input=document.getElementById('project-search'),cards=[...document.querySelectorAll('.project')],empty=document.getElementById('empty-state');
+input.addEventListener('input',()=>{const q=input.value.trim().toLowerCase();let n=0;cards.forEach(c=>{const show=(c.innerText+' '+c.dataset.search).toLowerCase().includes(q);c.style.display=show?'':'none';if(show)n++;});empty.style.display=n?'none':'block';});
+</script>
+</body></html>"""
+        self._send(200, page, "text/html; charset=utf-8")
 
     def do_HEAD(self):
         self._respond(False)
