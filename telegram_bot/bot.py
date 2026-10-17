@@ -1430,16 +1430,45 @@ def polling():
 
 class Handler(BaseHTTPRequestHandler):
     def _respond(self, body_enabled):
-        if self.path not in ("/", "/health", "/healthz"):
+        path = self.path.split("?", 1)[0]
+        if path in ("/health", "/healthz"):
+            body = json.dumps({"ok": True, "service": "m5mosh-nexus-telegram-catalog",
+                               "bot_configured": bool(TOKEN), "repositories": len(repos()),
+                               "services": len(services()), "interface": "telegram-bot"}).encode()
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            if body_enabled:
+                self.wfile.write(body)
+            return
+        if path != "/":
             self.send_response(404)
             self.end_headers()
             return
-        body = json.dumps({"ok": True, "service": "m5mosh-nexus-telegram-catalog",
-                           "bot_configured": bool(TOKEN), "repositories": len(repos()),
-                           "services": len(services()), "interface": "inline-menu-v1"}).encode()
+        status = "مُهيّأ" if TOKEN else "يحتاج إعداد رمز البوت"
+        page = """<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#101827">
+<title>M5mOsH Nexus</title>
+<style>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;background:radial-gradient(circle at top,#203b58,#0b1020 65%);color:#eef4ff;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+main{width:min(680px,100%);padding:30px;border:1px solid #ffffff24;border-radius:24px;background:#111a2bdd;box-shadow:0 24px 80px #0006}
+.logo{font-size:13px;letter-spacing:3px;color:#8dc8ff}h1{font-size:clamp(30px,6vw,46px);margin:12px 0}p{line-height:1.9;color:#c5d2e5}.status{display:flex;align-items:center;gap:10px;padding:14px;border-radius:14px;background:#173d35;margin:22px 0}.dot{width:10px;height:10px;border-radius:50%;background:#65e6a2;box-shadow:0 0 16px #65e6a2}.links{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px}a{color:#fff;text-decoration:none;background:#2563eb;padding:12px 16px;border-radius:12px}a.secondary{background:#26354a}small{display:block;margin-top:20px;color:#91a2ba}
+</style></head>
+<body><main><div class="logo">M5mOsH • NEXUS</div><h1>مرحبًا بك في Nexus</h1>
+<p>خدمة Nexus تعمل على Render. واجهة التحكم الأساسية للبوت موجودة داخل تيليجرام؛ هذه الصفحة تعرض حالة الخدمة وليست لوحة تحكم ويب كاملة.</p>
+<div class="status"><span class="dot"></span><div><strong>الخادم يستجيب</strong><br><span>حالة إعداد البوت: """ + status + """</span></div></div>
+<p>من تيليجرام افتح محادثة البوت وأرسل <b>/start</b> لعرض القائمة. إذا لم يستجب البوت، فالمشكلة في اتصال تيليجرام وليست في فتح هذه الصفحة.</p>
+<div class="links"><a href="/health">فحص حالة الخدمة</a><a class="secondary" href="https://github.com/m5moshbk/refactored-potato">مستودع GitHub</a></div>
+<small>مراقبة قراءة فقط • لا تنفّذ الصفحة تغييرات في مشاريعك</small></main></body></html>"""
+        body = page.encode("utf-8")
         self.send_response(200)
-        self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.send_header("Content-Type", "text/html; charset=utf-8")
         self.send_header("Content-Length", str(len(body)))
+        self.send_header("Cache-Control", "no-store")
         self.end_headers()
         if body_enabled:
             self.wfile.write(body)
@@ -1452,7 +1481,6 @@ class Handler(BaseHTTPRequestHandler):
 
     def log_message(self, fmt, *args):
         print("HTTP:", fmt % args, flush=True)
-
 
 def main():
     init_memory()
