@@ -12,6 +12,10 @@ with open(os.path.join(ROOT, "catalog.json"), encoding="utf-8") as f:
     CATALOG = json.load(f)
 TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
 ADMIN = os.getenv("TELEGRAM_ADMIN_CHAT_ID", "").strip()
+# Public chat mode lets non-admin users chat with the AI while keeping admin callbacks locked.
+PUBLIC_BOT_MODE = os.getenv("NEXUS_PUBLIC_MODE", "1").strip().lower() in ("1", "true", "yes", "on")
+PUBLIC_DAILY_LIMIT = max(1, min(100, int(os.getenv("NEXUS_PUBLIC_DAILY_LIMIT", "20"))))
+PUBLIC_USAGE = {}
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "").strip()
 OPENAI_MODEL = os.getenv("OPENAI_MODEL", "chat-latest").strip()
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip()
@@ -1186,10 +1190,36 @@ def split_customer_analysis(answer):
 
 
 def handle_message(chat_id, text, forwarded=False):
-    if not ADMIN or str(chat_id) != ADMIN:
-        send(chat_id, "هذا البوت خاص، ولم تُمنح هذه المحادثة صلاحية الاستخدام.")
-        return
     raw_text = (text or "").strip()
+    is_admin = bool(ADMIN) and str(chat_id) == ADMIN
+    if not is_admin:
+        if not PUBLIC_BOT_MODE:
+            send(chat_id, "البوت متاح حاليًا للمشرف فقط.")
+            return
+        if raw_text.lower() in ("/start", "/help", "/مساعدة", "/menu"):
+            send(chat_id,
+                 "أهلًا بك في M5mOsH Nexus 🤖\\n"
+                 "أرسل سؤالك برسالة عادية وسأحاول مساعدتك بالذكاء الاصطناعي.\\n"
+                 "الحد المجاني الحالي: " + str(PUBLIC_DAILY_LIMIT) +
+                 " رسالة يوميًا لكل محادثة. لا ترسل كلمات مرور أو مفاتيح سرية.")
+            return
+        if raw_text.startswith("/"):
+            send(chat_id, "هذا الأمر غير متاح للمستخدمين. أرسل سؤالك برسالة عادية، أو اكتب /start.")
+            return
+        now = time.time()
+        history = [stamp for stamp in PUBLIC_USAGE.get(str(chat_id), []) if now - stamp < 86400]
+        if len(history) >= PUBLIC_DAILY_LIMIT:
+            send(chat_id, "وصلت إلى حد الاستخدام اليومي (" + str(PUBLIC_DAILY_LIMIT) +
+                 " رسالة). حاول مرة أخرى بعد مرور 24 ساعة.")
+            PUBLIC_USAGE[str(chat_id)] = history
+            return
+        history.append(now)
+        PUBLIC_USAGE[str(chat_id)] = history
+        answer = ask_gpt_resilient(raw_text, chat_id=chat_id)
+        send(chat_id, answer)
+        remember_turn(chat_id, "user", raw_text)
+        remember_turn(chat_id, "assistant", answer)
+        return
     if forwarded and raw_text:
         prompt = (
             "حلل الرسالة المنقولة من عميل متجر إلكتروني. أجب بالعربية السعودية الطبيعية، "
