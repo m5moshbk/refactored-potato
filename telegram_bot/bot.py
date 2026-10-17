@@ -484,13 +484,13 @@ def refresh_live_inventory():
     return LIVE_STATUS
 
 def live_status_text():
-    return ("📡 حالة الجرد الحي — قراءة فقط\\n"
-            + "GitHub: " + LIVE_STATUS["github"] + "\\n"
-            + "Render: " + LIVE_STATUS["render"] + "\\n"
-            + "آخر محاولة: " + str(LIVE_STATUS["last_refresh"] or "لم تبدأ") + "\\n"
+    return ("📡 حالة الجرد الحي — قراءة فقط\n"
+            + "GitHub: " + LIVE_STATUS["github"] + "\n"
+            + "Render: " + LIVE_STATUS["render"] + "\n"
+            + "آخر محاولة: " + str(LIVE_STATUS["last_refresh"] or "لم تبدأ") + "\n"
             + ("ملاحظات: " + ", ".join(LIVE_STATUS["errors"]) if LIVE_STATUS["errors"] else
                "لا توجد أخطاء مسجلة في آخر محاولة.")
-            + "\\n\\nلا تُعدّل هذه الميزة المستودعات أو الخدمات؛ إنها تقرأ بياناتها فقط.")
+            + "\n\nلا تُعدّل هذه الميزة المستودعات أو الخدمات؛ إنها تقرأ بياناتها فقط.")
 
 def report_inventory_changes():
     """Persist a read-only inventory snapshot and notify the admin only on real diffs."""
@@ -707,7 +707,7 @@ def on_callback(chat_id, message_id, data):
         except (ValueError, IndexError):
             edit(chat_id, message_id, "تعذر فتح التصنيف.", category_keyboard())
     elif data == "store_audit_help":
-        edit(chat_id, message_id, "🛍️ فحص متجر عميل\\nأرسل رابط المتجر في هذه المحادثة مع طلب فحصه. تشمل المراجعة الظاهرة: الدفع، صفحات المنتجات، تجربة الجوال، الشحن والاسترجاع، التواصل، عناصر الثقة، SEO، والصور. الفحص الأولي لا يسجل الدخول ولا يختبر معاملة دفع.", [[button("🏠 القائمة الرئيسية", "menu")]])
+        edit(chat_id, message_id, "🛍️ فحص متجر عميل\nأرسل رابط المتجر في هذه المحادثة مع طلب فحصه. تشمل المراجعة الظاهرة: الدفع، صفحات المنتجات، تجربة الجوال، الشحن والاسترجاع، التواصل، عناصر الثقة، SEO، والصور. الفحص الأولي لا يسجل الدخول ولا يختبر معاملة دفع.", [[button("🏠 القائمة الرئيسية", "menu")]])
     elif data == "overview":
         edit(chat_id, message_id, overview(), [[button("🏠 القائمة الرئيسية", "menu")]])
     elif data == "live_inventory":
@@ -729,7 +729,7 @@ def on_callback(chat_id, message_id, data):
              [[button("⌨️ الأوامر", "commands")], [button("🏠 القائمة الرئيسية", "menu")]])
     elif data == "diagnostics":
         edit(chat_id, message_id,
-             "🩺 تشخيص مختصر\nالخدمة: " + "Render Web Service" + "\nالجرد: " + live_status_text().replace("\\n", "\n") + "\n\nفحص الصحة الخارجي: افتح رابط الخدمة. هذا لا يثبت أن Telegram أو OpenAI يعملان بالكامل. إذا لم يستجب البوت، راجع سجلات Render.",
+             "🩺 تشخيص مختصر\nالخدمة: " + "Render Web Service" + "\nالجرد: " + live_status_text().replace("\n", "\n") + "\n\nفحص الصحة الخارجي: افتح رابط الخدمة. هذا لا يثبت أن Telegram أو OpenAI يعملان بالكامل. إذا لم يستجب البوت، راجع سجلات Render.",
              [[button("📡 تحديث الجرد", "live_inventory_refresh")], [button("⌨️ الأوامر", "commands")], [button("🏠 القائمة الرئيسية", "menu")]])
     elif data == "memory_help":
         edit(chat_id, message_id,
@@ -831,12 +831,12 @@ def ask_gpt(user_text, chat_id=None):
                       headers={"Authorization": "Bearer " + OPENAI_API_KEY,
                                "Content-Type": "application/json"})
     else:
-        history_text = "\\n\\n".join(
+        history_text = "\n\n".join(
             ("المساعد: " if turn["role"] == "assistant" else "المستخدم: ") + turn["content"][:3000]
             for turn in memory
         )
         interaction_input = (
-            ("سياق المحادثة السابق:\\n" + history_text + "\\n\\n") if history_text else ""
+            ("سياق المحادثة السابق:\n" + history_text + "\n\n") if history_text else ""
         ) + current_context
         payload = {
             "model": selected_model,
@@ -943,7 +943,7 @@ def ask_gpt(user_text, chat_id=None):
                             elif isinstance(content, list):
                                 fallback_parts.extend(block.get("text", "") for block in content
                                                       if isinstance(block, dict) and block.get("text"))
-                    fallback_answer = "\\n".join(fallback_parts).strip()
+                    fallback_answer = "\n".join(fallback_parts).strip()
                 if fallback_answer:
                     print("Gemini fallback succeeded without Google Search grounding; model=" + fallback_model, flush=True)
                     return review_response(
@@ -1198,8 +1198,8 @@ def handle_message(chat_id, text, forwarded=False):
             return
         if raw_text.lower() in ("/start", "/help", "/مساعدة", "/menu"):
             send(chat_id,
-                 "أهلًا بك في M5mOsH Nexus 🤖\\n"
-                 "أرسل سؤالك برسالة عادية وسأحاول مساعدتك بالذكاء الاصطناعي.\\n"
+                 "أهلًا بك في M5mOsH Nexus 🤖\n"
+                 "أرسل سؤالك برسالة عادية وسأحاول مساعدتك بالذكاء الاصطناعي.\n"
                  "الحد المجاني الحالي: " + str(PUBLIC_DAILY_LIMIT) +
                  " رسالة يوميًا لكل محادثة. لا ترسل كلمات مرور أو مفاتيح سرية.")
             return
