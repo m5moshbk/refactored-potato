@@ -33,3 +33,34 @@
 
 ## المالك
 M5mOsH
+
+
+---
+
+# English Summary
+
+M5mOsH Nexus is a project index and preview directory. A Render URL or a successful deployment only confirms that a deployment exists; it does not prove every feature, integration, database, or authentication path works.
+
+## Core services
+- **Nexus static dashboard:** `https://m5mosh-nexus.onrender.com`
+- **Code inventory API:** `https://m5mosh-nexus-inventory-api.onrender.com` — receives authenticated, metadata-only inventory summaries.
+- **Telegram catalog service:** `https://m5mosh-nexus-telegram-catalog.onrender.com`
+
+## Inventory API safeguards
+- `POST /api/v1/inventory` requires a bearer token.
+- `GET /api/v1/status` exposes aggregate status only.
+- Source contents and detailed file paths are not intended to be stored.
+- The default SQLite database under `/tmp` is ephemeral.
+- See `inventory_api/README.md`, `inventory_api/DEPLOYMENT.md`, and `inventory_api/STATUS.md` for bilingual setup, deployment gates, and verified status.
+
+## Operating rules
+1. Keep one canonical repository per product and compare similar projects before retiring anything.
+2. Keep API keys and passwords out of source control.
+3. Separate deployed status from verified runtime behavior.
+4. Test authentication, API input validation, integrations, and persistence before production rollout.
+5. Do not automatically resume suspended services or promote preview branches without reviewing the changes.
+
+## Project fingerprint
+- Owner: Ahmed jafari
+- Signature / rights tag: M5mOsH
+- Contact: +99507190799
