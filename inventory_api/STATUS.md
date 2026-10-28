@@ -6,15 +6,15 @@
 
 - **المستودع:** `m5moshbk/refactored-potato`
 - **فرع العمل المعزول:** `fix/nexus-inventory-api-validation`
-- **الخدمة الحالية:** [m5mosh-nexus-inventory-api](https://m5mosh-nexus-inventory-api.onrender.com) تعمل على الفرع `feature/nexus-code-inventory-sync`. التغييرات الحالية لم تُنشر عليها.
-- **التغييرات:** تشديد التحقق من المسارات النسبية المعيارية ورفض المسارات المطلقة بصيغة Windows، ورفض القيم المنطقية كأحجام ملفات؛ إضافة اختبارات API وسير عمل CI مستقل.
-- **الاختبار:** نجح تشغيل [GitHub Actions #40652840107](https://github.com/m5moshbk/refactored-potato/actions/runs/40652840107) على الكود والاختبارات قبل تحديث ملفات التوثيق. يلزم التحقق من نتيجة أحدث تشغيل بعد تغييرات التوثيق.
+- **الخدمة الحالية:** [m5mosh-nexus-inventory-api](https://m5mosh-nexus-inventory-api.onrender.com) تعمل على الفرع `feature/nexus-code-inventory-sync`. لم تُنشر تغييرات هذا الفرع عليها.
+- **التغييرات:** تشديد التحقق من المسارات النسبية المعيارية ورفض المسارات المطلقة بصيغة Windows، ورفض القيم المنطقية كأحجام ملفات؛ إضافة اختبارات API وسير عمل CI مستقل وتوثيق عربي/إنجليزي.
+- **الاختبار:** نجح تشغيل [GitHub Actions #40652937732](https://github.com/m5moshbk/refactored-potato/actions/runs/40652937732) على رأس الفرع `0133b0a7036ae7de7a3475c03e68ea58101d2db0`، بما يشمل اختبارات API. أي تحديث توثيق أحدث يحتاج نتيجة CI خاصة به قبل الدمج.
 - **الخصوصية:** يقبل API بيانات وصفية محدودة ويخزن ملخصات إجمالية فقط؛ لا يُفترض حفظ محتوى المصدر أو مسارات الملفات.
 - **التخزين:** قاعدة SQLite الافتراضية تحت `/tmp` مؤقتة.
 - **الأسرار:** يجب ضبط `INGEST_TOKEN` في Render دون كشف قيمته.
 
 ### المتبقي قبل النشر
-1. انتظار نجاح CI على أحدث رأس للفرع.
+1. التأكد من نجاح CI على أحدث رأس للفرع.
 2. مراجعة إعدادات `INGEST_TOKEN` والتخزين الدائم.
 3. مراجعة طلب الدمج قبل أي دمج؛ لا تنشر هذا الفرع تلقائيًا على الخدمة الحية.
 
@@ -22,9 +22,9 @@
 
 - **Repository:** `m5moshbk/refactored-potato`
 - **Isolated work branch:** `fix/nexus-inventory-api-validation`
-- **Current service:** [m5mosh-nexus-inventory-api](https://m5mosh-nexus-inventory-api.onrender.com) runs from `feature/nexus-code-inventory-sync`. These changes have not been deployed to it.
-- **Changes:** strengthened normalized relative-path validation, rejected Windows absolute paths and boolean file sizes, and added API tests plus a dedicated CI workflow.
-- **Tests:** [GitHub Actions run #40652840107](https://github.com/m5moshbk/refactored-potato/actions/runs/40652840107) passed for the code and tests before documentation updates. The latest run after documentation changes still needs verification.
+- **Current service:** [m5mosh-nexus-inventory-api](https://m5mosh-nexus-inventory-api.onrender.com) runs from `feature/nexus-code-inventory-sync`. This branch has not been deployed to it.
+- **Changes:** strengthened normalized relative-path validation, rejected Windows absolute paths and boolean file sizes, and added API tests, a dedicated CI workflow, and bilingual documentation.
+- **Tests:** [GitHub Actions run #40652937732](https://github.com/m5moshbk/refactored-potato/actions/runs/40652937732) passed on branch head `0133b0a7036ae7de7a3475c03e68ea58101d2db0`, including API tests. Any newer documentation commit must also pass CI before merging.
 - **Privacy:** the API accepts limited metadata and stores aggregate summaries only; source contents and detailed paths are not intended to be persisted.
 - **Storage:** the default SQLite database under `/tmp` is ephemeral.
 - **Secrets:** configure `INGEST_TOKEN` in Render without disclosing its value.
