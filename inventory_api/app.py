@@ -153,11 +153,19 @@ def receive_inventory():
         # Only relative, normalized paths. Never accept absolute paths or traversal.
         if not isinstance(path, str) or not path or len(path) > 500:
             return jsonify({"error": "invalid_relative_path"}), 400
-        if path.startswith(("/", "\\\\")) or ".." in path.replace("\\\\", "/").split("/"):
+        normalized_path = path.replace("\\", "/")
+        path_parts = normalized_path.split("/")
+        is_windows_drive_path = len(normalized_path) >= 2 and normalized_path[1] == ":"
+        if (
+            path != normalized_path
+            or normalized_path.startswith("/")
+            or is_windows_drive_path
+            or any(part in ("", ".", "..") for part in path_parts)
+        ):
             return jsonify({"error": "path_must_be_relative"}), 400
         if not isinstance(ext, str) or ext.lower() not in ALLOWED_EXTENSIONS:
             return jsonify({"error": "extension_not_allowed"}), 400
-        if not isinstance(size, int) or size < 0 or size > 2**63 - 1:
+        if not isinstance(size, int) or isinstance(size, bool) or size < 0 or size > 2**63 - 1:
             return jsonify({"error": "invalid_size"}), 400
         if not isinstance(modified, str) or len(modified) > 64:
             return jsonify({"error": "invalid_modified_time"}), 400

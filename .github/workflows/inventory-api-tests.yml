@@ -1,0 +1,31 @@
+name: Nexus inventory API tests
+
+on:
+  push:
+    branches:
+      - fix/nexus-inventory-api-validation
+  pull_request:
+    paths:
+      - "inventory_api/**"
+      - ".github/workflows/inventory-api-tests.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r inventory_api/requirements.txt pytest
+      - name: Run inventory API tests
+        run: python -m pytest -q inventory_api/tests
