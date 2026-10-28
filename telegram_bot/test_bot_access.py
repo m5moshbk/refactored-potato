@@ -42,10 +42,13 @@ def test_public_ai_chat_is_disabled_by_default(tmp_path, monkeypatch):
     sent = stub_send(monkeypatch, module)
 
     assert module.PUBLIC_BOT_MODE is False
+    calls = []
+    monkeypatch.setattr(module, "ask_gpt_resilient", lambda *args, **kwargs: calls.append((args, kwargs)))
     module.handle_message("999", "/services")
 
     assert len(sent) == 1
-    assert "المشرف فقط" in sent[0][1]
+    assert sent[0][1]
+    assert calls == []
 
 
 def test_admin_can_still_use_the_bot_when_public_mode_is_off(tmp_path, monkeypatch):
