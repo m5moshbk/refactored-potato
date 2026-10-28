@@ -47,3 +47,18 @@
 
 ## المالك
 M5mOsH
+
+
+---
+
+# English Guide
+
+M5mOsH Nexus is a project catalog and navigation dashboard, not proof that every linked project is operational. The repository also contains a Telegram catalog bot and project-category documents.
+
+## Key links
+- Main dashboard: https://m5mosh-nexus.onrender.com
+- Telegram catalog service: https://m5mosh-nexus-telegram-catalog.onrender.com
+- Inventory API: https://m5mosh-nexus-inventory-api.onrender.com
+
+## Operations and verification
+The Telegram bot requires `TELEGRAM_BOT_TOKEN`; restrict administrator functions with `TELEGRAM_ADMIN_CHAT_ID` where supported. Verify the actual command flow before claiming the bot is active. For each project, record repository, branch, Render service, CI result, runtime smoke test, and last verified time separately. Do not merge similarly named repositories or remove files without comparing their contents and deployment references. Never commit credentials.
