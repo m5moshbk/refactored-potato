@@ -1,4 +1,5 @@
 from functools import lru_cache
+from urllib.parse import urlsplit
 
 from pydantic import field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -41,8 +42,25 @@ class Settings(BaseSettings):
             origins = self.allowed_origins
             if not origins or "*" in origins:
                 raise ValueError("Production CORS_ORIGINS must contain exact allowed origins; wildcards are forbidden.")
-            if any("localhost" in origin or "127.0.0.1" in origin for origin in origins):
-                raise ValueError("Production CORS_ORIGINS cannot contain localhost origins.")
+            for origin in origins:
+                try:
+                    parsed = urlsplit(origin)
+                    _ = parsed.port
+                except ValueError as exc:
+                    raise ValueError("Each production CORS origin must be a valid origin URL.") from exc
+                if (
+                    parsed.scheme != "https"
+                    or not parsed.hostname
+                    or parsed.username
+                    or parsed.password
+                    or parsed.path
+                    or parsed.query
+                    or parsed.fragment
+                ):
+                    raise ValueError("Production CORS origins must be HTTPS origins without paths, credentials, queries, or fragments.")
+                hostname = parsed.hostname.lower()
+                if hostname == "localhost" or hostname.endswith(".localhost") or hostname in {"127.0.0.1", "::1"}:
+                    raise ValueError("Production CORS_ORIGINS cannot contain localhost origins.")
             if self.debug:
                 raise ValueError("DEBUG must be disabled in production.")
             if self.auto_create_tables:
