@@ -1,0 +1,767 @@
+{
+  "schemaVersion": "1.0",
+  "generatedAt": "2026-10-31T14:05:04.489Z",
+  "sourceScope": "GitHub repositories for owner m5moshbk plus known bizweb-platform reference; Render workspace services",
+  "counts": {
+    "githubRepositories": 40,
+    "renderServices": 23,
+    "localProjectRecords": 8
+  },
+  "repositories": [
+    {
+      "name": "Gemail-Hack",
+      "fullName": "m5moshbk/Gemail-Hack",
+      "url": "https://github.com/m5moshbk/Gemail-Hack",
+      "defaultBranch": "master",
+      "visibility": "public",
+      "archived": false,
+      "description": "مستودع مسجل في GitHub؛ الوصف الوظيفي يحتاج مراجعة ملفات المشروع قبل التصنيف النهائي.",
+      "scriptInventory": "pending"
+    },
+    {
+      "name": "instainsane",
+      "fullName": "m5moshbk/instainsane",
+      "url": "https://github.com/m5moshbk/instainsane",
+      "defaultBranch": "master",
+      "visibility": "public",
+      "archived": false,
+      "description": "مستودع مسجل في GitHub؛ الوصف الوظيفي يحتاج مراجعة ملفات المشروع قبل التصنيف النهائي.",
+      "scriptInventory": "pending"
+    },
+    {
+      "name": "Ttb3",
+      "fullName": "m5moshbk/Ttb3",
+      "url": "https://github.com/m5moshbk/Ttb3",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "archived": false,
+      "description": "مستودع مسجل في GitHub؛ الوصف الوظيفي يحتاج مراجعة ملفات المشروع قبل التصنيف النهائي.",
+      "scriptInventory": "pending"
+    },
+    {
+      "name": "Ahmed",
+      "fullName": "m5moshbk/Ahmed",
+      "url": "https://github.com/m5moshbk/Ahmed",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "archived": false,
+      "description": "مستودع مسجل في GitHub؛ الوصف الوظيفي يحتاج مراجعة ملفات المشروع قبل التصنيف النهائي.",
+      "scriptInventory": "pending"
+    },
+    {
+      "name": "rouat-aljory",
+      "fullName": "m5moshbk/rouat-aljory",
+      "url": "https://github.com/m5moshbk/rouat-aljory",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "archived": false,
+      "description": "مستودع مسجل في GitHub؛ الوصف الوظيفي يحتاج مراجعة ملفات المشروع قبل التصنيف النهائي.",
+      "scriptInventory": "pending"
+    },
+    {
+      "name": "Jizan1448-site",
+      "fullName": "m5moshbk/Jizan1448-site",
+      "url": "https://github.com/m5moshbk/Jizan1448-site",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "archived": false,
+      "description": "موقع جازان 1448.",
+      "scriptInventory": "pending"
+    },
+    {
+      "name": "wedding-invite",
+      "fullName": "m5moshbk/wedding-invite",
+      "url": "https://github.com/m5moshbk/wedding-invite",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "archived": false,
+      "description": "مستودع مسجل في GitHub؛ الوصف الوظيفي يحتاج مراجعة ملفات المشروع قبل التصنيف النهائي.",
+      "scriptInventory": "pending"
+    },
+    {
+      "name": "urban-octo-couscous",
+      "fullName": "m5moshbk/urban-octo-couscous",
+      "url": "https://github.com/m5moshbk/urban-octo-couscous",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "archived": false,
+      "description": "مستودع مسجل في GitHub؛ الوصف الوظيفي يحتاج مراجعة ملفات المشروع قبل التصنيف النهائي.",
+      "scriptInventory": "pending"
+    },
+    {
+      "name": "Tuwami-X",
+      "fullName": "m5moshbk/Tuwami-X",
+      "url": "https://github.com/m5moshbk/Tuwami-X",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "archived": false,
+      "description": "مستودع مسجل في GitHub؛ الوصف الوظيفي يحتاج مراجعة ملفات المشروع قبل التصنيف النهائي.",
+      "scriptInventory": "pending"
+    },
+    {
+      "name": "nSr-ftns",
+      "fullName": "m5moshbk/nSr-ftns",
+      "url": "https://github.com/m5moshbk/nSr-ftns",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "archived": false,
+      "description": "مستودع مسجل في GitHub؛ الوصف الوظيفي يحتاج مراجعة ملفات المشروع قبل التصنيف النهائي.",
+      "scriptInventory": "pending"
+    },
+    {
+      "name": "Modat",
+      "fullName": "m5moshbk/Modat",
+      "url": "https://github.com/m5moshbk/Modat",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "archived": false,
+      "description": "مستودع كبير يضم ملفات TypeScript/React وأدوات وواجهات.",
+      "scriptInventory": "pending"
+    },
+    {
+      "name": "Tamara-Business-Site",
+      "fullName": "m5moshbk/Tamara-Business-Site",
+      "url": "https://github.com/m5moshbk/Tamara-Business-Site",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "archived": false,
+      "description": "موقع وتكاملات أعمال ومدفوعات؛ يلزم التحقق من sandbox والإنتاج.",
+      "scriptInventory": "pending"
+    },
+    {
+      "name": "Sentinel-Brain",
+      "fullName": "m5moshbk/Sentinel-Brain",
+      "url": "https://github.com/m5moshbk/Sentinel-Brain",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "archived": false,
+      "description": "مستودع مسجل في GitHub؛ الوصف الوظيفي يحتاج مراجعة ملفات المشروع قبل التصنيف النهائي.",
+      "scriptInventory": "pending"
+    },
+    {
+      "name": "SADA",
+      "fullName": "m5moshbk/SADA",
+      "url": "https://github.com/m5moshbk/SADA",
+      "defaultBranch": "main",
+      "visibility": "private",
+      "archived": false,
+      "description": "منظومة صدى: API وذاكرة ومكونات Human-AI وعميل Pythonista.",
+      "scriptInventory": "pending"
+    },
+    {
+      "name": "Crispy-Seeka",
+      "fullName": "m5moshbk/Crispy-Seeka",
+      "url": "https://github.com/m5moshbk/Crispy-Seeka",
+      "defaultBranch": "main",
+      "visibility": "private",
+      "archived": false,
+      "description": "مشروع المتصفح والخصوصية والفحص؛ له عدة خدمات Render، ويُعامل كأولوية تطوير.",
+      "scriptInventory": "pending"
+    },
+    {
+      "name": "m5moshbk-Elite-Console-X",
+      "fullName": "m5moshbk/m5moshbk-Elite-Console-X",
+      "url": "https://github.com/m5moshbk/m5moshbk-Elite-Console-X",
+      "defaultBranch": "main",
+      "visibility": "private",
+      "archived": false,
+      "description": "Elite Console X.",
+      "scriptInventory": "pending"
+    },
+    {
+      "name": "Sawa-Play-Monitor",
+      "fullName": "m5moshbk/Sawa-Play-Monitor",
+      "url": "https://github.com/m5moshbk/Sawa-Play-Monitor",
+      "defaultBranch": "main",
+      "visibility": "private",
+      "archived": false,
+      "description": "مراقبة وتحليل أحداث وخدمات Sawa؛ توجد عدة نسخ وخدمات.",
+      "scriptInventory": "pending"
+    },
+    {
+      "name": "refactored-potato",
+      "fullName": "m5moshbk/refactored-potato",
+      "url": "https://github.com/m5moshbk/refactored-potato",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "archived": false,
+      "description": "المستودع المحوري لـ Nexus ومكونات SADA Voice وTelegram.",
+      "scriptInventory": "pending"
+    },
+    {
+      "name": "redesigned-dollop",
+      "fullName": "m5moshbk/redesigned-dollop",
+      "url": "https://github.com/m5moshbk/redesigned-dollop",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "archived": false,
+      "description": "مستودع مسجل في GitHub؛ الوصف الوظيفي يحتاج مراجعة ملفات المشروع قبل التصنيف النهائي.",
+      "scriptInventory": "pending"
+    },
+    {
+      "name": "didactic-parakeet",
+      "fullName": "m5moshbk/didactic-parakeet",
+      "url": "https://github.com/m5moshbk/didactic-parakeet",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "archived": false,
+      "description": "مستودع مسجل في GitHub؛ الوصف الوظيفي يحتاج مراجعة ملفات المشروع قبل التصنيف النهائي.",
+      "scriptInventory": "pending"
+    },
+    {
+      "name": "crispy-spork",
+      "fullName": "m5moshbk/crispy-spork",
+      "url": "https://github.com/m5moshbk/crispy-spork",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "archived": false,
+      "description": "مستودع مسجل في GitHub؛ الوصف الوظيفي يحتاج مراجعة ملفات المشروع قبل التصنيف النهائي.",
+      "scriptInventory": "pending"
+    },
+    {
+      "name": "jubilant-barnacle",
+      "fullName": "m5moshbk/jubilant-barnacle",
+      "url": "https://github.com/m5moshbk/jubilant-barnacle",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "archived": false,
+      "description": "مستودع مسجل في GitHub؛ الوصف الوظيفي يحتاج مراجعة ملفات المشروع قبل التصنيف النهائي.",
+      "scriptInventory": "pending"
+    },
+    {
+      "name": "super-engine",
+      "fullName": "m5moshbk/super-engine",
+      "url": "https://github.com/m5moshbk/super-engine",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "archived": false,
+      "description": "مستودع مسجل في GitHub؛ الوصف الوظيفي يحتاج مراجعة ملفات المشروع قبل التصنيف النهائي.",
+      "scriptInventory": "pending"
+    },
+    {
+      "name": "special-carnival",
+      "fullName": "m5moshbk/special-carnival",
+      "url": "https://github.com/m5moshbk/special-carnival",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "archived": false,
+      "description": "مستودع مسجل في GitHub؛ الوصف الوظيفي يحتاج مراجعة ملفات المشروع قبل التصنيف النهائي.",
+      "scriptInventory": "pending"
+    },
+    {
+      "name": "psychic-octo-palm-tree",
+      "fullName": "m5moshbk/psychic-octo-palm-tree",
+      "url": "https://github.com/m5moshbk/psychic-octo-palm-tree",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "archived": false,
+      "description": "مستودع مسجل في GitHub؛ الوصف الوظيفي يحتاج مراجعة ملفات المشروع قبل التصنيف النهائي.",
+      "scriptInventory": "pending"
+    },
+    {
+      "name": "studious-adventure",
+      "fullName": "m5moshbk/studious-adventure",
+      "url": "https://github.com/m5moshbk/studious-adventure",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "archived": false,
+      "description": "مستودع مسجل في GitHub؛ الوصف الوظيفي يحتاج مراجعة ملفات المشروع قبل التصنيف النهائي.",
+      "scriptInventory": "pending"
+    },
+    {
+      "name": "automatic-fortnight",
+      "fullName": "m5moshbk/automatic-fortnight",
+      "url": "https://github.com/m5moshbk/automatic-fortnight",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "archived": false,
+      "description": "مستودع مسجل في GitHub؛ الوصف الوظيفي يحتاج مراجعة ملفات المشروع قبل التصنيف النهائي.",
+      "scriptInventory": "pending"
+    },
+    {
+      "name": "probable-fortnight",
+      "fullName": "m5moshbk/probable-fortnight",
+      "url": "https://github.com/m5moshbk/probable-fortnight",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "archived": false,
+      "description": "مستودع مسجل في GitHub؛ الوصف الوظيفي يحتاج مراجعة ملفات المشروع قبل التصنيف النهائي.",
+      "scriptInventory": "pending"
+    },
+    {
+      "name": "aus-luxe-auto-store",
+      "fullName": "m5moshbk/aus-luxe-auto-store",
+      "url": "https://github.com/m5moshbk/aus-luxe-auto-store",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "archived": false,
+      "description": "مستودع مسجل في GitHub؛ الوصف الوظيفي يحتاج مراجعة ملفات المشروع قبل التصنيف النهائي.",
+      "scriptInventory": "pending"
+    },
+    {
+      "name": "todo-list-app",
+      "fullName": "m5moshbk/todo-list-app",
+      "url": "https://github.com/m5moshbk/todo-list-app",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "archived": false,
+      "description": "مستودع مسجل في GitHub؛ الوصف الوظيفي يحتاج مراجعة ملفات المشروع قبل التصنيف النهائي.",
+      "scriptInventory": "pending"
+    },
+    {
+      "name": "scaling-computing-machine",
+      "fullName": "m5moshbk/scaling-computing-machine",
+      "url": "https://github.com/m5moshbk/scaling-computing-machine",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "archived": false,
+      "description": "مستودع مسجل في GitHub؛ الوصف الوظيفي يحتاج مراجعة ملفات المشروع قبل التصنيف النهائي.",
+      "scriptInventory": "pending"
+    },
+    {
+      "name": "bookish-octo-eureka",
+      "fullName": "m5moshbk/bookish-octo-eureka",
+      "url": "https://github.com/m5moshbk/bookish-octo-eureka",
+      "defaultBranch": "main",
+      "visibility": "private",
+      "archived": false,
+      "description": "مستودع Python صغير مع اختبارات.",
+      "scriptInventory": "pending"
+    },
+    {
+      "name": "curly-octo-adventure",
+      "fullName": "m5moshbk/curly-octo-adventure",
+      "url": "https://github.com/m5moshbk/curly-octo-adventure",
+      "defaultBranch": "main",
+      "visibility": "private",
+      "archived": false,
+      "description": "مستودع مسجل في GitHub؛ الوصف الوظيفي يحتاج مراجعة ملفات المشروع قبل التصنيف النهائي.",
+      "scriptInventory": "pending"
+    },
+    {
+      "name": "super-duper-octo-adventure",
+      "fullName": "m5moshbk/super-duper-octo-adventure",
+      "url": "https://github.com/m5moshbk/super-duper-octo-adventure",
+      "defaultBranch": "main",
+      "visibility": "private",
+      "archived": false,
+      "description": "يضم واجهات Mailer Inbox ومتجر AUS Luxe وبعض مكونات الخدمات.",
+      "scriptInventory": "pending"
+    },
+    {
+      "name": "crispy-octo-fortnight",
+      "fullName": "m5moshbk/crispy-octo-fortnight",
+      "url": "https://github.com/m5moshbk/crispy-octo-fortnight",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "archived": false,
+      "description": "مستودع مسجل في GitHub؛ الوصف الوظيفي يحتاج مراجعة ملفات المشروع قبل التصنيف النهائي.",
+      "scriptInventory": "pending"
+    },
+    {
+      "name": "musical-couscous",
+      "fullName": "m5moshbk/musical-couscous",
+      "url": "https://github.com/m5moshbk/musical-couscous",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "archived": false,
+      "description": "مستودع مسجل في GitHub؛ الوصف الوظيفي يحتاج مراجعة ملفات المشروع قبل التصنيف النهائي.",
+      "scriptInventory": "pending"
+    },
+    {
+      "name": "openbot",
+      "fullName": "m5moshbk/openbot",
+      "url": "https://github.com/m5moshbk/openbot",
+      "defaultBranch": "main",
+      "visibility": "public",
+      "archived": false,
+      "description": "مستودع تطبيق OpenBot كبير؛ يحتاج فصل مكونات المشروع الأصلي عن أي إضافات خاصة.",
+      "scriptInventory": "pending"
+    },
+    {
+      "name": "M5mOsH-Team-",
+      "fullName": "m5moshbk/M5mOsH-Team-",
+      "url": "https://github.com/m5moshbk/M5mOsH-Team-",
+      "defaultBranch": "main",
+      "visibility": "private",
+      "archived": false,
+      "description": "مشروع فريق/تنسيق يحتوي ملفات تشغيل واختبارات.",
+      "scriptInventory": "pending"
+    },
+    {
+      "name": "M5mOsH_Team-",
+      "fullName": "m5moshbk/M5mOsH_Team-",
+      "url": "https://github.com/m5moshbk/M5mOsH_Team-",
+      "defaultBranch": "main",
+      "visibility": "private",
+      "archived": false,
+      "description": "مستودع مسجل في GitHub؛ الوصف الوظيفي يحتاج مراجعة ملفات المشروع قبل التصنيف النهائي.",
+      "scriptInventory": "pending"
+    },
+    {
+      "name": "bizweb-platform",
+      "fullName": "m5moshb/bizweb-platform",
+      "url": "https://github.com/m5moshb/bizweb-platform",
+      "defaultBranch": "feature/smart-marketer-mvp",
+      "visibility": "private",
+      "archived": false,
+      "description": "منصة التجار وSmart Marketer؛ مرتبطة بعدة خدمات ومعاينات Render.",
+      "scriptInventory": "pending"
+    }
+  ],
+  "services": [
+    {
+      "id": "srv-dbgpdfnf3r2c73abft7g",
+      "name": "sawa-play-monitor-v4",
+      "type": "web_service",
+      "branch": "feature/sawa-v4-isolated-launch",
+      "repository": "https://github.com/m5moshbk/Sawa-Play-Monitor",
+      "url": "https://sawa-play-monitor-v4.onrender.com",
+      "suspended": true,
+      "autoDeploy": false,
+      "updatedAt": "2026-10-31T03:23:04.178793Z",
+      "healthCheck": "not_checked",
+      "displayStatus": "معلّق في Render"
+    },
+    {
+      "id": "srv-dbfc74e7bikc73cvf0a0",
+      "name": "m5mosh-mailer-inbox-runtime",
+      "type": "web_service",
+      "branch": "feature/mailer-inbox-runtime",
+      "repository": "https://github.com/m5moshbk/super-duper-octo-adventure",
+      "url": "https://m5mosh-mailer-inbox-runtime.onrender.com",
+      "suspended": false,
+      "autoDeploy": false,
+      "updatedAt": "2026-10-26T03:23:39.541358Z",
+      "healthCheck": "not_checked",
+      "displayStatus": "غير معلّق؛ صحة التطبيق غير مفحوصة"
+    },
+    {
+      "id": "srv-db8qha4s728c73an921g",
+      "name": "m5mosh-mailer-inbox",
+      "type": "static_site",
+      "branch": "main",
+      "repository": "https://github.com/m5moshbk/super-duper-octo-adventure",
+      "url": "https://m5mosh-mailer-inbox.onrender.com",
+      "suspended": false,
+      "autoDeploy": true,
+      "updatedAt": "2026-10-16T05:37:04.715902Z",
+      "healthCheck": "not_checked",
+      "displayStatus": "غير معلّق؛ صحة التطبيق غير مفحوصة"
+    },
+    {
+      "id": "srv-db7q86u7bikc73bpic10",
+      "name": "sada-visual-monitor",
+      "type": "static_site",
+      "branch": "feature/sada-visual-monitor-web",
+      "repository": "https://github.com/m5moshbk/Sawa-Play-Monitor",
+      "url": "https://sada-visual-monitor.onrender.com",
+      "suspended": false,
+      "autoDeploy": true,
+      "updatedAt": "2026-10-14T15:52:38.59519Z",
+      "healthCheck": "not_checked",
+      "displayStatus": "غير معلّق؛ صحة التطبيق غير مفحوصة"
+    },
+    {
+      "id": "srv-db7ejh5g1s2s73a85otg",
+      "name": "m5mosh-nexus-inventory-api",
+      "type": "web_service",
+      "branch": "feature/nexus-code-inventory-sync",
+      "repository": "https://github.com/m5moshbk/refactored-potato",
+      "url": "https://m5mosh-nexus-inventory-api.onrender.com",
+      "suspended": false,
+      "autoDeploy": true,
+      "updatedAt": "2026-10-15T23:30:25.972956Z",
+      "healthCheck": "not_checked",
+      "displayStatus": "غير معلّق؛ صحة التطبيق غير مفحوصة"
+    },
+    {
+      "id": "srv-db7eap0473hc73d2rovg",
+      "name": "m5mosh-nexus-telegram-catalog",
+      "type": "web_service",
+      "branch": "main",
+      "repository": "https://github.com/m5moshbk/refactored-potato",
+      "url": "https://m5mosh-nexus-telegram-catalog.onrender.com",
+      "suspended": true,
+      "autoDeploy": true,
+      "updatedAt": "2026-10-31T01:26:12.449569Z",
+      "healthCheck": "not_checked",
+      "displayStatus": "معلّق في Render"
+    },
+    {
+      "id": "srv-db6t75aj9qps73af6hm0",
+      "name": "aus-luxe-auto-store",
+      "type": "static_site",
+      "branch": "main",
+      "repository": "https://github.com/m5moshbk/super-duper-octo-adventure",
+      "url": "https://aus-luxe-auto-store.onrender.com",
+      "suspended": true,
+      "autoDeploy": true,
+      "updatedAt": "2026-10-28T07:22:20.16581Z",
+      "healthCheck": "not_checked",
+      "displayStatus": "معلّق في Render"
+    },
+    {
+      "id": "srv-db6mnhm7bikc73aj3pb0",
+      "name": "m5mosh-nexus",
+      "type": "static_site",
+      "branch": "main",
+      "repository": "https://github.com/m5moshbk/refactored-potato",
+      "url": "https://m5mosh-nexus.onrender.com",
+      "suspended": false,
+      "autoDeploy": true,
+      "updatedAt": "2026-10-31T13:40:02.819547Z",
+      "healthCheck": "not_checked",
+      "displayStatus": "غير معلّق؛ صحة التطبيق غير مفحوصة"
+    },
+    {
+      "id": "srv-db4f6dss728c73aiv5jg",
+      "name": "m5mosh-final-portfolio-preview",
+      "type": "web_service",
+      "branch": "finish/portfolio-motion-and-code-review",
+      "repository": "https://github.com/m5moshb/bizweb-platform",
+      "url": "https://m5mosh-final-portfolio-preview.onrender.com",
+      "suspended": false,
+      "autoDeploy": true,
+      "updatedAt": "2026-10-09T14:00:19.077133Z",
+      "healthCheck": "not_checked",
+      "displayStatus": "غير معلّق؛ صحة التطبيق غير مفحوصة"
+    },
+    {
+      "id": "srv-db4euqflk1mc73fqm6b0",
+      "name": "m5mosh-v2-ux-fix-preview",
+      "type": "web_service",
+      "branch": "fix/ux-accessibility-controls-v2",
+      "repository": "https://github.com/m5moshb/bizweb-platform",
+      "url": "https://m5mosh-v2-ux-fix-preview.onrender.com",
+      "suspended": false,
+      "autoDeploy": true,
+      "updatedAt": "2026-10-31T09:44:42.949359Z",
+      "healthCheck": "not_checked",
+      "displayStatus": "غير معلّق؛ صحة التطبيق غير مفحوصة"
+    },
+    {
+      "id": "srv-db4epgbbc2fs73bie070",
+      "name": "m5mosh-v1-polished-preview",
+      "type": "web_service",
+      "branch": "feature/ui-polish-v1",
+      "repository": "https://github.com/m5moshb/bizweb-platform",
+      "url": "https://m5mosh-v1-polished-preview.onrender.com",
+      "suspended": false,
+      "autoDeploy": true,
+      "updatedAt": "2026-10-09T13:32:40.627861Z",
+      "healthCheck": "not_checked",
+      "displayStatus": "غير معلّق؛ صحة التطبيق غير مفحوصة"
+    },
+    {
+      "id": "srv-db4br37lot8c738gi8t0",
+      "name": "m5mosh-v1-preview",
+      "type": "static_site",
+      "branch": "feature/m5mosh-store-check-mvp",
+      "repository": "https://github.com/m5moshb/bizweb-platform",
+      "url": "https://m5mosh-v1-preview.onrender.com",
+      "suspended": true,
+      "autoDeploy": true,
+      "updatedAt": "2026-10-31T03:52:03.579977Z",
+      "healthCheck": "not_checked",
+      "displayStatus": "معلّق في Render"
+    },
+    {
+      "id": "srv-db4bqurtqb8s73ep4img",
+      "name": "m5mosh-v1-api-preview",
+      "type": "web_service",
+      "branch": "feature/m5mosh-store-check-mvp",
+      "repository": "https://github.com/m5moshb/bizweb-platform",
+      "url": "https://m5mosh-v1-api-preview.onrender.com",
+      "suspended": true,
+      "autoDeploy": true,
+      "updatedAt": "2026-10-31T03:24:40.025505Z",
+      "healthCheck": "not_checked",
+      "displayStatus": "معلّق في Render"
+    },
+    {
+      "id": "srv-db4akcdg1s2s738qu6g0",
+      "name": "m5mosh-digital-preview",
+      "type": "static_site",
+      "branch": "main",
+      "repository": "https://github.com/m5moshb/bizweb-platform",
+      "url": "https://m5mosh-digital-preview.onrender.com",
+      "suspended": true,
+      "autoDeploy": true,
+      "updatedAt": "2026-10-31T01:05:32.994582Z",
+      "healthCheck": "not_checked",
+      "displayStatus": "معلّق في Render"
+    },
+    {
+      "id": "srv-davc0eid0e5s73fd8c3g",
+      "name": "sawa-play-monitor",
+      "type": "web_service",
+      "branch": "main",
+      "repository": "https://github.com/m5moshbk/Sawa-Play-Monitor",
+      "url": "https://sawa-play-monitor.onrender.com",
+      "suspended": true,
+      "autoDeploy": true,
+      "updatedAt": "2026-10-31T03:17:35.8144Z",
+      "healthCheck": "not_checked",
+      "displayStatus": "معلّق في Render"
+    },
+    {
+      "id": "srv-dav6ojt9fdbs73bil5o0",
+      "name": "m5mosh-control-center",
+      "type": "web_service",
+      "branch": "control-center-integration",
+      "repository": "https://github.com/m5moshbk/SADA",
+      "url": "https://m5mosh-control-center.onrender.com",
+      "suspended": false,
+      "autoDeploy": true,
+      "updatedAt": "2026-10-01T16:31:21.641478Z",
+      "healthCheck": "not_checked",
+      "displayStatus": "غير معلّق؛ صحة التطبيق غير مفحوصة"
+    },
+    {
+      "id": "srv-dav4cnp7lnhs73aq00f0",
+      "name": "elite-console-x",
+      "type": "web_service",
+      "branch": "main",
+      "repository": "https://github.com/m5moshbk/m5moshbk-Elite-Console-X",
+      "url": "https://elite-console-x.onrender.com",
+      "suspended": true,
+      "autoDeploy": true,
+      "updatedAt": "2026-10-31T01:06:19.736333Z",
+      "healthCheck": "not_checked",
+      "displayStatus": "معلّق في Render"
+    },
+    {
+      "id": "srv-dat9r5rbc2fs73bogrqg",
+      "name": "hendaset-aldaaf-alajel",
+      "type": "static_site",
+      "branch": "main",
+      "repository": "https://github.com/m5moshb/bizweb-platform",
+      "url": "https://hendaset-aldaaf-alajel.onrender.com",
+      "suspended": false,
+      "autoDeploy": true,
+      "updatedAt": "2026-10-31T02:24:33.931937Z",
+      "healthCheck": "not_checked",
+      "displayStatus": "غير معلّق؛ صحة التطبيق غير مفحوصة"
+    },
+    {
+      "id": "srv-darjiiojo6nc73888s80",
+      "name": "Crispy-Seeka-",
+      "type": "static_site",
+      "branch": "main",
+      "repository": "https://github.com/m5moshbk/Crispy-Seeka",
+      "url": "https://crispy-seeka-a64y.onrender.com",
+      "suspended": false,
+      "autoDeploy": true,
+      "updatedAt": "2026-10-31T05:15:34.571169Z",
+      "healthCheck": "not_checked",
+      "displayStatus": "غير معلّق؛ صحة التطبيق غير مفحوصة"
+    },
+    {
+      "id": "srv-darjh6e0tbcc73bs0mv0",
+      "name": "crispy-seeka-secure",
+      "type": "web_service",
+      "branch": "main",
+      "repository": "https://github.com/m5moshbk/Crispy-Seeka",
+      "url": "https://crispy-seeka-secure.onrender.com",
+      "suspended": false,
+      "autoDeploy": true,
+      "updatedAt": "2026-10-31T05:16:03.832656Z",
+      "healthCheck": "not_checked",
+      "displayStatus": "غير معلّق؛ صحة التطبيق غير مفحوصة"
+    },
+    {
+      "id": "srv-darj2ju0tbcc73bq6al0",
+      "name": "Crispy-Seeka-1",
+      "type": "static_site",
+      "branch": "main",
+      "repository": "https://github.com/m5moshbk/Crispy-Seeka",
+      "url": "https://crispy-seeka-1.onrender.com",
+      "suspended": false,
+      "autoDeploy": true,
+      "updatedAt": "2026-10-31T05:15:32.028665Z",
+      "healthCheck": "not_checked",
+      "displayStatus": "غير معلّق؛ صحة التطبيق غير مفحوصة"
+    },
+    {
+      "id": "srv-darj1ve0tbcc73bq3t0g",
+      "name": "Crispy-Seeka",
+      "type": "web_service",
+      "branch": "main",
+      "repository": "https://github.com/m5moshbk/Crispy-Seeka",
+      "url": "https://crispy-seeka.onrender.com",
+      "suspended": false,
+      "autoDeploy": true,
+      "updatedAt": "2026-10-31T00:48:12.524364Z",
+      "healthCheck": "not_checked",
+      "displayStatus": "غير معلّق؛ صحة التطبيق غير مفحوصة"
+    },
+    {
+      "id": "srv-dar2cbp7lnhs739pmurg",
+      "name": "beefitness-payments-gateway",
+      "type": "web_service",
+      "branch": "main",
+      "repository": "https://github.com/m5moshbk/Tamara-Business-Site",
+      "url": "https://beefitness-payments-gateway.onrender.com",
+      "suspended": false,
+      "autoDeploy": true,
+      "updatedAt": "2026-10-29T01:23:45.798893Z",
+      "healthCheck": "not_checked",
+      "displayStatus": "غير معلّق؛ صحة التطبيق غير مفحوصة"
+    }
+  ],
+  "localProjects": [
+    {
+      "name": "M5mOsH Nexus",
+      "category": "central-platform",
+      "description": "الفهرس المركزي للمشاريع والخدمات والسكريبتات وسجل الأدلة والاستمرارية.",
+      "evidence": "Render + GitHub"
+    },
+    {
+      "name": "M5mOsH Twin Guardian",
+      "category": "automation",
+      "description": "أداة دورات مراقبة/تحقق؛ توجد تقارير سابقة بعدد 50 دورة مكتملة في تقرير 3.0.",
+      "evidence": "تقرير محلي سابق"
+    },
+    {
+      "name": "Sawa Forensics",
+      "category": "forensics",
+      "description": "أداة فحص جنائي محلية وتقارير مؤشرات وملفات وقواعد بيانات.",
+      "evidence": "تقارير Pythonista سابقة"
+    },
+    {
+      "name": "Sawa V4",
+      "category": "monitoring",
+      "description": "نسخة مراقبة محلية مع قاعدة SQLite ومسار بيانات موثق.",
+      "evidence": "تقرير محلي سابق"
+    },
+    {
+      "name": "M5mOsH Human Bridge / WASL AI",
+      "category": "accessibility",
+      "description": "مشروع إتاحة وترجمة بين العربية ولغة الإشارة والصوت والنص.",
+      "evidence": "خطة مشروع معتمدة"
+    },
+    {
+      "name": "Salla Plus / Neon",
+      "category": "commerce",
+      "description": "منصة تجار مع PostgreSQL وTamara sandbox ومكونات خدمات متعددة.",
+      "evidence": "سجل مشروع سابق"
+    },
+    {
+      "name": "Smart Marketer",
+      "category": "commerce",
+      "description": "منصة التجار والتسويق؛ مستودع bizweb-platform وفرع feature/smart-marketer-mvp.",
+      "evidence": "GitHub + Render"
+    },
+    {
+      "name": "M5mOsH Copyright Guard",
+      "category": "governance",
+      "description": "مشروع حماية الحقوق ونسبة الملكية والمراجعة.",
+      "evidence": "سجل مشروع سابق"
+    }
+  ],
+  "policy": {
+    "statusMeaning": "Render not_suspended does not prove the process is healthy; service health must be checked separately.",
+    "scriptInventory": "Script path completeness is recorded in scripts-catalog.json; local Pythonista files are not assumed to exist in GitHub."
+  }
+}
