@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.config import settings
@@ -61,7 +62,7 @@ def get_current_user(
 
 @router.post("/signup", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
 def signup(payload: UserCreate, db: Session = Depends(get_db)):
-    key = _signing_key()
+    _signing_key()
     email = payload.email.lower()
     if db.query(User).filter(User.email == email).first():
         raise HTTPException(status_code=409, detail="An account with this email already exists.")
@@ -74,9 +75,9 @@ def signup(payload: UserCreate, db: Session = Depends(get_db)):
     db.add(user)
     try:
         db.commit()
-    except Exception:
+    except IntegrityError:
         db.rollback()
-        raise HTTPException(status_code=409, detail="Unable to create this account.")
+        raise HTTPException(status_code=409, detail="An account with this email already exists.")
     db.refresh(user)
     return TokenResponse(access_token=create_token(user.email))
 
