@@ -1,10 +1,19 @@
-import hashlib
+"""Voice identity integration boundary.
+
+A cryptographic hash of an audio file is not a speaker embedding and must never
+be treated as proof of speaker identity. Biometric enrollment and verification
+remain deliberately unavailable until a consent-based model and anti-spoofing
+pipeline have been evaluated.
+"""
+
 
 class VoicePrintService:
     def create_fingerprint(self, audio_bytes: bytes) -> str:
-        return hashlib.sha256(audio_bytes).hexdigest()
+        raise NotImplementedError(
+            "Voice biometrics are disabled; raw-audio hashes are not biometrics."
+        )
 
-    def compare(self, reference_hash: str, candidate_hash: str) -> float:
-        if reference_hash == candidate_hash:
-            return 1.0
-        return 0.0
+    def compare(self, reference_embedding: str, candidate_embedding: str) -> float:
+        raise NotImplementedError(
+            "Voice biometrics are disabled until a validated speaker model is integrated."
+        )

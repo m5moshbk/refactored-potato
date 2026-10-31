@@ -1,16 +1,20 @@
-version: "3.9"
-
 services:
   db:
     image: postgres:15
+    restart: unless-stopped
     environment:
-      POSTGRES_DB: sada_voice
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
+      POSTGRES_DB: ${POSTGRES_DB:-sada_voice}
+      POSTGRES_USER: ${POSTGRES_USER:-sada_voice}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in sada-voice/.env}
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-sada_voice} -d ${POSTGRES_DB:-sada_voice}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   pgdata:
