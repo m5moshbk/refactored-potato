@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0",
-  "generatedAt": "2026-10-31T14:13:41.221Z",
+  "generatedAt": "2026-10-31T14:25:36.390Z",
   "sourceScope": "GitHub repositories for owner m5moshbk plus known bizweb-platform reference; Render workspace services",
   "counts": {
     "githubRepositories": 40,
@@ -761,6 +761,12 @@
       "category": "governance",
       "description": "مشروع حماية الحقوق ونسبة الملكية والمراجعة.",
       "evidence": "سجل مشروع سابق"
+    },
+    {
+      "name": "BizWeb Platform / Smart Marketer",
+      "category": "merchant-platform",
+      "description": "منصة التجار متعددة المتاجر: تسجيل العملاء عبر OTP، إنشاء المتجر، إدارة المنتجات والمخزون، السلة والطلبات والتحليلات.",
+      "evidence": "GitHub m5moshb/bizweb-platform · feature/smart-marketer-mvp · PR #46 قيد المراجعة"
     }
   ],
   "policy": {
@@ -785,15 +791,6 @@
       "title": "إرسال البريد غير مربوط",
       "evidence": "واجهة Mailer تحفظ المستلمين محلياً وتعرض معاينة فقط. Backend على feature/mailer-inbox-runtime يدير Telegram Webhook ولا يحتوي SMTP/Email API.",
       "next": "اختيار مزود بريد، إعداد متغيرات بيئة سرية، تنفيذ API إرسال آمن، ثم اختبار رسالة تجريبية بموافقة المستخدم."
-    },
-    {
-      "id": "AUTH-01",
-      "area": "Email registration / OTP",
-      "severity": "high",
-      "status": "not_confirmed",
-      "title": "تسجيل الموقع ورمز التحقق يحتاجان تحديد التطبيق ومسار التسجيل",
-      "evidence": "لم تظهر دورة OTP بريدية مكتملة في Mailer Inbox أو AUS Luxe؛ لا يجوز تعميم ذلك على بقية المستودعات دون فحصها.",
-      "next": "تحديد الموقع المقصود ثم تدقيق endpoints وقاعدة المستخدمين ومزود البريد وانتهاء صلاحية الرمز ومعدل إعادة الإرسال."
     },
     {
       "id": "SHOP-01",
@@ -821,6 +818,33 @@
       "title": "الملفات المحلية ليست ضمن جرد GitHub",
       "evidence": "فهرس GitHub لا يصل إلى Documents على جهاز Pythonista؛ سجلنا الأسماء والتقارير السابقة فقط.",
       "next": "استيراد فهرس الملفات المحلي بصلاحية قراءة فقط ثم مطابقة SHA-256 دون رفع الملفات الخاصة تلقائياً."
+    },
+    {
+      "id": "AUTH-01",
+      "area": "BizWeb account registration / OTP",
+      "severity": "high",
+      "status": "code_fix_pending_merge",
+      "title": "تسجيل OTP كان منفصلاً عن جلسة الحساب ومخطط قاعدة البيانات",
+      "evidence": "تم تحديد اختلاف بين تدفق OTP للعميل وتسجيل الحساب، وحقول purpose/phone/password-null كانت تحتاج migration. إصلاحات الواجهة والمخطط موجودة في PR #46.",
+      "next": "انتظار نجاح CI ومراجعة PR ثم نشر الفرع الصحيح بعد الموافقة."
+    },
+    {
+      "id": "BIZWEB-02",
+      "area": "BizWeb Render API",
+      "severity": "critical",
+      "status": "blocked_by_manual_suspend",
+      "title": "خدمة API الحالية معلّقة يدوياً",
+      "evidence": "Render service m5mosh-v1-api-preview بحالة suspended بواسطة User؛ الموقع الثابت يشير إليها.",
+      "next": "تأكيد صريح قبل استئناف الخدمة وتحديث الفرع المستهدف."
+    },
+    {
+      "id": "CLICK-01",
+      "area": "BizWeb product analytics",
+      "severity": "medium",
+      "status": "code_fix_pending_merge",
+      "title": "جدول نقرات المنتجات كان موجوداً دون API عام لتسجيلها",
+      "evidence": "migration 010 أنشأت store_product_click_events لكن server.js لم يكن يحتوي route لتسجيل النقرات. PR #46 يضيف route واختبار تكامل.",
+      "next": "دمج التغييرات ونشر API ثم ربط صفحة العرض بـ ?store=slug."
     }
   ]
 }
