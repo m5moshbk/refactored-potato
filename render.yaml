@@ -7,7 +7,7 @@ services:
     rootDir: sada-voice/backend
     buildCommand: pip install -r requirements.txt
     startCommand: alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT
-    healthCheckPath: /health
+    healthCheckPath: /ready
     autoDeployTrigger: off
     envVars:
       - key: ENVIRONMENT
