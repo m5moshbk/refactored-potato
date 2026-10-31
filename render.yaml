@@ -16,8 +16,6 @@ services:
         value: "false"
       - key: AUTO_CREATE_TABLES
         value: "false"
-      - key: VOICE_IDENTITY_ENABLED
-        value: "false"
       - key: SPEECH_PROVIDER
         value: browser
       - key: ACCESS_TOKEN_MINUTES
