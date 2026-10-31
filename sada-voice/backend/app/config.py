@@ -1,17 +1,40 @@
-from pydantic_settings import BaseSettings
+from functools import lru_cache
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
 
 class Settings(BaseSettings):
-    APP_NAME: str = "Sada Voice"
-    DATABASE_URL: str = "postgresql://postgres:password@localhost:5432/sada_voice"
-    SECRET_KEY: str = "change-me"
-    JWT_ALGORITHM: str = "HS256"
-    OPENAI_API_KEY: str = ""
-    GEMINI_API_KEY: str = ""
-    AZURE_SPEECH_KEY: str = ""
-    AZURE_SPEECH_REGION: str = ""
-    DEBUG: bool = True
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        case_sensitive=False,
+        extra="ignore",
+    )
 
-    class Config:
-        env_file = ".env"
+    app_name: str = "M5mOsH Voice Nexus API"
+    environment: str = "development"
+    database_url: str = "sqlite:///./sada_voice.db"
+    secret_key: str = ""
+    jwt_algorithm: str = "HS256"
+    access_token_minutes: int = 30
+    cors_origins: str = "http://localhost:3000"
+    max_audio_bytes: int = 15 * 1024 * 1024
+    auto_create_tables: bool = False
+    speech_provider: str = "browser"
+    voice_identity_enabled: bool = False
+    debug: bool = False
 
-settings = Settings()
+    @property
+    def allowed_origins(self) -> list[str]:
+        return [item.strip() for item in self.cors_origins.split(",") if item.strip()]
+
+    @property
+    def is_production(self) -> bool:
+        return self.environment.lower() == "production"
+
+
+@lru_cache
+def get_settings() -> Settings:
+    return Settings()
+
+
+settings = get_settings()
