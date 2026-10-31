@@ -803,7 +803,7 @@ status.textContent='تم فتح مساحة التحكم تلقائيًا. اخت
   <header class="nx-sheet-head"><div class="mark" style="width:36px;height:36px;border-radius:12px">N</div><div class="nx-sheet-title"><strong id="nxSheetTitle">مركز M5mOsH</strong><small id="nxSheetSub">مشاريعك وملفاتك في مكان واحد</small></div><button class="nx-sheet-close" id="nxSheetClose" type="button" aria-label="إغلاق">×</button></header>
   <div class="nx-sheet-search"><input id="nxAssetSearch" type="search" placeholder="ابحث عن مشروع أو خدمة أو سكريبت..." aria-label="بحث شامل في الأصول"></div>
   <nav class="nx-sheet-tabs" id="nxSheetTabs" aria-label="أقسام المركز">
-   <button class="nx-sheet-tab active" data-panel="projects">المشاريع</button><button class="nx-sheet-tab" data-panel="services">الخدمات</button><button class="nx-sheet-tab" data-panel="scripts">السكريبتات</button><button class="nx-sheet-tab" data-panel="local">ملفات Pythonista</button><button class="nx-sheet-tab" data-panel="more">المزيد</button>
+   <button class="nx-sheet-tab active" data-panel="projects">المشاريع</button><button class="nx-sheet-tab" data-panel="services">الخدمات</button><button class="nx-sheet-tab" data-panel="scripts">السكريبتات</button><button class="nx-sheet-tab" data-panel="local">ملفات Pythonista</button><button class="nx-sheet-tab" data-panel="issues">الأعطال</button><button class="nx-sheet-tab" data-panel="more">المزيد</button>
   </nav>
   <div class="nx-sheet-content" id="nxSheetContent"><div class="nx-sheet-empty">جارٍ تحميل فهرس المشاريع والسكريبتات…</div></div>
   <footer class="nx-cockpit-foot"><span>© M5mOsH · جميع الحقوق محفوظة</span><span id="nxCatalogStatus">مصادر الفهرس: GitHub + Render + السجل المحلي</span></footer>
@@ -870,14 +870,22 @@ status.textContent='تم فتح مساحة التحكم تلقائيًا. اخت
   const rows=(scripts?.localPythonista||[]).filter(r=>(r.name+' '+r.note).toLowerCase().includes(q));
   return '<div class="nx-catalog-summary"><span>'+rows.length+' سجلات محلية معروفة</span><span>لم يتم فحص جهاز Pythonista الآن</span></div><div class="nx-sheet-grid">'+rows.map(r=>'<article class="nx-asset-card"><strong>'+esc(r.name)+'</strong><p>'+esc(r.note)+'</p><div class="nx-asset-meta"><span class="nx-asset-pill warn">'+esc(r.status)+'</span></div></article>').join('')+'</div><div class="nx-sheet-empty">هذا القسم يسجل الأعمال المحلية المعروفة فقط؛ لا يدّعي أنه نسخ ملفات جهازك إلى GitHub.</div>';
  }
+ function issueCards(){
+  const rows=projects?.knownIssues||[];
+  const q=search.value.trim().toLowerCase();
+  const filtered=rows.filter(x=>(x.id+' '+x.area+' '+x.title+' '+x.evidence+' '+x.next).toLowerCase().includes(q));
+  const label={ui_only:'واجهة محلية فقط',not_implemented:'غير منفذ',not_confirmed:'غير محسوم',blocked:'محجوب/معلّق',not_scanned:'لم يُفحص'};
+  const cls={ui_only:'warn',not_implemented:'warn',not_confirmed:'warn',blocked:'warn',not_scanned:'warn'};
+  return '<div class="nx-catalog-summary"><span>'+filtered.length+' ملاحظة مسجلة</span><span>كل حالة مرتبطة بدليل</span><span>لا إعادة تشغيل تلقائية</span></div><div class="nx-sheet-grid">'+filtered.map(x=>'<article class="nx-asset-card"><div class="nx-asset-meta"><span class="nx-asset-pill warn">'+esc(x.id)+'</span><span class="nx-asset-pill">'+esc(label[x.status]||x.status)+'</span><span class="nx-asset-pill">'+esc(x.severity)+'</span></div><strong>'+esc(x.title)+'</strong><p>'+esc(x.evidence)+'</p><p><b>الخطوة المطلوبة:</b> '+esc(x.next)+'</p><div class="nx-asset-meta">'+esc(x.area)+'</div></article>').join('')+'</div>'+(filtered.length?'':'<div class="nx-sheet-empty">لا توجد أعطال مطابقة.</div>');
+ }
  function moreCards(){
-  return '<div class="nx-quick-section"><h3>الأقسام الحالية</h3><div class="nx-quick-links"><a href="#projects" data-jump>مكتبة المشاريع الحالية</a><a href="#operatorPanel" data-jump>مركز المهام</a><a href="#nexusWorkbench" data-jump>مساحة المشغل</a><a href="#nxRepairCenter" data-jump>مركز الإصلاح</a><a href="#nxVision" data-jump>مختبر الرؤية</a><a href="design-system.html">استوديو التصميم</a></div></div><div class="nx-quick-section"><h3>البريد والمتجر</h3><div class="nx-quick-links"><a href="https://m5mosh-mailer-inbox.onrender.com/" target="_blank" rel="noopener noreferrer">Mailer Inbox — واجهة حالية</a><a href="https://aus-luxe-auto-store.onrender.com/" target="_blank" rel="noopener noreferrer">AUS Luxe — نموذج المتجر</a></div><p class="note">البريد والإرسال وOTP والدفع تحتاج ربطاً خلفياً واختبارات مستقلة؛ الروابط لا تعني أن هذه الوظائف جاهزة.</p></div>';
+  return '<div class="nx-quick-section"><h3>المتابعة</h3><div class="nx-quick-links"><button type="button" data-show-issues>فتح سجل الأعطال</button></div></div><div class="nx-quick-section"><h3>الأقسام الحالية</h3><div class="nx-quick-links"><a href="#projects" data-jump>مكتبة المشاريع الحالية</a><a href="#operatorPanel" data-jump>مركز المهام</a><a href="#nexusWorkbench" data-jump>مساحة المشغل</a><a href="#nxRepairCenter" data-jump>مركز الإصلاح</a><a href="#nxVision" data-jump>مختبر الرؤية</a><a href="design-system.html">استوديو التصميم</a></div></div><div class="nx-quick-section"><h3>البريد والمتجر</h3><div class="nx-quick-links"><a href="https://m5mosh-mailer-inbox.onrender.com/" target="_blank" rel="noopener noreferrer">Mailer Inbox — واجهة حالية</a><a href="https://aus-luxe-auto-store.onrender.com/" target="_blank" rel="noopener noreferrer">AUS Luxe — نموذج المتجر</a></div><p class="note">البريد والإرسال وOTP والدفع تحتاج ربطاً خلفياً واختبارات مستقلة؛ الروابط لا تعني أن هذه الوظائف جاهزة.</p></div>';
  }
  function render(){
   if(!projects||!scripts)return;
-  content.innerHTML=active==='projects'?projectCards():active==='services'?serviceCards():active==='scripts'?scriptCards():active==='local'?localCards():moreCards();
+  content.innerHTML=active==='projects'?projectCards():active==='services'?serviceCards():active==='scripts'?scriptCards():active==='local'?localCards():active==='issues'?issueCards():moreCards();
   $('nxMoreScripts')?.addEventListener('click',()=>{scriptLimit+=80;render()});
-  content.querySelectorAll('[data-jump]').forEach(a=>a.addEventListener('click',()=>close()));
+  content.querySelectorAll('[data-jump]').forEach(a=>a.addEventListener('click',()=>close()));content.querySelector('[data-show-issues]')?.addEventListener('click',()=>setPanel('issues'));
  }
  dock.forEach(b=>b.addEventListener('click',()=>open(b.dataset.openPanel)));
  tabs.forEach(b=>b.addEventListener('click',()=>setPanel(b.dataset.panel)));
