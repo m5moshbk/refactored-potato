@@ -22812,6 +22812,147 @@
       "scriptCount": 0,
       "scripts": [],
       "scanStatus": "complete"
+    },
+    "bizweb-platform": {
+      "branch": "feature/smart-marketer-mvp",
+      "totalFiles": 81,
+      "scriptCount": 33,
+      "scripts": [
+        {
+          "path": "backend/data/schema.sql",
+          "size": 645
+        },
+        {
+          "path": "backend/migrate.js",
+          "size": 1664
+        },
+        {
+          "path": "backend/migrations/001_initial.sql",
+          "size": 1152
+        },
+        {
+          "path": "backend/migrations/0029_customer_leads_otp.sql",
+          "size": 1407
+        },
+        {
+          "path": "backend/migrations/002_auth.sql",
+          "size": 622
+        },
+        {
+          "path": "backend/migrations/003_orders.sql",
+          "size": 875
+        },
+        {
+          "path": "backend/migrations/004_inquiries.sql",
+          "size": 562
+        },
+        {
+          "path": "backend/migrations/005_seed_catalog.sql",
+          "size": 2198
+        },
+        {
+          "path": "backend/migrations/006_analytics_events.sql",
+          "size": 620
+        },
+        {
+          "path": "backend/migrations/007_analytics_event_allowlist.sql",
+          "size": 359
+        },
+        {
+          "path": "backend/migrations/008_multistore.sql",
+          "size": 6899
+        },
+        {
+          "path": "backend/migrations/009_customer_leads.sql",
+          "size": 1261
+        },
+        {
+          "path": "backend/migrations/010_product_reviews_clicks.sql",
+          "size": 2243
+        },
+        {
+          "path": "backend/migrations/999_smart_marketer.sql",
+          "size": 2885
+        },
+        {
+          "path": "backend/src/server.js",
+          "size": 78065
+        },
+        {
+          "path": "backend/src/smartMarketer.js",
+          "size": 16944
+        },
+        {
+          "path": "backend/src/storeAuditor.js",
+          "size": 10033
+        },
+        {
+          "path": "backend/test/storeAuditor.test.js",
+          "size": 2728
+        },
+        {
+          "path": "backend/test/storeCommerce.integration.js",
+          "size": 7081
+        },
+        {
+          "path": "frontend/admin.js",
+          "size": 10664
+        },
+        {
+          "path": "frontend/app.js",
+          "size": 75488
+        },
+        {
+          "path": "frontend/auth.js",
+          "size": 1529
+        },
+        {
+          "path": "frontend/dashboard.js",
+          "size": 2650
+        },
+        {
+          "path": "frontend/interaction-polish.js",
+          "size": 4154
+        },
+        {
+          "path": "frontend/motion-experience.js",
+          "size": 7759
+        },
+        {
+          "path": "frontend/order.js",
+          "size": 3857
+        },
+        {
+          "path": "frontend/portfolio-finish.js",
+          "size": 16153
+        },
+        {
+          "path": "frontend/product-showcase.js",
+          "size": 3835
+        },
+        {
+          "path": "frontend/smart-marketer/app.js",
+          "size": 19956
+        },
+        {
+          "path": "frontend/store-console.js",
+          "size": 15908
+        },
+        {
+          "path": "frontend/ux-fixes.js",
+          "size": 2964
+        },
+        {
+          "path": "sada_store_v4/app.py",
+          "size": 21639
+        },
+        {
+          "path": "src/app.js",
+          "size": 2152
+        }
+      ],
+      "scanStatus": "complete",
+      "sourceOwner": "m5moshb"
     }
   },
   "localPythonista": [
@@ -22840,5 +22981,13 @@
       "status": "reported_local_file",
       "note": "Previously identified single hash mismatch in the local Nexus report."
     }
-  ]
+  ],
+  "summary": {
+    "repositoriesIndexed": 40,
+    "scriptFilesIndexed": 5661,
+    "emptyRepositories": 13,
+    "accessBlocked": 1,
+    "scanErrors": 0,
+    "notes": "Counts include tracked source/script extensions in repository trees, including tests and migrations; not every file is executable. Local Pythonista inventory remains separate."
+  }
 }
