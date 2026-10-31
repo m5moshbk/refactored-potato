@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0",
-  "generatedAt": "2026-10-31T14:25:36.390Z",
+  "generatedAt": "2026-10-31T14:29:10.737Z",
   "sourceScope": "GitHub repositories for owner m5moshbk plus known bizweb-platform reference; Render workspace services",
   "counts": {
     "githubRepositories": 40,
@@ -903,10 +903,10 @@
       "id": "AUTH-01",
       "area": "BizWeb account registration / OTP",
       "severity": "high",
-      "status": "code_fix_pending_merge",
+      "status": "merged_feature_branch_pending_deploy",
       "title": "تسجيل OTP كان منفصلاً عن جلسة الحساب ومخطط قاعدة البيانات",
-      "evidence": "تم تحديد اختلاف بين تدفق OTP للعميل وتسجيل الحساب، وحقول purpose/phone/password-null كانت تحتاج migration. إصلاحات الواجهة والمخطط موجودة في PR #46.",
-      "next": "انتظار نجاح CI ومراجعة PR ثم نشر الفرع الصحيح بعد الموافقة."
+      "evidence": "تم تحديد اختلاف بين تدفق OTP للعميل وتسجيل الحساب، وحقول purpose/phone/password-null كانت تحتاج migration. إصلاحات الواجهة والمخطط موجودة في PR #46. PR #46 merged into feature/smart-marketer-mvp; validate and migration-integration CI jobs passed.",
+      "next": "تحديث فرعي الواجهة وAPI على Render بعد الموافقة واستئناف API يدويًا."
     },
     {
       "id": "BIZWEB-02",
@@ -914,17 +914,17 @@
       "severity": "critical",
       "status": "blocked_by_manual_suspend",
       "title": "خدمة API الحالية معلّقة يدوياً",
-      "evidence": "Render service m5mosh-v1-api-preview بحالة suspended بواسطة User؛ الموقع الثابت يشير إليها.",
+      "evidence": "Render service m5mosh-v1-api-preview ما زالت suspended بواسطة User؛ لا يوجد نشر للتغييرات المدمجة.",
       "next": "تأكيد صريح قبل استئناف الخدمة وتحديث الفرع المستهدف."
     },
     {
       "id": "CLICK-01",
       "area": "BizWeb product analytics",
       "severity": "medium",
-      "status": "code_fix_pending_merge",
+      "status": "merged_feature_branch_pending_deploy",
       "title": "جدول نقرات المنتجات كان موجوداً دون API عام لتسجيلها",
-      "evidence": "migration 010 أنشأت store_product_click_events لكن server.js لم يكن يحتوي route لتسجيل النقرات. PR #46 يضيف route واختبار تكامل.",
-      "next": "دمج التغييرات ونشر API ثم ربط صفحة العرض بـ ?store=slug."
+      "evidence": "migration 010 أنشأت store_product_click_events لكن server.js لم يكن يحتوي route لتسجيل النقرات. PR #46 يضيف route واختبار تكامل. PR #46 merged into feature/smart-marketer-mvp; validate and migration-integration CI jobs passed.",
+      "next": "تحديث فرعي الواجهة وAPI على Render بعد الموافقة واستئناف API يدويًا."
     }
   ],
   "localPythonista": [
