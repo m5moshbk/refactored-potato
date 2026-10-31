@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="ar" dir="rtl" data-theme="cinematic">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#080d18">
+<meta name="description" content="M5mOsH Nexus Design System Studio — هوية ومكونات واجهات ولوحات بيانات ومخططات هندسية.">
+<title>M5mOsH Nexus — Design System Studio</title>
+<style>
+:root{color-scheme:dark;--bg:#080d18;--surface:#101a2b;--surface2:#142137;--surface3:#1a2942;--line:#293a56;--text:#eff5ff;--muted:#99aac4;--accent:#65e7dc;--accent2:#a694ff;--gold:#f2c978;--good:#62d6a4;--warn:#f2c978;--bad:#ff8799;--shadow:0 22px 70px #0006;--radius:22px;--grid:rgba(255,255,255,.035)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(ellipse at 10% -10%,color-mix(in srgb,var(--accent) 15%,transparent),transparent 35%),radial-gradient(ellipse at 100% 18%,color-mix(in srgb,var(--accent2) 13%,transparent),transparent 33%),var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif;line-height:1.65;min-height:100vh}body:before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:34px 34px;mask-image:linear-gradient(#000,transparent 90%)}a{color:inherit;text-decoration:none}button{font:inherit}.shell{width:min(1240px,calc(100% - 40px));margin:auto}.topbar{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:22px 0;border-bottom:1px solid var(--line)}.brand{display:flex;align-items:center;gap:12px;font-weight:850;letter-spacing:.3px}.brand-mark{width:44px;height:44px;border-radius:15px;display:grid;place-items:center;color:#06121b;background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 0 34px color-mix(in srgb,var(--accent) 24%,transparent);font-size:20px}.brand small{display:block;color:var(--muted);font-size:10px;font-weight:500;letter-spacing:1.5px}.top-links{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.top-links a,.top-links button{border:1px solid var(--line);background:var(--surface);padding:9px 13px;border-radius:12px;color:var(--muted);font-size:12px}.top-links a:hover,.top-links button:hover{border-color:var(--accent);color:var(--text)}.hero{position:relative;display:grid;grid-template-columns:1.1fr .9fr;gap:30px;align-items:center;padding:68px 0 38px;min-height:390px}.eyebrow{display:flex;align-items:center;gap:9px;color:var(--accent);font-size:11px;font-weight:800;letter-spacing:2px}.live-dot{width:7px;height:7px;border-radius:50%;background:var(--good);box-shadow:0 0 14px var(--good)}h1{font-size:clamp(38px,5.6vw,72px);line-height:1.08;letter-spacing:-2px;margin:17px 0}.gradient{background:linear-gradient(100deg,var(--text),var(--accent),var(--accent2));background-clip:text;color:transparent}.hero p{max-width:650px;color:var(--muted);font-size:15px;line-height:2}.hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:23px}.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line);border-radius:13px;padding:11px 16px;background:var(--surface2);color:var(--text);font-size:12px;font-weight:750;cursor:pointer;transition:.2s}.btn:hover{transform:translateY(-2px);border-color:var(--accent)}.btn.primary{background:linear-gradient(110deg,var(--accent),color-mix(in srgb,var(--accent2) 70%,var(--accent)));border:0;color:#07131b}.btn.ghost{background:transparent}.hero-art{min-height:285px;display:grid;place-items:center;position:relative;isolation:isolate}.core{width:174px;height:174px;border-radius:50%;display:grid;place-items:center;text-align:center;background:radial-gradient(circle at 40% 35%,var(--surface3),var(--bg) 72%);border:1px solid color-mix(in srgb,var(--accent) 70%,transparent);box-shadow:0 0 65px color-mix(in srgb,var(--accent) 15%,transparent),inset 0 0 35px color-mix(in srgb,var(--accent2) 16%,transparent);z-index:2}.core strong{font-size:27px;letter-spacing:3px}.core small{display:block;color:var(--accent);font-size:9px;letter-spacing:2px}.ring{position:absolute;border:1px solid color-mix(in srgb,var(--accent2) 40%,transparent);border-radius:50%;transform:rotateX(65deg) rotate(-22deg)}.ring.r1{width:245px;height:245px}.ring.r2{width:315px;height:315px;transform:rotateX(68deg) rotate(35deg);border-color:color-mix(in srgb,var(--accent) 25%,transparent)}.orbit-label{position:absolute;z-index:3;padding:9px 12px;border:1px solid var(--line);border-radius:12px;background:color-mix(in srgb,var(--surface) 88%,transparent);backdrop-filter:blur(12px);font-size:10px;color:var(--muted);box-shadow:var(--shadow)}.orbit-label.one{top:15%;right:3%}.orbit-label.two{bottom:12%;left:3%}.orbit-label.three{top:18%;left:5%}.theme-switcher{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:15px;border:1px solid var(--line);border-radius:18px;background:color-mix(in srgb,var(--surface) 88%,transparent);box-shadow:var(--shadow)}.theme-switcher strong{font-size:12px;margin-left:6px}.theme-btn{border:1px solid var(--line);border-radius:999px;padding:8px 12px;background:var(--bg);color:var(--muted);font-size:11px;cursor:pointer}.theme-btn[aria-pressed=true]{color:var(--text);border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 12%,transparent)}.section{padding:38px 0}.section-head{display:flex;align-items:end;justify-content:space-between;gap:20px;margin-bottom:17px}.section-head h2{font-size:23px;margin:0;letter-spacing:-.5px}.section-head p{color:var(--muted);font-size:12px;margin:5px 0 0}.kicker{color:var(--accent);font-size:10px;letter-spacing:1.8px;font-weight:800}.grid{display:grid;gap:14px}.stats{grid-template-columns:repeat(4,1fr)}.card{background:linear-gradient(145deg,color-mix(in srgb,var(--surface2) 94%,transparent),var(--surface));border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}.stat{padding:18px;position:relative;overflow:hidden}.stat:after{content:"";position:absolute;width:100px;height:100px;border-radius:50%;background:color-mix(in srgb,var(--accent) 9%,transparent);left:-32px;top:-40px;filter:blur(3px)}.stat-label{color:var(--muted);font-size:11px}.stat-value{font-size:30px;font-weight:850;letter-spacing:-1px;margin:5px 0}.stat-foot{font-size:10px;color:var(--good)}.showcase{grid-template-columns:1fr 1fr}.showcase-card{padding:22px;min-height:220px}.card-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px}.card-title h3{font-size:15px;margin:0}.card-title small{font-size:10px;color:var(--muted)}.status{display:inline-flex;align-items:center;gap:6px;padding:6px 9px;border-radius:999px;border:1px solid var(--line);font-size:10px;color:var(--muted);white-space:nowrap}.status:before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}.status.good{color:var(--good);border-color:color-mix(in srgb,var(--good) 30%,var(--line))}.status.warn{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 30%,var(--line))}.status.bad{color:var(--bad);border-color:color-mix(in srgb,var(--bad) 30%,var(--line))}.chart-wrap{width:100%;overflow:hidden}.chart-wrap svg{width:100%;height:auto;display:block}.legend{display:flex;gap:16px;flex-wrap:wrap;color:var(--muted);font-size:10px;margin-top:12px}.legend i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-left:5px;background:var(--accent)}.legend i.alt{background:var(--accent2)}.bars{display:grid;grid-template-columns:repeat(7,1fr);gap:12px;align-items:end;height:145px;padding-top:10px}.bar-col{display:flex;flex-direction:column;align-items:center;justify-content:end;height:100%;gap:8px}.bar{width:min(28px,70%);height:var(--h);border-radius:8px 8px 3px 3px;background:linear-gradient(180deg,var(--accent),color-mix(in srgb,var(--accent2) 70%,var(--accent)));box-shadow:0 0 18px color-mix(in srgb,var(--accent) 15%,transparent)}.bar-col small{color:var(--muted);font-size:9px}.component-grid{grid-template-columns:repeat(3,1fr)}.component-card{padding:19px;min-height:170px}.component-card h3{font-size:14px;margin:0 0 8px}.component-card p{font-size:11px;color:var(--muted);line-height:1.8;margin:0 0 16px}.button-row{display:flex;gap:8px;flex-wrap:wrap}.mini-btn{border:1px solid var(--line);border-radius:10px;padding:8px 11px;background:var(--surface3);font-size:10px;color:var(--text)}.mini-btn.primary{background:var(--accent);color:#07131b;border-color:transparent;font-weight:800}.mini-btn.danger{color:var(--bad);border-color:color-mix(in srgb,var(--bad) 45%,var(--line));background:transparent}.tokens{grid-template-columns:repeat(6,1fr)}.token{padding:10px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}.swatch{height:62px;border-radius:9px;margin-bottom:9px;background:var(--swatch);border:1px solid #ffffff18}.token b{display:block;font-size:10px}.token code{font-size:9px;color:var(--muted)}.type-specimen{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;padding:15px 0;border-bottom:1px solid var(--line)}.type-specimen:last-child{border:0}.type-specimen small{color:var(--muted);font-size:10px}.type-specimen strong{font-size:clamp(18px,3vw,31px)}.architecture{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:10px;align-items:center;padding:22px}.arch-node{padding:17px 12px;text-align:center;border:1px solid var(--line);border-radius:16px;background:var(--surface2);min-height:105px;display:grid;align-content:center;gap:6px}.arch-node strong{font-size:12px}.arch-node small{font-size:9px;color:var(--muted)}.arch-node.core-node{border-color:var(--accent);box-shadow:inset 0 0 25px color-mix(in srgb,var(--accent) 8%,transparent)}.arch-arrow{color:var(--accent);font-size:20px}.table-wrap{overflow:auto}.table{width:100%;border-collapse:collapse;min-width:580px}.table th,.table td{text-align:right;padding:13px 14px;border-bottom:1px solid var(--line);font-size:11px}.table th{color:var(--muted);font-weight:650;background:var(--surface2)}.table td{color:var(--text)}.table tr:last-child td{border:0}.timeline{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.step{padding:17px;position:relative}.step-num{width:30px;height:30px;border-radius:10px;display:grid;place-items:center;background:color-mix(in srgb,var(--accent) 13%,var(--surface));color:var(--accent);font-size:11px;font-weight:800}.step h3{font-size:12px;margin:12px 0 5px}.step p{font-size:10px;color:var(--muted);line-height:1.8;margin:0}.note{border:1px solid color-mix(in srgb,var(--gold) 35%,var(--line));background:color-mix(in srgb,var(--gold) 7%,var(--surface));border-radius:15px;padding:13px 15px;color:var(--muted);font-size:10px;line-height:1.9}.footer{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:25px 0 40px;border-top:1px solid var(--line);color:var(--muted);font-size:10px}.footer strong{color:var(--text)}.copy{cursor:pointer;background:transparent;border:0;color:var(--accent);font-size:10px;padding:0}
+[data-theme="luxury"]{--bg:#f2f1ed;--surface:#fffefa;--surface2:#e8e6df;--surface3:#ddd9ce;--line:#d4d0c5;--text:#202a37;--muted:#68717b;--accent:#244f78;--accent2:#b18b54;--gold:#a77d42;--good:#277b58;--warn:#a77d42;--bad:#bd4c5b;--shadow:0 18px 50px #24324612;--grid:rgba(30,50,70,.04);color-scheme:light}
+[data-theme="cyber"]{--bg:#070611;--surface:#151024;--surface2:#201638;--surface3:#2b1c46;--line:#533b70;--text:#f8f0ff;--muted:#b6a3c9;--accent:#ed66ff;--accent2:#53e7ff;--gold:#ffe078;--good:#70f5c0;--warn:#ffe078;--bad:#ff7297;--shadow:0 22px 70px #0009}
+[data-theme="enterprise"]{--bg:#0d1420;--surface:#172335;--surface2:#1c2c42;--surface3:#263b55;--line:#344b67;--text:#f0f5fb;--muted:#a6b6c9;--accent:#7db7ff;--accent2:#72d7c3;--gold:#e9c47d;--good:#69d4a5;--warn:#e9c47d;--bad:#ff8f9d;--shadow:0 18px 55px #0004}
+@media(max-width:900px){.hero{grid-template-columns:1fr;padding-top:48px}.hero-art{min-height:280px}.stats{grid-template-columns:repeat(2,1fr)}.component-grid{grid-template-columns:repeat(2,1fr)}.tokens{grid-template-columns:repeat(3,1fr)}.timeline{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:620px){.shell{width:min(100% - 26px,1240px)}.topbar{align-items:flex-start}.top-links{justify-content:flex-end}.top-links a{font-size:10px;padding:8px}.hero{padding:38px 0 25px;gap:8px}h1{font-size:42px;letter-spacing:-1px}.hero-art{min-height:245px}.core{width:145px;height:145px}.ring.r1{width:210px;height:210px}.ring.r2{width:270px;height:270px}.showcase{grid-template-columns:1fr}.component-grid{grid-template-columns:1fr}.tokens{grid-template-columns:repeat(2,1fr)}.architecture{grid-template-columns:1fr;gap:8px}.arch-arrow{transform:rotate(90deg);text-align:center}.timeline{grid-template-columns:1fr 1fr}.section{padding:27px 0}.section-head{align-items:flex-start;flex-direction:column}.brand small{letter-spacing:.7px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="shell">
+<header class="topbar">
+ <a class="brand" href="index.html" aria-label="العودة إلى M5mOsH Nexus"><span class="brand-mark">N</span><span>M5mOsH Nexus<small>DESIGN SYSTEM STUDIO</small></span></a>
+ <nav class="top-links" aria-label="التنقل"><a href="index.html">الرئيسية ↗</a><a href="#components">المكونات</a><a href="#architecture">الهندسة</a></nav>
+</header>
+<main>
+<section class="hero">
+ <div>
+  <div class="eyebrow"><span class="live-dot"></span> VISUAL LANGUAGE · COMPONENT LIBRARY</div>
+  <h1>واجهة لها حضور.<br><span class="gradient">ومنظومة لها معنى.</span></h1>
+  <p>استوديو الهوية البصرية لـ M5mOsH Nexus: أربعة اتجاهات تصميمية متناسقة، ومكونات واجهات قابلة لإعادة الاستخدام، ورسوم بيانات ومخططات هندسية. هذه صفحة عرض للمكونات وليست لوحة تشغيل أو مصدراً لحالة الخدمات.</p>
+  <div class="hero-actions"><a class="btn primary" href="#components">استكشف المكونات ↓</a><a class="btn ghost" href="#tokens">نظام الألوان والخطوط</a></div>
+ </div>
+ <div class="hero-art" aria-label="رسم تجريدي لهوية Nexus">
+  <div class="ring r1"></div><div class="ring r2"></div>
+  <span class="orbit-label one">DESIGN · SYSTEM</span><span class="orbit-label two">DATA · INSIGHT</span><span class="orbit-label three">BUILD · EVOLVE</span>
+  <div class="core"><div><strong>NEXUS</strong><small>IDEA → IMPACT</small></div></div>
+ </div>
+</section>
+<div class="theme-switcher" role="group" aria-label="تبديل النمط البصري">
+ <strong>اختر النمط:</strong>
+ <button class="theme-btn" data-theme-choice="cinematic" aria-pressed="true">01 · سينمائي تقني</button>
+ <button class="theme-btn" data-theme-choice="luxury" aria-pressed="false">02 · مؤسسي فاخر</button>
+ <button class="theme-btn" data-theme-choice="cyber" aria-pressed="false">03 · Cyberpunk</button>
+ <button class="theme-btn" data-theme-choice="enterprise" aria-pressed="false">04 · Enterprise</button>
+</div>
+<section class="section" id="overview">
+ <div class="section-head"><div><div class="kicker">01 / DASHBOARD LANGUAGE</div><h2>مؤشرات ولوحات معلومات</h2><p>تدرج بصري واضح بين الرقم والعنوان والسياق.</p></div><span class="status warn">بيانات تصميم تجريبية</span></div>
+ <div class="grid stats">
+  <article class="card stat"><div class="stat-label">المشاريع في النموذج</div><div class="stat-value">12</div><div class="stat-foot">عينة توضيحية فقط</div></article>
+  <article class="card stat"><div class="stat-label">المكونات المعروضة</div><div class="stat-value">08</div><div class="stat-foot">نظام عرض أولي</div></article>
+  <article class="card stat"><div class="stat-label">اتجاهات الهوية</div><div class="stat-value">04</div><div class="stat-foot">قابلة للتبديل</div></article>
+  <article class="card stat"><div class="stat-label">مستوى التوثيق</div><div class="stat-value">v1.0</div><div class="stat-foot">نسخة استكشافية</div></article>
+ </div>
+</section>
+<section class="section">
+ <div class="section-head"><div><div class="kicker">02 / DATA VISUALIZATION</div><h2>رسوم البيانات</h2><p>أمثلة بصرية توضح شكل الرسوم عند ربطها ببيانات حقيقية.</p></div><span class="status">SVG · Responsive</span></div>
+ <div class="grid showcase">
+  <article class="card showcase-card"><div class="card-title"><div><h3>اتجاه المؤشر</h3><small>منحنى تجريبي — لا يمثل قياساً حقيقياً</small></div><span class="status good">Sample</span></div>
+   <div class="chart-wrap"><svg viewBox="0 0 520 180" role="img" aria-label="رسم خطي تجريبي"><defs><linearGradient id="area" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="var(--accent)" stop-opacity=".28"/><stop offset="1" stop-color="var(--accent)" stop-opacity="0"/></linearGradient></defs><g stroke="var(--line)" stroke-dasharray="3 6"><path d="M25 25H505M25 65H505M25 105H505M25 145H505"/></g><path d="M25 132 C70 124 75 90 115 98 S170 116 205 78 S265 90 300 62 S360 78 390 42 S455 58 505 22 L505 155 L25 155Z" fill="url(#area)"/><path d="M25 132 C70 124 75 90 115 98 S170 116 205 78 S265 90 300 62 S360 78 390 42 S455 58 505 22" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linecap="round"/><g fill="var(--accent2)" stroke="var(--surface)" stroke-width="3"><circle cx="115" cy="98" r="5"/><circle cx="205" cy="78" r="5"/><circle cx="300" cy="62" r="5"/><circle cx="390" cy="42" r="5"/><circle cx="505" cy="22" r="5"/></g><g fill="var(--muted)" font-size="10"><text x="25" y="174">01</text><text x="145" y="174">02</text><text x="265" y="174">03</text><text x="385" y="174">04</text><text x="495" y="174">05</text></g></svg></div>
+   <div class="legend"><span><i></i>السلسلة الأساسية</span><span><i class="alt"></i>نقاط مرجعية</span></div>
+  </article>
+  <article class="card showcase-card"><div class="card-title"><div><h3>مقارنة الفئات</h3><small>قيم افتراضية لاستخدامها كعنصر تصميمي</small></div><span class="status">Sample</span></div>
+   <div class="bars" role="img" aria-label="أعمدة توضيحية للفئات"><div class="bar-col"><div class="bar" style="--h:48%"></div><small>نظام</small></div><div class="bar-col"><div class="bar" style="--h:72%"></div><small>منتج</small></div><div class="bar-col"><div class="bar" style="--h:58%"></div><small>بيانات</small></div><div class="bar-col"><div class="bar" style="--h:90%"></div><small>تصميم</small></div><div class="bar-col"><div class="bar" style="--h:66%"></div><small>تشغيل</small></div><div class="bar-col"><div class="bar" style="--h:39%"></div><small>أمن</small></div><div class="bar-col"><div class="bar" style="--h:80%"></div><small>تطوير</small></div></div>
+   <div class="legend"><span><i></i>مقياس مرئي توضيحي</span></div>
+  </article>
+ </div>
+</section>
+<section class="section" id="components">
+ <div class="section-head"><div><div class="kicker">03 / REUSABLE UI</div><h2>مكتبة المكونات</h2><p>عناصر قابلة للتحويل إلى Design Tokens ومكونات مشتركة في صفحات Nexus.</p></div><span class="status good">Component showcase</span></div>
+ <div class="grid component-grid">
+  <article class="card component-card"><h3>الأزرار والإجراءات</h3><p>تمييز الإجراء الأساسي عن الثانوي والتحذيري، مع حالات تركيز واضحة.</p><div class="button-row"><button class="mini-btn primary">إجراء أساسي</button><button class="mini-btn">ثانوي</button><button class="mini-btn danger">تحذير</button></div></article>
+  <article class="card component-card"><h3>حالات النظام</h3><p>الحالة اللونية لا تظهر منفردة؛ يصاحبها وصف نصي مفهوم.</p><div class="button-row"><span class="status good">جاهز</span><span class="status warn">يحتاج مراجعة</span><span class="status bad">متعطل</span></div></article>
+  <article class="card component-card"><h3>بطاقة مشروع</h3><p>هوية مختصرة، وصف واضح، حالة موثقة، وروابط منفصلة عن البيانات الوصفية.</p><div class="card" style="padding:12px;border-radius:13px;box-shadow:none"><div class="card-title"><strong style="font-size:12px">Nexus Core</strong><span class="status good">LIVE</span></div><small style="color:var(--muted);font-size:10px">المصدر · Render / GitHub</small></div></article>
+  <article class="card component-card"><h3>بطاقة مؤشر</h3><p>رقم كبير مع تسمية وسياق ومصدر، دون زخرفة تنافس المعلومة.</p><div class="card" style="padding:12px;border-radius:13px;box-shadow:none"><small style="color:var(--muted)">معدل اكتمال العينة</small><strong style="display:block;font-size:25px">86%</strong></div></article>
+  <article class="card component-card"><h3>ملاحظات وتنبيهات</h3><p>التنبيه يوضح الأثر والإجراء المطلوب، ولا يعتمد على اللون فقط.</p><div class="note">ملاحظة تصميمية: اربط كل رقم بمصدره وتاريخ آخر تحقق.</div></article>
+  <article class="card component-card"><h3>سجل الأحداث</h3><p>تسلسل زمني قابل للمراجعة مع فصل الأحداث المؤكدة عن المقترحات.</p><div style="display:grid;gap:8px;font-size:10px"><div><span class="status good">موثق</span> تمت مراجعة البنية</div><div><span class="status warn">مقترح</span> إضافة اختبار بصري</div></div></article>
+ </div>
+</section>
+<section class="section" id="tokens">
+ <div class="section-head"><div><div class="kicker">04 / DESIGN TOKENS</div><h2>الألوان والخطوط والمسافات</h2><p>قيم مركزية قابلة للتطبيق عبر الواجهات بدلاً من تنسيقات متفرقة.</p></div><span class="status">Theme-aware</span></div>
+ <div class="grid tokens">
+  <div class="token"><div class="swatch" style="--swatch:var(--bg)"></div><b>Background</b><code>--bg</code></div>
+  <div class="token"><div class="swatch" style="--swatch:var(--surface)"></div><b>Surface</b><code>--surface</code></div>
+  <div class="token"><div class="swatch" style="--swatch:var(--accent)"></div><b>Accent</b><code>--accent</code></div>
+  <div class="token"><div class="swatch" style="--swatch:var(--accent2)"></div><b>Accent 02</b><code>--accent2</code></div>
+  <div class="token"><div class="swatch" style="--swatch:var(--good)"></div><b>Success</b><code>--good</code></div>
+  <div class="token"><div class="swatch" style="--swatch:var(--bad)"></div><b>Danger</b><code>--bad</code></div>
+ </div>
+ <div class="card" style="padding:20px;margin-top:14px">
+  <div class="type-specimen"><div><strong>عنوان رئيسي — 32 / 40</strong><br><small>Hero / Page title · وزن ثقيل</small></div><button class="copy" data-copy="font-size:32px; line-height:1.25">نسخ المواصفة</button></div>
+  <div class="type-specimen"><div><strong style="font-size:20px">عنوان قسم — 20 / 28</strong><br><small>Section heading · وزن شبه ثقيل</small></div><button class="copy" data-copy="font-size:20px; line-height:1.4">نسخ المواصفة</button></div>
+  <div class="type-specimen"><div><strong style="font-size:14px;font-weight:500">نص أساسي — 14 / 24</strong><br><small>Body copy · قراءة مريحة بالعربية</small></div><button class="copy" data-copy="font-size:14px; line-height:1.7">نسخ المواصفة</button></div>
+ </div>
+</section>
+<section class="section" id="architecture">
+ <div class="section-head"><div><div class="kicker">05 / ARCHITECTURE VISUALIZATION</div><h2>مخطط ترابط المنظومة</h2><p>تصور بنيوي لمكان كل طبقة؛ لا يمثل تكاملاً منفذاً بحد ذاته.</p></div><span class="status warn">مخطط مفاهيمي</span></div>
+ <div class="card architecture" role="img" aria-label="Nexus يربط التطبيقات ومصادر البيانات والبنية التحتية">
+  <div class="arch-node"><strong>المشاريع والتطبيقات</strong><small>Products · Services · Tools</small></div><div class="arch-arrow">←</div>
+  <div class="arch-node core-node"><strong>M5mOsH Nexus</strong><small>Registry · Evidence · Continuity</small></div><div class="arch-arrow">←</div>
+  <div class="arch-node"><strong>مصادر البنية</strong><small>GitHub · Render · Databases</small></div>
+ </div>
+ <div class="grid timeline" style="margin-top:14px">
+  <article class="card step"><span class="step-num">01</span><h3>اكتشاف المصدر</h3><p>تحديد المنصة والمرجع والمعرف الثابت.</p></article>
+  <article class="card step"><span class="step-num">02</span><h3>جمع الدليل</h3><p>تسجيل وقت الفحص والنتيجة ومصدرها.</p></article>
+  <article class="card step"><span class="step-num">03</span><h3>تقييم الحالة</h3><p>فصل المؤكد عن غير المتحقق والمقترح.</p></article>
+  <article class="card step"><span class="step-num">04</span><h3>عرض القرار</h3><p>إظهار الأولوية والخطوة التالية بوضوح.</p></article>
+ </div>
+</section>
+<section class="section">
+ <div class="section-head"><div><div class="kicker">06 / COMPONENT GOVERNANCE</div><h2>مواصفات الاستخدام</h2><p>قواعد تحافظ على الاتساق وقابلية الوصول وسلامة المعنى.</p></div></div>
+ <div class="card table-wrap"><table class="table"><thead><tr><th>المكوّن</th><th>قاعدة الاستخدام</th><th>التحقق</th></tr></thead><tbody>
+ <tr><td>الحالة</td><td>نص + لون + مصدر موثق</td><td>لا حالة بلا دليل</td></tr>
+ <tr><td>المؤشر</td><td>قيمة + وحدة + فترة + مصدر</td><td>لا أرقام تجريبية في الإنتاج</td></tr>
+ <tr><td>الرسم البياني</td><td>عنوان ومحاور ومفتاح قراءة</td><td>تطابق البيانات مع المصدر</td></tr>
+ <tr><td>زر الإجراء</td><td>فعل واضح + تأكيد للإجراءات الحساسة</td><td>لا زر يوحي بتنفيذ غير موجود</td></tr>
+ <tr><td>مخطط النظام</td><td>تمييز المقترح عن الموجود فعلياً</td><td>توثيق الروابط والحدود</td></tr>
+ </tbody></table></div>
+ <p class="note" style="margin-top:14px">تنبيه: هذه الصفحة مكتبة عرض أولية. الأرقام والرسوم داخلها تجريبية ولا تمثل صحة الخدمات أو أداء المشاريع. ربط المكونات ببيانات حقيقية يتطلب واجهة API موثقة وصلاحيات قراءة آمنة.</p>
+</section>
+</main>
+<footer class="footer"><span><strong>M5mOsH Nexus</strong> · Design System Studio</span><span>© M5mOsH — All rights reserved</span><span>Arabic-first · RTL · Responsive · Reduced-motion aware</span></footer>
+</div>
+<script>
+(function(){
+ const root=document.documentElement;
+ const buttons=[...document.querySelectorAll('[data-theme-choice]')];
+ buttons.forEach(button=>button.addEventListener('click',()=>{
+  const theme=button.dataset.themeChoice;
+  root.dataset.theme=theme;
+  buttons.forEach(item=>item.setAttribute('aria-pressed',String(item===button)));
+  document.querySelector('meta[name="theme-color"]').content=getComputedStyle(root).getPropertyValue('--bg').trim();
+ }));
+ document.querySelectorAll('[data-copy]').forEach(button=>button.addEventListener('click',async()=>{
+  const value=button.dataset.copy;
+  try{await navigator.clipboard.writeText(value);button.textContent='تم النسخ ✓';}
+  catch(_){button.textContent=value;}
+  window.setTimeout(()=>button.textContent='نسخ المواصفة',1800);
+ }));
+})();
+</script>
+</body>
+</html>
