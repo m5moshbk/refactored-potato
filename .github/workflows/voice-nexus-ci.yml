@@ -1,0 +1,61 @@
+name: Voice Nexus CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches:
+      - main
+      - feat/voice-nexus-safe-foundation
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    name: Backend import and migration check
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: sada-voice/backend
+    env:
+      ENVIRONMENT: development
+      DATABASE_URL: sqlite:///./ci.db
+      SECRET_KEY: ci-only-random-signing-key-32-chars-minimum
+      AUTO_CREATE_TABLES: "true"
+      CORS_ORIGINS: http://localhost:3000
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: sada-voice/backend/requirements.txt
+      - name: Install backend dependencies
+        run: pip install -r requirements.txt
+      - name: Compile Python sources
+        run: python -m compileall -q app migrations
+      - name: Apply database migrations
+        run: alembic upgrade head
+      - name: Import FastAPI application
+        run: python -c "from app.main import app; assert app.title == 'M5mOsH Voice Nexus API'"
+
+  frontend:
+    name: Frontend typecheck and production build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: sada-voice/frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: sada-voice/frontend/package.json
+      - name: Install frontend dependencies
+        run: npm install
+      - name: TypeScript check
+        run: npm run typecheck
+      - name: Production build
+        run: npm run build
