@@ -20,7 +20,6 @@ class Settings(BaseSettings):
     max_audio_bytes: int = 15 * 1024 * 1024
     auto_create_tables: bool = False
     speech_provider: str = "browser"
-    voice_identity_enabled: bool = False
     debug: bool = False
 
     @property
