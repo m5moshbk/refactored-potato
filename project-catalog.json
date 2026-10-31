@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0",
-  "generatedAt": "2026-10-31T14:09:35.330Z",
+  "generatedAt": "2026-10-31T14:12:55.450Z",
   "sourceScope": "GitHub repositories for owner m5moshbk plus known bizweb-platform reference; Render workspace services",
   "counts": {
     "githubRepositories": 40,
@@ -766,5 +766,61 @@
   "policy": {
     "statusMeaning": "Render not_suspended does not prove the process is healthy; service health must be checked separately.",
     "scriptInventory": "Script path completeness is recorded in scripts-catalog.json; local Pythonista files are not assumed to exist in GitHub."
-  }
+  },
+  "knownIssues": [
+    {
+      "id": "NEXUS-01",
+      "area": "Nexus operator controls",
+      "severity": "high",
+      "status": "ui_only",
+      "title": "أزرار المشغل تسجل طلبات محلية ولا تنفذ عمليات خادم",
+      "evidence": "تعليقات وكود index.html يوضحان أن Workbench محلي في المتصفح وأن الطلبات تحفظ في localStorage؛ لا يوجد إثبات لتنفيذ deploy/restart أو تعديلات GitHub من هذه الأزرار.",
+      "next": "ربط كل إجراء بواجهة API موثقة وصلاحيات حقيقية وسجل تدقيق، أو توضيح أنه مجرد مسودة."
+    },
+    {
+      "id": "MAIL-01",
+      "area": "Mailer Inbox",
+      "severity": "critical",
+      "status": "not_implemented",
+      "title": "إرسال البريد غير مربوط",
+      "evidence": "واجهة Mailer تحفظ المستلمين محلياً وتعرض معاينة فقط. Backend على feature/mailer-inbox-runtime يدير Telegram Webhook ولا يحتوي SMTP/Email API.",
+      "next": "اختيار مزود بريد، إعداد متغيرات بيئة سرية، تنفيذ API إرسال آمن، ثم اختبار رسالة تجريبية بموافقة المستخدم."
+    },
+    {
+      "id": "AUTH-01",
+      "area": "Email registration / OTP",
+      "severity": "high",
+      "status": "not_confirmed",
+      "title": "تسجيل الموقع ورمز التحقق يحتاجان تحديد التطبيق ومسار التسجيل",
+      "evidence": "لم تظهر دورة OTP بريدية مكتملة في Mailer Inbox أو AUS Luxe؛ لا يجوز تعميم ذلك على بقية المستودعات دون فحصها.",
+      "next": "تحديد الموقع المقصود ثم تدقيق endpoints وقاعدة المستخدمين ومزود البريد وانتهاء صلاحية الرمز ومعدل إعادة الإرسال."
+    },
+    {
+      "id": "SHOP-01",
+      "area": "AUS Luxe Auto Store",
+      "severity": "critical",
+      "status": "blocked",
+      "title": "المتجر معلّق وسير الطلب ليس Checkout حقيقياً",
+      "evidence": "خدمة Render aus-luxe-auto-store معلّقة يدوياً. كود السلة يستخدم localStorage ويرسل إلى رقم WhatsApp تجريبي 966500000000؛ لا يوجد دفع أو API طلبات موثق.",
+      "next": "عدم استئناف الخدمة قبل موافقة صريحة؛ ثم ضبط رقم التواصل الصحيح، API للطلبات، وتدفق دفع Sandbox واختباره."
+    },
+    {
+      "id": "RENDER-01",
+      "area": "Render services",
+      "severity": "medium",
+      "status": "blocked",
+      "title": "بعض الخدمات معلّقة يدوياً",
+      "evidence": "سجل Render يظهر تعليق AUS Luxe وElite Console X وSawa Play Monitor وSawa V4 ونسخ أخرى بواسطة User.",
+      "next": "عدم إعادة تشغيل أي خدمة معلّقة يدوياً قبل تأكيد أن التعليق لم يكن مقصوداً."
+    },
+    {
+      "id": "LOCAL-01",
+      "area": "Pythonista local scripts",
+      "severity": "medium",
+      "status": "not_scanned",
+      "title": "الملفات المحلية ليست ضمن جرد GitHub",
+      "evidence": "فهرس GitHub لا يصل إلى Documents على جهاز Pythonista؛ سجلنا الأسماء والتقارير السابقة فقط.",
+      "next": "استيراد فهرس الملفات المحلي بصلاحية قراءة فقط ثم مطابقة SHA-256 دون رفع الملفات الخاصة تلقائياً."
+    }
+  ]
 }
