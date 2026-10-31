@@ -1,147 +1,286 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
+
+type SpeechAlternative = { transcript: string };
+type SpeechResult = ArrayLike<SpeechAlternative>;
+type SpeechEvent = { results: ArrayLike<SpeechResult> };
+type SpeechErrorEvent = { error: string };
+type SpeechRecognitionLike = {
+  lang: string;
+  continuous: boolean;
+  interimResults: boolean;
+  onresult: ((event: SpeechEvent) => void) | null;
+  onerror: ((event: SpeechErrorEvent) => void) | null;
+  onend: (() => void) | null;
+  start: () => void;
+  stop: () => void;
+};
+type SpeechWindow = Window & {
+  SpeechRecognition?: new () => SpeechRecognitionLike;
+  webkitSpeechRecognition?: new () => SpeechRecognitionLike;
+};
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const phrases = [
+  "نعم",
+  "لا",
+  "أحتاج مساعدة",
+  "أريد التحدث مع شخص",
+  "أحتاج إلى استراحة",
+  "شكرًا لك",
+];
 
 export default function HomePage() {
-  const [mode, setMode] = useState<"login" | "signup">("signup");
+  const [mode, setMode] = useState<"signup" | "login">("signup");
+  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [fullName, setFullName] = useState("");
-  const [loggedIn, setLoggedIn] = useState(false);
-  const [file, setFile] = useState<File | null>(null);
+  const [token, setToken] = useState("");
+  const [authMessage, setAuthMessage] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [consent, setConsent] = useState(false);
+  const [listening, setListening] = useState(false);
   const [transcript, setTranscript] = useState("");
+  const [speechMessage, setSpeechMessage] = useState("");
+  const [spokenText, setSpokenText] = useState("");
+  const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
 
-  const handleAuth = async () => {
-    const endpoint = mode === "signup"
-      ? "http://localhost:8000/api/v1/signup"
-      : "http://localhost:8000/api/v1/login";
-
-    const payload = mode === "signup"
-      ? { email, full_name: fullName, password }
-      : { email, password };
-
-    const res = await fetch(endpoint, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-
-    const data = await res.json();
-    if (data.access_token) {
-      setLoggedIn(true);
+  async function handleAuth() {
+    setBusy(true);
+    setAuthMessage("");
+    try {
+      const response = await fetch(`${API_URL}/api/v1/${mode}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(
+          mode === "signup"
+            ? { email, full_name: fullName, password }
+            : { email, password }
+        ),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.detail || "تعذر إتمام الطلب.");
+      sessionStorage.setItem("voice-nexus-token", data.access_token);
+      setToken(data.access_token);
+      setAuthMessage("تم تسجيل الدخول لهذه الجلسة.");
+    } catch (error) {
+      setAuthMessage(error instanceof Error ? error.message : "حدث خطأ غير متوقع.");
+    } finally {
+      setBusy(false);
     }
-  };
+  }
 
-  const handleUpload = async () => {
-    if (!file) return;
+  function startListening() {
+    if (!consent) {
+      setSpeechMessage("يرجى الموافقة أولًا على استخدام الميكروفون ومعالجة الكلام عبر المتصفح.");
+      return;
+    }
+    const speechWindow = window as SpeechWindow;
+    const Recognition = speechWindow.SpeechRecognition || speechWindow.webkitSpeechRecognition;
+    if (!Recognition) {
+      setSpeechMessage("التعرف على الكلام غير مدعوم في هذا المتصفح. يمكنك استخدام لوحة العبارات والكتابة.");
+      return;
+    }
+    const recognition = new Recognition();
+    recognition.lang = "ar-SA";
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.onresult = (event) => {
+      const parts: string[] = [];
+      for (let i = 0; i < event.results.length; i += 1) {
+        parts.push(event.results[i][0].transcript);
+      }
+      setTranscript(parts.join(" "));
+    };
+    recognition.onerror = (event) => {
+      setSpeechMessage(`تعذر التعرف على الكلام: ${event.error}`);
+      setListening(false);
+    };
+    recognition.onend = () => setListening(false);
+    recognitionRef.current = recognition;
+    try {
+      recognition.start();
+      setListening(true);
+      setSpeechMessage("الميكروفون نشط بطلب منك. اضغط إيقاف عند الانتهاء.");
+    } catch {
+      setSpeechMessage("تعذر بدء الميكروفون. تحقق من إذن المتصفح ثم حاول مجددًا.");
+    }
+  }
 
-    const formData = new FormData();
-    formData.append("file", file);
+  function stopListening() {
+    recognitionRef.current?.stop();
+    setListening(false);
+  }
 
-    const res = await fetch("http://localhost:8000/api/v1/transcribe", {
-      method: "POST",
-      body: formData,
-    });
+  function speak(text = spokenText) {
+    if (!text.trim() || !("speechSynthesis" in window)) {
+      setSpeechMessage("تحويل النص إلى صوت غير متاح في هذا المتصفح أو لا يوجد نص.");
+      return;
+    }
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "ar-SA";
+    window.speechSynthesis.speak(utterance);
+  }
 
-    const data = await res.json();
-    setTranscript(data.transcript || "لا يوجد نص");
-  };
-
-  if (!loggedIn) {
-    return (
-      <main className="min-h-screen bg-slate-950 text-white p-8">
-        <div className="max-w-md mx-auto bg-slate-900 p-8 rounded-2xl shadow-xl">
-          <h1 className="text-4xl font-bold mb-6">صدى الحرف</h1>
-
-          <div className="flex gap-3 mb-6">
-            <button
-              onClick={() => setMode("signup")}
-              className={`flex-1 p-3 rounded-lg ${mode === "signup" ? "bg-indigo-600" : "bg-slate-700"}`}
-            >
-              تسجيل جديد
-            </button>
-            <button
-              onClick={() => setMode("login")}
-              className={`flex-1 p-3 rounded-lg ${mode === "login" ? "bg-indigo-600" : "bg-slate-700"}`}
-            >
-              تسجيل دخول
-            </button>
-          </div>
-
-          {mode === "signup" && (
-            <input
-              placeholder="الاسم الكامل"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              className="w-full mb-3 p-3 rounded-lg bg-slate-800 border border-slate-700"
-            />
-          )}
-
-          <input
-            placeholder="البريد الإلكتروني"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full mb-3 p-3 rounded-lg bg-slate-800 border border-slate-700"
-          />
-
-          <input
-            type="password"
-            placeholder="كلمة المرور"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full mb-4 p-3 rounded-lg bg-slate-800 border border-slate-700"
-          />
-
-          <button
-            onClick={handleAuth}
-            className="w-full bg-indigo-600 hover:bg-indigo-500 p-3 rounded-lg font-semibold"
-          >
-            {mode === "signup" ? "إنشاء الحساب" : "تسجيل الدخول"}
-          </button>
-        </div>
-      </main>
-    );
+  function logout() {
+    sessionStorage.removeItem("voice-nexus-token");
+    setToken("");
+    setAuthMessage("تم إنهاء الجلسة على هذا الجهاز.");
   }
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white p-8">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-5xl font-bold mb-4">صدى الحرف</h1>
-        <p className="text-slate-300 text-lg mb-8">
-          منصة صوتية ذكية لدعم التواصل، التحقق الصوتي، والهوية الرقمية.
-        </p>
+    <main className="shell">
+      <nav className="topbar">
+        <a className="brand" href="#" aria-label="صدى الحرف - الصفحة الرئيسية">
+          <span className="brand-mark">ص</span>
+          <span><strong>M5mOsH</strong><small>VOICE NEXUS</small></span>
+        </a>
+        <span className="top-tag">VOICE • IDENTITY • ACCESS • FUTURE</span>
+      </nav>
 
-        <div className="bg-slate-900 rounded-2xl p-6">
-          <input
-            type="file"
-            accept="audio/*"
-            onChange={(e) => setFile(e.target.files?.[0] || null)}
-            className="block w-full text-sm text-slate-200 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-500 file:text-white hover:file:bg-indigo-400"
-          />
-
-          <button
-            onClick={handleUpload}
-            className="mt-4 bg-indigo-600 px-4 py-2 rounded-lg hover:bg-indigo-500"
-          >
-            تحويل الصوت إلى نص
-          </button>
-        </div>
-
-        <div className="mt-8 bg-slate-900 p-6 rounded-2xl">
-          <h2 className="text-2xl font-semibold mb-2">النص:</h2>
-          <p className="text-slate-200 whitespace-pre-wrap">
-            {transcript || "لم يتم تحويل أي ملف بعد."}
+      <section className="hero">
+        <div className="hero-copy">
+          <p className="eyebrow">منصة عربية للصوت والتواصل الشامل</p>
+          <h1>صوتك يستحق أن <span>يُسمع.</span></h1>
+          <p className="lead">
+            صدى الحرف يجمع أدوات التواصل الصوتي وإمكانية الوصول في تجربة عربية
+            واضحة، مع بناء آمن للهوية الرقمية دون ادعاءات بيومترية غير مثبتة.
           </p>
+          <div className="hero-actions">
+            <a className="primary-link" href="#workspace">ابدأ التجربة</a>
+            <a className="secondary-link" href="#principles">مبادئ الأمان</a>
+          </div>
+          <div className="signal-row">
+            <span><i className="signal-dot" /> واجهة عربية RTL</span>
+            <span>خصوصية بموافقة واضحة</span>
+            <span>لا تخزين صوت خام افتراضيًا</span>
+          </div>
+        </div>
+        <div className="voice-orbit" aria-hidden="true">
+          <div className="orbit orbit-one" />
+          <div className="orbit orbit-two" />
+          <div className="orbit-core"><span>ص</span><small>صدى الحرف</small></div>
+          <div className="orbit-caption">VOICE / HUMAN / ACCESS</div>
+        </div>
+      </section>
+
+      <section className="feature-grid" aria-label="قدرات المنصة">
+        <article className="feature-card">
+          <span className="feature-number">01</span>
+          <h2>كلام إلى نص</h2>
+          <p>استخدم التعرف الصوتي المدمج في المتصفح عندما يكون مدعومًا، مع إظهار حدود التوافق والخصوصية.</p>
+        </article>
+        <article className="feature-card">
+          <span className="feature-number">02</span>
+          <h2>نص إلى صوت</h2>
+          <p>حوّل الرسائل المكتوبة إلى كلام باستخدام إمكانات النطق المتاحة على جهازك.</p>
+        </article>
+        <article className="feature-card">
+          <span className="feature-number">03</span>
+          <h2>تواصل بديل</h2>
+          <p>لوحة عبارات سريعة قابلة للنطق لتسهيل التعبير عن الاحتياجات اليومية.</p>
+        </article>
+        <article className="feature-card muted-card">
+          <span className="feature-number">04</span>
+          <h2>الهوية الصوتية</h2>
+          <p>ميزة قيد التطوير؛ التحقق البيومتري معطل حتى دمج نموذج مختبر ومقاومة انتحال وموافقة صريحة.</p>
+        </article>
+      </section>
+
+      <section className="workspace" id="workspace">
+        <div className="section-heading">
+          <p className="eyebrow">مساحة التجربة</p>
+          <h2>تواصل بالطريقة التي تناسبك</h2>
+          <p>يمكنك تجربة أدوات المتصفح دون إنشاء حساب. الحساب مطلوب فقط للواجهات المحمية في الخادم.</p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
-          {['نعم', 'لا', 'أحتاج مساعدة', 'أريد الطبيب'].map((item) => (
-            <button key={item} className="bg-slate-800 hover:bg-slate-700 p-4 rounded-xl">
-              {item}
-            </button>
-          ))}
+        <div className="workspace-grid">
+          <article className="panel speech-panel">
+            <div className="panel-heading">
+              <div><span className="panel-kicker">01 / SPEECH</span><h3>تحويل الكلام إلى نص</h3></div>
+              <span className={listening ? "status live" : "status"}>{listening ? "يستمع الآن" : "متوقف"}</span>
+            </div>
+            <label className="consent-line">
+              <input type="checkbox" checked={consent} onChange={(event) => setConsent(event.target.checked)} />
+              <span>أوافق على استخدام الميكروفون ومعالجة الكلام بواسطة خدمة التعرف التي يوفرها المتصفح.</span>
+            </label>
+            <div className="button-row">
+              <button className="button-primary" onClick={startListening} disabled={listening}>ابدأ الاستماع</button>
+              <button className="button-quiet" onClick={stopListening} disabled={!listening}>إيقاف</button>
+              <button className="button-quiet" onClick={() => setTranscript("")}>مسح النص</button>
+            </div>
+            <label className="field-label" htmlFor="transcript">النص الناتج</label>
+            <textarea id="transcript" value={transcript} onChange={(event) => setTranscript(event.target.value)} placeholder="سيظهر النص هنا، ويمكنك تعديله..." rows={5} />
+            <p className="helper">{speechMessage || "التعرف الصوتي يعتمد على دعم المتصفح واللغة وإعدادات الخصوصية لديه."}</p>
+          </article>
+
+          <article className="panel access-panel">
+            <div className="panel-heading">
+              <div><span className="panel-kicker">02 / ACCESS</span><h3>لوحة التواصل السريع</h3></div>
+            </div>
+            <p className="panel-intro">اختر عبارة لتظهر في مربع النص، ثم انطقها عند الحاجة.</p>
+            <div className="phrase-grid">
+              {phrases.map((phrase) => (
+                <button key={phrase} className="phrase-button" onClick={() => setSpokenText(phrase)}>{phrase}</button>
+              ))}
+            </div>
+            <label className="field-label" htmlFor="spokenText">اكتب رسالتك</label>
+            <textarea id="spokenText" value={spokenText} onChange={(event) => setSpokenText(event.target.value)} placeholder="اكتب ما تريد قوله..." rows={3} />
+            <button className="button-primary full-button" onClick={() => speak()}> <span aria-hidden="true">▶</span> نطق الرسالة</button>
+          </article>
         </div>
-      </div>
+      </section>
+
+      <section className="account-section">
+        <div className="section-heading">
+          <p className="eyebrow">حساب المنصة</p>
+          <h2>مساحة الحساب المحمية</h2>
+          <p>إنشاء الحساب وتسجيل الدخول يحتاجان إعداد الخادم وقاعدة البيانات ومفتاح توقيع آمن.</p>
+        </div>
+        <div className="account-panel">
+          {token ? (
+            <div className="account-success">
+              <div><strong>الجلسة نشطة</strong><p>تم حفظ رمز الجلسة في ذاكرة الجلسة لهذا التبويب فقط.</p></div>
+              <button className="button-quiet" onClick={logout}>تسجيل الخروج</button>
+            </div>
+          ) : (
+            <>
+              <div className="tabs">
+                <button className={mode === "signup" ? "tab active" : "tab"} onClick={() => setMode("signup")}>إنشاء حساب</button>
+                <button className={mode === "login" ? "tab active" : "tab"} onClick={() => setMode("login")}>تسجيل الدخول</button>
+              </div>
+              {mode === "signup" && <label className="field-label">الاسم<input value={fullName} onChange={(event) => setFullName(event.target.value)} autoComplete="name" /></label>}
+              <label className="field-label">البريد الإلكتروني<input type="email" value={email} onChange={(event) => setEmail(event.target.value)} autoComplete="email" /></label>
+              <label className="field-label">كلمة المرور<input type="password" value={password} onChange={(event) => setPassword(event.target.value)} autoComplete={mode === "signup" ? "new-password" : "current-password"} /></label>
+              <button className="button-primary full-button" onClick={handleAuth} disabled={busy || !email || !password || (mode === "signup" && password.length < 12)}>
+                {busy ? "جارٍ الإرسال..." : mode === "signup" ? "إنشاء الحساب" : "دخول"}
+              </button>
+              {mode === "signup" && <p className="helper">استخدم كلمة مرور من 12 حرفًا على الأقل.</p>}
+            </>
+          )}
+          {authMessage && <p className="notice" role="status">{authMessage}</p>}
+        </div>
+      </section>
+
+      <section className="principles" id="principles">
+        <div className="section-heading">
+          <p className="eyebrow">الثقة أولًا</p>
+          <h2>ما الذي لا ندّعيه؟</h2>
+        </div>
+        <div className="principle-list">
+          <p><strong>لا تحقق بيومتري وهمي:</strong> تشابه ملفات الصوت أو تطابق بصمتها الرقمية لا يثبت هوية المتحدث.</p>
+          <p><strong>لا تسجيل خفي:</strong> تشغيل الميكروفون يتطلب إجراءً واضحًا وموافقة المستخدم.</p>
+          <p><strong>لا حفظ افتراضي للصوت:</strong> أدوات المتصفح هنا لا ترفع ملفات صوت إلى خادم المشروع.</p>
+          <p><strong>لا جاهزية إنتاجية مزعومة:</strong> التكاملات الحساسة تظل معطلة حتى الاختبار والمراجعة المستقلة.</p>
+        </div>
+      </section>
+
+      <footer className="footer">
+        <div><strong>M5mOsH Voice Nexus</strong><p>الصوت ليس مجرد وسيلة للتواصل. إنه وسيلة للتعبير والوصول.</p></div>
+        <span>© M5mOsH — All rights reserved</span>
+      </footer>
     </main>
   );
 }
