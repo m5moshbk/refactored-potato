@@ -178,6 +178,32 @@ body.nexus-editing [data-nv-selected="1"]{outline:2px solid #61e4df!important;ou
 @keyframes nxFlow{from{filter:hue-rotate(0deg);opacity:.6}to{filter:hue-rotate(55deg);opacity:1}}
 @media(prefers-reduced-motion:reduce){.nx-vcard:before,.nx-progress span{animation:none}}
 
+
+/* M5mOsH Nexus mobile OS cockpit */
+body{padding-bottom:calc(96px + env(safe-area-inset-bottom))}
+#nxMobileDock{position:fixed;z-index:15000;left:50%;bottom:calc(12px + env(safe-area-inset-bottom));transform:translateX(-50%);width:min(720px,calc(100% - 22px));display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;padding:7px;border:1px solid #9fb7d333;border-radius:22px;background:linear-gradient(145deg,#142338ed,#0a1220ee);backdrop-filter:blur(24px) saturate(150%);box-shadow:0 18px 55px #0009,inset 0 1px #ffffff18}
+.nx-dock-btn{min-width:0;min-height:55px;border:1px solid transparent;border-radius:15px;background:transparent;color:#aebbd0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font:inherit;cursor:pointer;touch-action:manipulation;transition:background .18s,border-color .18s,transform .18s}
+.nx-dock-btn .nx-dock-icon{font-size:19px;line-height:1.1}.nx-dock-btn small{font-size:9px;white-space:nowrap}.nx-dock-btn[aria-pressed=true],.nx-dock-btn:hover{background:#61e4df14;border-color:#61e4df55;color:#e9fbff}.nx-dock-btn:active{transform:scale(.96)}
+#nxCockpitOverlay{position:fixed;z-index:14999;inset:0;background:#020611a8;backdrop-filter:blur(10px);display:none;align-items:flex-end;justify-content:center;padding:12px 12px calc(92px + env(safe-area-inset-bottom))}
+#nxCockpitOverlay.open{display:flex;animation:nxOverlayIn .18s ease-out}
+#nxCockpitSheet{width:min(920px,100%);max-height:min(78vh,760px);overflow:hidden;display:flex;flex-direction:column;border:1px solid #7186a955;border-radius:24px;background:linear-gradient(145deg,#121e31f7,#080f1cf7);box-shadow:0 28px 90px #000b;animation:nxSheetUp .22s cubic-bezier(.2,.75,.2,1)}
+.nx-sheet-head{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid #ffffff15}.nx-sheet-head strong{font-size:15px}.nx-sheet-head small{display:block;color:#8fa2bd;font-size:10px}.nx-sheet-grip{width:34px;height:4px;border-radius:99px;background:#7586a4;margin:0 auto 8px;display:none}
+.nx-sheet-title{min-width:0;flex:1}.nx-sheet-close{width:34px;height:34px;border:1px solid #ffffff22;border-radius:11px;background:#ffffff0a;color:#eaf2ff;font-size:20px;cursor:pointer}
+.nx-sheet-search{display:flex;gap:8px;padding:12px 14px;border-bottom:1px solid #ffffff10}.nx-sheet-search input{width:100%;min-width:0;background:#070e1b;border:1px solid #34465f;border-radius:12px;padding:11px 13px;color:#eff6ff;font:inherit;font-size:13px;outline:none}.nx-sheet-search input:focus{border-color:#61e4df;box-shadow:0 0 0 3px #61e4df18}
+.nx-sheet-content{overflow:auto;padding:13px;overscroll-behavior:contain}.nx-sheet-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.nx-asset-card{min-width:0;padding:13px;border:1px solid #ffffff16;border-radius:16px;background:linear-gradient(145deg,#17263b,#0e1727);display:flex;flex-direction:column;gap:7px}
+.nx-asset-card strong{font-size:12px;overflow-wrap:anywhere}.nx-asset-card p{margin:0;color:#9eafc7;font-size:10px;line-height:1.8}.nx-asset-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;color:#8fa2bd;font-size:9px}
+.nx-asset-pill{display:inline-flex;padding:4px 7px;border:1px solid #ffffff20;border-radius:99px;font-size:9px;color:#b8c8df}.nx-asset-pill.good{color:#7ed7ae;border-color:#7ed7ae55}.nx-asset-pill.warn{color:#f4c875;border-color:#f4c87555}.nx-asset-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:auto}.nx-asset-actions a,.nx-asset-actions button{border:1px solid #61e4df55;border-radius:9px;padding:7px 9px;background:#61e4df0d;color:#8ff1e7;font-size:10px;cursor:pointer}
+.nx-script-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 11px;border-bottom:1px solid #ffffff10;font-size:10px}.nx-script-row code{color:#d6e3f5;overflow-wrap:anywhere;direction:ltr;text-align:left}.nx-script-row a{color:#61e4df;white-space:nowrap}.nx-sheet-empty{padding:22px;text-align:center;color:#9eafc7;font-size:12px}
+.nx-sheet-tabs{display:flex;gap:6px;overflow:auto;padding:10px 14px 0}.nx-sheet-tab{flex:none;border:1px solid #34465f;border-radius:999px;background:#0b1422;color:#aebbd0;padding:7px 11px;font-size:10px;cursor:pointer}.nx-sheet-tab.active{border-color:#61e4df;color:#61e4df;background:#61e4df12}
+.nx-cockpit-foot{padding:10px 15px;border-top:1px solid #ffffff12;color:#8295b1;font-size:9px;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.nx-quick-section{margin-bottom:12px}.nx-quick-section h3{font-size:12px;margin:0 0 9px;color:#dce8fa}
+.nx-quick-links{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.nx-quick-links a{border:1px solid #ffffff18;border-radius:13px;padding:11px;background:#ffffff08;font-size:10px;color:#c7d5e8}
+.nx-catalog-summary{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.nx-catalog-summary span{padding:8px 10px;border:1px solid #ffffff18;border-radius:11px;background:#ffffff08;font-size:10px;color:#c4d3e7}
+@keyframes nxOverlayIn{from{opacity:0}to{opacity:1}}@keyframes nxSheetUp{from{opacity:0;transform:translateY(22px) scale(.99)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(max-width:600px){body{padding-bottom:calc(90px + env(safe-area-inset-bottom))}#nxMobileDock{bottom:calc(7px + env(safe-area-inset-bottom));border-radius:19px;padding:6px;gap:3px}.nx-dock-btn{min-height:51px;border-radius:13px}.nx-dock-btn .nx-dock-icon{font-size:18px}.nx-dock-btn small{font-size:8px}#nxCockpitOverlay{padding:0 0 calc(76px + env(safe-area-inset-bottom))}#nxCockpitSheet{width:100%;max-height:82vh;border-radius:23px 23px 0 0;border-bottom:0}.nx-sheet-grip{display:block}.nx-sheet-head{padding:10px 14px}.nx-sheet-grid{grid-template-columns:1fr}.nx-quick-links{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(prefers-reduced-motion:reduce){#nxCockpitOverlay.open,#nxCockpitSheet{animation:none!important}.nx-dock-btn{transition:none}}
+
 </style></head>
 <body><div class="wrap">
 <header class="top"><div class="brand"><div class="mark">N</div><div>M5mOsH Nexus<div class="muted" style="font-size:11px;font-weight:500;margin-top:3px">مركز إدارة منظومة المشاريع الرقمية</div></div></div><nav class="top-links" aria-label="روابط Nexus"><a class="tag" href="design-system.html">✦ استوديو التصميم</a><a class="tag" href="https://dashboard.render.com/" target="_blank" rel="noreferrer">مساحة التشغيل ↗</a></nav></header>
@@ -770,4 +796,133 @@ status.textContent='تم فتح مساحة التحكم تلقائيًا. اخت
  document.getElementById('nxAiPlan')?.addEventListener('click',()=>setTask('خطة تطوير أسبوعية — شريك Nexus','اليوم 1: جرد الملفات والفروع والتكرارات.\nاليوم 2: اختبار صحة روابط وخدمات Render.\nاليوم 3: ترتيب الأسرار والصلاحيات.\nاليوم 4: إصلاح أعلى عطل مثبت مع اختبارات.\nاليوم 5: توحيد المعاينات حسب المجال.\nاليوم 6: بناء واجهة API آمنة لمراقبة الحالة.\nاليوم 7: مراجعة النتائج وتقرير الإنجاز والوقت.\nكل يوم: لا تنفيذ على الإنتاج دون موافقة، واكتب نتيجة قابلة للتحقق لكل مهمة.'));
 })();
 </script>
+
+<div id="nxCockpitOverlay" aria-hidden="true">
+ <section id="nxCockpitSheet" role="dialog" aria-modal="true" aria-labelledby="nxSheetTitle">
+  <div class="nx-sheet-grip"></div>
+  <header class="nx-sheet-head"><div class="mark" style="width:36px;height:36px;border-radius:12px">N</div><div class="nx-sheet-title"><strong id="nxSheetTitle">مركز M5mOsH</strong><small id="nxSheetSub">مشاريعك وملفاتك في مكان واحد</small></div><button class="nx-sheet-close" id="nxSheetClose" type="button" aria-label="إغلاق">×</button></header>
+  <div class="nx-sheet-search"><input id="nxAssetSearch" type="search" placeholder="ابحث عن مشروع أو خدمة أو سكريبت..." aria-label="بحث شامل في الأصول"></div>
+  <nav class="nx-sheet-tabs" id="nxSheetTabs" aria-label="أقسام المركز">
+   <button class="nx-sheet-tab active" data-panel="projects">المشاريع</button><button class="nx-sheet-tab" data-panel="services">الخدمات</button><button class="nx-sheet-tab" data-panel="scripts">السكريبتات</button><button class="nx-sheet-tab" data-panel="local">ملفات Pythonista</button><button class="nx-sheet-tab" data-panel="issues">الأعطال</button><button class="nx-sheet-tab" data-panel="more">المزيد</button>
+  </nav>
+  <div class="nx-sheet-content" id="nxSheetContent"><div class="nx-sheet-empty">جارٍ تحميل فهرس المشاريع والسكريبتات…</div></div>
+  <footer class="nx-cockpit-foot"><span>© M5mOsH · جميع الحقوق محفوظة</span><span id="nxCatalogStatus">مصادر الفهرس: GitHub + Render + السجل المحلي</span></footer>
+ </section>
+</div>
+<nav id="nxMobileDock" aria-label="التنقل السريع">
+ <button class="nx-dock-btn" data-open-panel="projects" type="button" aria-pressed="false"><span class="nx-dock-icon">⌂</span><small>المشاريع</small></button>
+ <button class="nx-dock-btn" data-open-panel="services" type="button" aria-pressed="false"><span class="nx-dock-icon">◈</span><small>الخدمات</small></button>
+ <button class="nx-dock-btn" data-open-panel="scripts" type="button" aria-pressed="false"><span class="nx-dock-icon">⌘</span><small>السكريبتات</small></button>
+ <button class="nx-dock-btn" data-open-panel="issues" type="button" aria-pressed="false"><span class="nx-dock-icon">⚑</span><small>الأعطال</small></button>
+ <button class="nx-dock-btn" data-open-panel="more" type="button" aria-pressed="false"><span class="nx-dock-icon">•••</span><small>المزيد</small></button>
+</nav>
+
+<script>
+(()=> {
+ const $=id=>document.getElementById(id);
+ const overlay=$('nxCockpitOverlay'),content=$('nxSheetContent'),search=$('nxAssetSearch'),tabs=[...document.querySelectorAll('.nx-sheet-tab')],dock=[...document.querySelectorAll('.nx-dock-btn')];
+ let projects=null,scripts=null,services=[],active='projects',scriptLimit=80;
+ let projectLoading=null,scriptLoading=null;
+ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const safeUrl=u=>{try{const x=new URL(u);return ['http:','https:'].includes(x.protocol)?x.href:'#'}catch{return '#'}};
+ const setPanel=p=>{active=p;tabs.forEach(t=>t.classList.toggle('active',t.dataset.panel===p));dock.forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.openPanel===p)));search.value='';scriptLimit=80;render()};
+ const open=p=>{setPanel(p);overlay.classList.add('open');overlay.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';$('nxSheetClose').focus();ensureLoaded()};
+ const close=()=>{overlay.classList.remove('open');overlay.setAttribute('aria-hidden','true');document.body.style.overflow='';dock.forEach(b=>b.setAttribute('aria-pressed','false'))};
+ async function loadProjects(){
+  if(projects)return projects;
+  if(projectLoading)return projectLoading;
+  projectLoading=(async()=>{
+   const response=await fetch('project-catalog.json',{cache:'no-store'});
+   if(!response.ok)throw new Error('project_catalog_http_error');
+   projects=await response.json();services=projects.services||[];
+   $('nxCatalogStatus').textContent='تم تحميل الفهرس · '+(projects.counts?.githubRepositories||0)+' مستودع · '+services.length+' خدمة';
+   return projects;
+  })();
+  try{return await projectLoading}finally{projectLoading=null}
+ }
+ async function loadScripts(){
+  if(scripts)return scripts;
+  if(scriptLoading)return scriptLoading;
+  scriptLoading=(async()=>{
+   const response=await fetch('scripts-catalog.json',{cache:'no-store'});
+   if(!response.ok)throw new Error('script_catalog_http_error');
+   scripts=await response.json();
+   $('nxCatalogStatus').textContent='تم تحميل فهرس السكريبتات · '+(scripts.summary?.scriptFilesIndexed||0)+' ملف';
+   return scripts;
+  })();
+  try{return await scriptLoading}finally{scriptLoading=null}
+ }
+ async function ensureLoaded(){
+  try{
+   await loadProjects();
+   if(active==='scripts')await loadScripts();
+   render();
+  }catch(error){
+   $('nxCatalogStatus').textContent='تعذر تحميل أحد ملفات الفهرس؛ تحقق من نشر ملفات JSON.';
+   content.innerHTML='<div class="nx-sheet-empty">تعذر تحميل بيانات هذا القسم. بقية واجهة Nexus ما زالت متاحة.</div>';
+  }
+ }
+ function projectCards(){
+  if(!projects)return '<div class="nx-sheet-empty">الفهرس غير متاح.</div>';
+  const q=search.value.trim().toLowerCase();
+  const rows=(projects.repositories||[]).filter(r=>(r.name+' '+r.fullName+' '+r.description).toLowerCase().includes(q));
+  const local=(projects.localProjects||[]).filter(r=>(r.name+' '+r.description).toLowerCase().includes(q));
+  const total=rows.length+local.length;
+  return '<div class="nx-catalog-summary"><span>'+rows.length+' مستودع مطابق</span><span>'+local.length+' سجل مشروع محلي</span><span>'+services.length+' خدمة مرتبطة</span></div><div class="nx-sheet-grid">'+rows.map(r=>{
+   const count=r.scriptCount??'—';
+   const state=r.scriptScanStatus==='empty_repository'?'مستودع فارغ':r.scriptScanStatus==='access_blocked'?'الوصول محجوب':r.scriptScanStatus==='complete'?'مفهرس':'لم يُفحص';
+   return '<article class="nx-asset-card"><strong>'+esc(r.name)+'</strong><p>'+esc(r.description)+'</p><div class="nx-asset-meta"><span class="nx-asset-pill">'+esc(r.visibility)+'</span><span class="nx-asset-pill">'+esc(r.defaultBranch)+'</span><span class="nx-asset-pill">'+esc(state)+'</span><span class="nx-asset-pill">'+esc(count)+' سكريبت</span></div><div class="nx-asset-actions"><a href="'+safeUrl(r.url)+'" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></article>'
+  }).join('')+local.map(r=>'<article class="nx-asset-card"><strong>'+esc(r.name)+'</strong><p>'+esc(r.description)+'</p><div class="nx-asset-meta"><span class="nx-asset-pill warn">سجل مشروع — الملفات المحلية لم تُفحص</span></div></article>').join('')+'</div>'+(total?'':'<div class="nx-sheet-empty">لا توجد نتائج مطابقة.</div>');
+ }
+ function serviceCards(){
+  const q=search.value.trim().toLowerCase();
+  const rows=services.filter(s=>(s.name+' '+(s.repository||'')+' '+(s.branch||'')).toLowerCase().includes(q));
+  return '<div class="nx-catalog-summary"><span>'+rows.length+' خدمة</span><span>المعلّق: '+rows.filter(s=>s.suspended).length+'</span><span>التشغيل الصحي لم يُفحص من هذه الصفحة</span></div><div class="nx-sheet-grid">'+rows.map(s=>'<article class="nx-asset-card"><strong>'+esc(s.name)+'</strong><p>'+esc(s.repository||'مستودع غير مسجل')+'</p><div class="nx-asset-meta"><span class="nx-asset-pill '+(s.suspended?'warn':'good')+'">'+(s.suspended?'معلّق':'غير معلّق')+'</span><span class="nx-asset-pill">'+esc(s.type)+'</span><span class="nx-asset-pill">Auto deploy: '+(s.autoDeploy?'On':'Off')+'</span></div><p>الفرع: '+esc(s.branch||'—')+'</p><div class="nx-asset-actions">'+(s.url?'<a href="'+safeUrl(s.url)+'" target="_blank" rel="noopener noreferrer">فتح الخدمة ↗</a>':'')+'<a href="https://dashboard.render.com/" target="_blank" rel="noopener noreferrer">Render ↗</a></div></article>').join('')+'</div>'+(rows.length?'':'<div class="nx-sheet-empty">لا توجد خدمات مطابقة.</div>');
+ }
+ function scriptCards(){
+  if(!scripts)return '<div class="nx-sheet-empty">فهرس السكريبتات غير متاح.</div>';
+  const q=search.value.trim().toLowerCase(),rows=[];
+  for(const [repo,entry] of Object.entries(scripts.repositories||{})){
+   for(const f of (entry.scripts||[])){
+    const label=repo+' '+f.path;
+    if(!q||label.toLowerCase().includes(q))rows.push({repo,path:f.path,branch:f.branch||entry.branch||'main'});
+   }
+  }
+  const shown=rows.slice(0,scriptLimit);
+  const groups=Object.entries(scripts.repositories||{}).filter(([name])=>!q||name.toLowerCase().includes(q)).map(([name,e])=>({name,count:e.scriptCount||0,status:e.scanStatus||'unknown'}));
+  return '<div class="nx-catalog-summary"><span>'+esc(scripts.summary?.repositoriesIndexed||groups.length)+' مستودع مفهرس</span><span>'+esc(scripts.summary?.scriptFilesIndexed||rows.length)+' ملف سكريبت/مصدر</span><span>'+rows.length+' نتيجة بحث</span></div><div class="nx-sheet-grid">'+groups.filter(g=>g.count>0).sort((a,b)=>b.count-a.count).map(g=>'<article class="nx-asset-card"><strong>'+esc(g.name)+'</strong><div class="nx-asset-meta"><span class="nx-asset-pill good">'+g.count+' ملف</span><span class="nx-asset-pill">'+esc(g.status)+'</span></div></article>').join('')+'</div><div style="margin-top:12px;border:1px solid #ffffff18;border-radius:14px;overflow:hidden">'+shown.map(f=>{const repo=(projects?.repositories||[]).find(r=>r.name===f.repo);const base=repo?.url||'https://github.com/m5moshbk/'+encodeURIComponent(f.repo);const href=base+'/blob/'+encodeURIComponent(f.branch)+'/'+f.path.split('/').map(encodeURIComponent).join('/');return '<div class="nx-script-row"><code>'+esc(f.repo+'/'+f.path)+'</code><a href="'+safeUrl(href)+'" target="_blank" rel="noopener noreferrer">فتح ↗</a></div>'}).join('')+'</div>'+(rows.length>shown.length?'<div class="nx-asset-actions" style="margin-top:10px"><button id="nxMoreScripts" type="button">عرض المزيد ('+(rows.length-shown.length)+')</button></div>':'')+(rows.length?'':'<div class="nx-sheet-empty">لا توجد ملفات مطابقة.</div>');
+ }
+ function localCards(){
+  const q=search.value.trim().toLowerCase();
+  const rows=(projects?.localPythonista||[]).filter(r=>(r.name+' '+r.note).toLowerCase().includes(q));
+  return '<div class="nx-catalog-summary"><span>'+rows.length+' سجلات محلية معروفة</span><span>لم يتم فحص جهاز Pythonista الآن</span></div><div class="nx-sheet-grid">'+rows.map(r=>'<article class="nx-asset-card"><strong>'+esc(r.name)+'</strong><p>'+esc(r.note)+'</p><div class="nx-asset-meta"><span class="nx-asset-pill warn">'+esc(r.status)+'</span></div></article>').join('')+'</div><div class="nx-sheet-empty">هذا القسم يسجل الأعمال المحلية المعروفة فقط؛ لا يدّعي أنه نسخ ملفات جهازك إلى GitHub.</div>';
+ }
+ function issueCards(){
+  const rows=projects?.knownIssues||[];
+  const q=search.value.trim().toLowerCase();
+  const filtered=rows.filter(x=>(x.id+' '+x.area+' '+x.title+' '+x.evidence+' '+x.next).toLowerCase().includes(q));
+  const label={ui_only:'واجهة محلية فقط',not_implemented:'غير منفذ',not_confirmed:'غير محسوم',blocked:'محجوب/معلّق',not_scanned:'لم يُفحص'};
+  const cls={ui_only:'warn',not_implemented:'warn',not_confirmed:'warn',blocked:'warn',not_scanned:'warn'};
+  return '<div class="nx-catalog-summary"><span>'+filtered.length+' ملاحظة مسجلة</span><span>كل حالة مرتبطة بدليل</span><span>لا إعادة تشغيل تلقائية</span></div><div class="nx-sheet-grid">'+filtered.map(x=>'<article class="nx-asset-card"><div class="nx-asset-meta"><span class="nx-asset-pill warn">'+esc(x.id)+'</span><span class="nx-asset-pill">'+esc(label[x.status]||x.status)+'</span><span class="nx-asset-pill">'+esc(x.severity)+'</span></div><strong>'+esc(x.title)+'</strong><p>'+esc(x.evidence)+'</p><p><b>الخطوة المطلوبة:</b> '+esc(x.next)+'</p><div class="nx-asset-meta">'+esc(x.area)+'</div></article>').join('')+'</div>'+(filtered.length?'':'<div class="nx-sheet-empty">لا توجد أعطال مطابقة.</div>');
+ }
+ function moreCards(){
+  return '<div class="nx-quick-section"><h3>المتابعة</h3><div class="nx-quick-links"><button type="button" data-show-issues>فتح سجل الأعطال</button></div></div><div class="nx-quick-section"><h3>الأقسام الحالية</h3><div class="nx-quick-links"><a href="#projects" data-jump>مكتبة المشاريع الحالية</a><a href="#operatorPanel" data-jump>مركز المهام</a><a href="#nexusWorkbench" data-jump>مساحة المشغل</a><a href="#nxRepairCenter" data-jump>مركز الإصلاح</a><a href="#nxVision" data-jump>مختبر الرؤية</a><a href="design-system.html">استوديو التصميم</a></div></div><div class="nx-quick-section"><h3>البريد والمتجر</h3><div class="nx-quick-links"><a href="https://m5mosh-mailer-inbox.onrender.com/" target="_blank" rel="noopener noreferrer">Mailer Inbox — واجهة حالية</a><a href="https://aus-luxe-auto-store.onrender.com/" target="_blank" rel="noopener noreferrer">AUS Luxe — نموذج المتجر</a></div><p class="note">البريد والإرسال وOTP والدفع تحتاج ربطاً خلفياً واختبارات مستقلة؛ الروابط لا تعني أن هذه الوظائف جاهزة.</p></div>';
+ }
+ function render(){
+  if(!projects){content.innerHTML='<div class="nx-sheet-empty">جارٍ تحميل المشاريع…</div>';return;}
+  if(active==='scripts'&&!scripts){content.innerHTML='<div class="nx-sheet-empty">جارٍ تحميل فهرس السكريبتات عند الطلب…</div>';return;}
+  content.innerHTML=active==='projects'?projectCards():active==='services'?serviceCards():active==='scripts'?scriptCards():active==='local'?localCards():active==='issues'?issueCards():moreCards();
+  $('nxMoreScripts')?.addEventListener('click',()=>{scriptLimit+=80;render()});
+  content.querySelectorAll('[data-jump]').forEach(a=>a.addEventListener('click',()=>close()));content.querySelector('[data-show-issues]')?.addEventListener('click',()=>setPanel('issues'));
+ }
+ dock.forEach(b=>b.addEventListener('click',()=>open(b.dataset.openPanel)));
+ tabs.forEach(b=>b.addEventListener('click',()=>{setPanel(b.dataset.panel);ensureLoaded()}));
+ $('nxSheetClose').addEventListener('click',close);
+ overlay.addEventListener('click',e=>{if(e.target===overlay)close()});
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&overlay.classList.contains('open'))close()});
+ search.addEventListener('input',()=>{scriptLimit=80;render()});
+ $('nxCatalogStatus').textContent='الفهرس جاهز · تُحمّل التفاصيل عند فتح القسم';
+})();
+</script>
+
 </body></html>
