@@ -60,6 +60,703 @@
       "scriptCount": 0,
       "scripts": [],
       "scanStatus": "complete"
+    },
+    "wedding-invite": {
+      "branch": "main",
+      "scanStatus": "access_blocked",
+      "error": "FORBIDDEN: Error code: FORBIDDEN; Error: GitHub API error 403: {\"message\":\"Repository access blocked\",\"block\":{\"reason\":\"private_information\",\"created_at\":\"2025-12-10T15:46:25Z\",\"html_url\":\"https://github.com/tos\"}}"
+    },
+    "urban-octo-couscous": {
+      "branch": "main",
+      "treeTruncated": false,
+      "totalFiles": 1,
+      "scriptCount": 0,
+      "scripts": [],
+      "scanStatus": "complete"
+    },
+    "Tuwami-X": {
+      "branch": "main",
+      "scanStatus": "empty_repository",
+      "error": "CONFLICT: Error code: CONFLICT; Error: GitHub API error 409: {\"message\":\"Git Repository is empty.\",\"documentation_url\":\"https://docs.github.com/rest/git/trees#get-a-tree\",\"status\":\"409\"}"
+    },
+    "nSr-ftns": {
+      "branch": "main",
+      "scanStatus": "empty_repository",
+      "error": "CONFLICT: Error code: CONFLICT; Error: GitHub API error 409: {\"message\":\"Git Repository is empty.\",\"documentation_url\":\"https://docs.github.com/rest/git/trees#get-a-tree\",\"status\":\"409\"}"
+    },
+    "Modat": {
+      "branch": "main",
+      "treeTruncated": false,
+      "totalFiles": 214,
+      "scriptCount": 163,
+      "scripts": [
+        {
+          "path": "artifacts/api-server/build.mjs",
+          "size": 3455
+        },
+        {
+          "path": "artifacts/api-server/src/app.ts",
+          "size": 656
+        },
+        {
+          "path": "artifacts/api-server/src/index.ts",
+          "size": 511
+        },
+        {
+          "path": "artifacts/api-server/src/lib/logger.ts",
+          "size": 421
+        },
+        {
+          "path": "artifacts/api-server/src/routes/health.ts",
+          "size": 288
+        },
+        {
+          "path": "artifacts/api-server/src/routes/index.ts",
+          "size": 171
+        },
+        {
+          "path": "artifacts/mockup-sandbox/mockupPreviewPlugin.ts",
+          "size": 4639
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/.generated/mockup-components.ts",
+          "size": 171
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/App.tsx",
+          "size": 3654
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/components/ui/accordion.tsx",
+          "size": 2001
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/components/ui/alert-dialog.tsx",
+          "size": 4419
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/components/ui/alert.tsx",
+          "size": 1598
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/components/ui/aspect-ratio.tsx",
+          "size": 140
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/components/ui/avatar.tsx",
+          "size": 1419
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/components/ui/badge.tsx",
+          "size": 1163
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/components/ui/breadcrumb.tsx",
+          "size": 2712
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/components/ui/button-group.tsx",
+          "size": 2209
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/components/ui/button.tsx",
+          "size": 1925
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/components/ui/calendar.tsx",
+          "size": 7569
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/components/ui/card.tsx",
+          "size": 1828
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/components/ui/carousel.tsx",
+          "size": 6210
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/components/ui/chart.tsx",
+          "size": 10674
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/components/ui/checkbox.tsx",
+          "size": 1031
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/components/ui/collapsible.tsx",
+          "size": 329
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/components/ui/command.tsx",
+          "size": 4887
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/components/ui/context-menu.tsx",
+          "size": 7406
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/components/ui/dialog.tsx",
+          "size": 3835
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/components/ui/drawer.tsx",
+          "size": 3007
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/components/ui/dropdown-menu.tsx",
+          "size": 7606
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/components/ui/empty.tsx",
+          "size": 2396
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/components/ui/field.tsx",
+          "size": 6044
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/components/ui/form.tsx",
+          "size": 4175
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/components/ui/hover-card.tsx",
+          "size": 1237
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/components/ui/input-group.tsx",
+          "size": 4883
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/components/ui/input-otp.tsx",
+          "size": 2143
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/components/ui/input.tsx",
+          "size": 768
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/components/ui/item.tsx",
+          "size": 4494
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/components/ui/kbd.tsx",
+          "size": 862
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/components/ui/label.tsx",
+          "size": 724
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/components/ui/menubar.tsx",
+          "size": 8608
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/components/ui/navigation-menu.tsx",
+          "size": 5124
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/components/ui/pagination.tsx",
+          "size": 2751
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/components/ui/popover.tsx",
+          "size": 1342
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/components/ui/progress.tsx",
+          "size": 792
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/components/ui/radio-group.tsx",
+          "size": 1410
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/components/ui/resizable.tsx",
+          "size": 1723
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/components/ui/scroll-area.tsx",
+          "size": 1642
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/components/ui/select.tsx",
+          "size": 5745
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/components/ui/separator.tsx",
+          "size": 756
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/components/ui/sheet.tsx",
+          "size": 4280
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/components/ui/sidebar.tsx",
+          "size": 21056
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/components/ui/skeleton.tsx",
+          "size": 266
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/components/ui/slider.tsx",
+          "size": 1037
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/components/ui/sonner.tsx",
+          "size": 894
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/components/ui/spinner.tsx",
+          "size": 331
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/components/ui/switch.tsx",
+          "size": 1148
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/components/ui/table.tsx",
+          "size": 2859
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/components/ui/tabs.tsx",
+          "size": 1877
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/components/ui/textarea.tsx",
+          "size": 649
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/components/ui/toast.tsx",
+          "size": 4845
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/components/ui/toaster.tsx",
+          "size": 772
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/components/ui/toggle-group.tsx",
+          "size": 1753
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/components/ui/toggle.tsx",
+          "size": 1486
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/components/ui/tooltip.tsx",
+          "size": 1267
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/hooks/use-mobile.tsx",
+          "size": 565
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/hooks/use-toast.ts",
+          "size": 3767
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/lib/utils.ts",
+          "size": 166
+        },
+        {
+          "path": "artifacts/mockup-sandbox/src/main.tsx",
+          "size": 157
+        },
+        {
+          "path": "artifacts/mockup-sandbox/vite.config.ts",
+          "size": 1615
+        },
+        {
+          "path": "artifacts/modat221/src/App.tsx",
+          "size": 2206
+        },
+        {
+          "path": "artifacts/modat221/src/components/layout/Footer.tsx",
+          "size": 5506
+        },
+        {
+          "path": "artifacts/modat221/src/components/layout/Header.tsx",
+          "size": 3791
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/ProductCard.tsx",
+          "size": 2987
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/WhatsAppButton.tsx",
+          "size": 2074
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/accordion.tsx",
+          "size": 2001
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/alert-dialog.tsx",
+          "size": 4419
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/alert.tsx",
+          "size": 1598
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/aspect-ratio.tsx",
+          "size": 140
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/avatar.tsx",
+          "size": 1419
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/badge.tsx",
+          "size": 1213
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/breadcrumb.tsx",
+          "size": 2712
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/button-group.tsx",
+          "size": 2209
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/button.tsx",
+          "size": 1929
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/calendar.tsx",
+          "size": 7569
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/card.tsx",
+          "size": 1828
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/carousel.tsx",
+          "size": 6210
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/chart.tsx",
+          "size": 10763
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/checkbox.tsx",
+          "size": 1031
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/collapsible.tsx",
+          "size": 329
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/command.tsx",
+          "size": 4887
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/context-menu.tsx",
+          "size": 7406
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/dialog.tsx",
+          "size": 3835
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/drawer.tsx",
+          "size": 3007
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/dropdown-menu.tsx",
+          "size": 7606
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/empty.tsx",
+          "size": 2396
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/field.tsx",
+          "size": 6044
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/form.tsx",
+          "size": 4175
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/hover-card.tsx",
+          "size": 1237
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/input-group.tsx",
+          "size": 4971
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/input-otp.tsx",
+          "size": 2143
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/input.tsx",
+          "size": 768
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/item.tsx",
+          "size": 4494
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/kbd.tsx",
+          "size": 862
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/label.tsx",
+          "size": 724
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/menubar.tsx",
+          "size": 8608
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/navigation-menu.tsx",
+          "size": 5124
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/pagination.tsx",
+          "size": 2751
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/popover.tsx",
+          "size": 1342
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/progress.tsx",
+          "size": 792
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/radio-group.tsx",
+          "size": 1410
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/resizable.tsx",
+          "size": 1723
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/scroll-area.tsx",
+          "size": 1642
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/select.tsx",
+          "size": 5745
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/separator.tsx",
+          "size": 756
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/sheet.tsx",
+          "size": 4280
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/sidebar.tsx",
+          "size": 21846
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/skeleton.tsx",
+          "size": 266
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/slider.tsx",
+          "size": 1037
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/sonner.tsx",
+          "size": 894
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/spinner.tsx",
+          "size": 331
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/switch.tsx",
+          "size": 1148
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/table.tsx",
+          "size": 2859
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/tabs.tsx",
+          "size": 1877
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/textarea.tsx",
+          "size": 649
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/toast.tsx",
+          "size": 4845
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/toaster.tsx",
+          "size": 772
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/toggle-group.tsx",
+          "size": 1753
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/toggle.tsx",
+          "size": 1486
+        },
+        {
+          "path": "artifacts/modat221/src/components/ui/tooltip.tsx",
+          "size": 1267
+        },
+        {
+          "path": "artifacts/modat221/src/data/products.ts",
+          "size": 6973
+        },
+        {
+          "path": "artifacts/modat221/src/hooks/use-document-title.ts",
+          "size": 177
+        },
+        {
+          "path": "artifacts/modat221/src/hooks/use-mobile.tsx",
+          "size": 565
+        },
+        {
+          "path": "artifacts/modat221/src/hooks/use-toast.ts",
+          "size": 3895
+        },
+        {
+          "path": "artifacts/modat221/src/lib/utils.ts",
+          "size": 166
+        },
+        {
+          "path": "artifacts/modat221/src/main.tsx",
+          "size": 157
+        },
+        {
+          "path": "artifacts/modat221/src/pages/About.tsx",
+          "size": 4710
+        },
+        {
+          "path": "artifacts/modat221/src/pages/Contact.tsx",
+          "size": 5986
+        },
+        {
+          "path": "artifacts/modat221/src/pages/Faq.tsx",
+          "size": 5067
+        },
+        {
+          "path": "artifacts/modat221/src/pages/Home.tsx",
+          "size": 9984
+        },
+        {
+          "path": "artifacts/modat221/src/pages/Payment.tsx",
+          "size": 6764
+        },
+        {
+          "path": "artifacts/modat221/src/pages/Privacy.tsx",
+          "size": 6597
+        },
+        {
+          "path": "artifacts/modat221/src/pages/ProductDetail.tsx",
+          "size": 7490
+        },
+        {
+          "path": "artifacts/modat221/src/pages/Products.tsx",
+          "size": 5023
+        },
+        {
+          "path": "artifacts/modat221/src/pages/Rental.tsx",
+          "size": 3477
+        },
+        {
+          "path": "artifacts/modat221/src/pages/Returns.tsx",
+          "size": 5919
+        },
+        {
+          "path": "artifacts/modat221/src/pages/Shipping.tsx",
+          "size": 4398
+        },
+        {
+          "path": "artifacts/modat221/src/pages/Terms.tsx",
+          "size": 6724
+        },
+        {
+          "path": "artifacts/modat221/src/pages/not-found.tsx",
+          "size": 711
+        },
+        {
+          "path": "artifacts/modat221/vite.config.ts",
+          "size": 1351
+        },
+        {
+          "path": "lib/api-client-react/src/custom-fetch.ts",
+          "size": 11377
+        },
+        {
+          "path": "lib/api-client-react/src/generated/api.schemas.ts",
+          "size": 178
+        },
+        {
+          "path": "lib/api-client-react/src/generated/api.ts",
+          "size": 2544
+        },
+        {
+          "path": "lib/api-client-react/src/index.ts",
+          "size": 194
+        },
+        {
+          "path": "lib/api-spec/orval.config.ts",
+          "size": 1803
+        },
+        {
+          "path": "lib/api-zod/src/generated/api.ts",
+          "size": 296
+        },
+        {
+          "path": "lib/api-zod/src/generated/types/healthStatus.ts",
+          "size": 179
+        },
+        {
+          "path": "lib/api-zod/src/generated/types/index.ts",
+          "size": 159
+        },
+        {
+          "path": "lib/api-zod/src/index.ts",
+          "size": 68
+        },
+        {
+          "path": "lib/db/drizzle.config.ts",
+          "size": 352
+        },
+        {
+          "path": "lib/db/src/index.ts",
+          "size": 416
+        },
+        {
+          "path": "lib/db/src/schema/index.ts",
+          "size": 743
+        },
+        {
+          "path": "scripts/post-merge.sh",
+          "size": 72
+        },
+        {
+          "path": "scripts/src/hello.ts",
+          "size": 46
+        }
+      ],
+      "scanStatus": "complete"
+    },
+    "Tamara-Business-Site": {
+      "branch": "main",
+      "treeTruncated": false,
+      "totalFiles": 5,
+      "scriptCount": 1,
+      "scripts": [
+        {
+          "path": "server.js",
+          "size": 14507
+        }
+      ],
+      "scanStatus": "complete"
     }
   },
   "localPythonista": [
