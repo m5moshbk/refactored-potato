@@ -1061,6 +1061,54 @@
       "scriptCount": 0,
       "scripts": [],
       "scanStatus": "complete"
+    },
+    "scaling-computing-machine": {
+      "branch": "main",
+      "treeTruncated": false,
+      "totalFiles": 1,
+      "scriptCount": 0,
+      "scripts": [],
+      "scanStatus": "complete"
+    },
+    "bookish-octo-eureka": {
+      "branch": "main",
+      "treeTruncated": false,
+      "totalFiles": 8,
+      "scriptCount": 2,
+      "scripts": [
+        {
+          "path": "app.py",
+          "size": 32562
+        },
+        {
+          "path": "tests/test_app.py",
+          "size": 5581
+        }
+      ],
+      "scanStatus": "complete"
+    },
+    "curly-octo-adventure": {
+      "branch": "main",
+      "scanStatus": "empty_repository",
+      "error": "CONFLICT: Error code: CONFLICT; Error: GitHub API error 409: {\"message\":\"Git Repository is empty.\",\"documentation_url\":\"https://docs.github.com/rest/git/trees#get-a-tree\",\"status\":\"409\"}"
+    },
+    "super-duper-octo-adventure": {
+      "branch": "main",
+      "treeTruncated": false,
+      "totalFiles": 5,
+      "scriptCount": 0,
+      "scripts": [],
+      "scanStatus": "complete"
+    },
+    "crispy-octo-fortnight": {
+      "branch": "main",
+      "scanStatus": "empty_repository",
+      "error": "CONFLICT: Error code: CONFLICT; Error: GitHub API error 409: {\"message\":\"Git Repository is empty.\",\"documentation_url\":\"https://docs.github.com/rest/git/trees#get-a-tree\",\"status\":\"409\"}"
+    },
+    "musical-couscous": {
+      "branch": "main",
+      "scanStatus": "empty_repository",
+      "error": "CONFLICT: Error code: CONFLICT; Error: GitHub API error 409: {\"message\":\"Git Repository is empty.\",\"documentation_url\":\"https://docs.github.com/rest/git/trees#get-a-tree\",\"status\":\"409\"}"
     }
   },
   "localPythonista": [
