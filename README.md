@@ -1,49 +1,64 @@
-# M5mOsH Nexus — فهرس المشاريع
+# M5mOsH Voice Nexus
 
-مركز واجهة لتجميع روابط المشاريع ومعايناتها. هذا المستودع وخدمة Render المرتبطة به هما واجهة فهرسة؛ لا يفترضان أن جميع المشاريع متصلة ببعضها أو أن وظائفها التشغيلية قد اجتازت الاختبار.
+M5mOsH Voice Nexus هو مشروع عربي ذكي يركّز على الصوت والهوية والتفاعل الرقمي الآمن. يهدف إلى تحويل الكلام إلى نص، ودعم الأشخاص البكم أو ذوي صعوبات النطق، مع تمكين التحقق الآمن عبر بصمة الصوت.
 
-
-## الأقسام المنظمة
-- **[قسم المتاجر](catalog/متاجر.md)** — AUS Luxe وواجهة الأعمال/الدفع، مع تمييز النماذج الأولية عن الدفع الفعلي.
-- **[قسم الأدوات](catalog/أدوات.md)** — SADA وSawa Play Monitor وElite Console X وغيرها.
-- **[كتالوج المستودعات للبوت](telegram_bot/catalog.json)** — بيانات 34 مستودعًا: التصنيف، الغرض، الاستخدام، المكونات، الفرع والرابط.
-- **[بوت Telegram: تعليمات التشغيل](telegram_bot/README.md)** — أوامر القراءة والبحث عن المستودعات.
-
-### بوت Telegram
-خدمة Render أُنشئت باسم `m5mosh-nexus-telegram-catalog`: https://m5mosh-nexus-telegram-catalog.onrender.com
-- فحص الصحة: `/health`
-- يتطلب ضبط `TELEGRAM_BOT_TOKEN` في Render لتفعيل أوامر Telegram، ويوصى بضبط `TELEGRAM_ADMIN_CHAT_ID`.
-- إلى أن يُضاف الرمز وتنجح تجربة أمر من Telegram، الحالة هي **الخدمة منشأة؛ تفعيل البوت لم يُتحقق بعد**.
-- البوت للقراءة فقط؛ لا يحذف ولا يعدل ولا ينشر مستودعات.
+## الفكرة الأساسية
+الوقت الحالي يتطلب منصات ذكية أكثر شمولية. الصوت ليس مجرد وسيلة للتواصل، بل هو هوية، أمان، وتقارب إنساني.
 
 ## الهدف
-توفير نقطة دخول واضحة لمشاريع M5mOsH، مع وصف موجز لكل مشروع، ورابط المستودع، ورابط المعاينة عند توفره، وفصل حالة النشر عن حالة التحقق الوظيفي.
+- تحويل الصوت إلى نص
+- دعم التواصل الصوتي
+- التحقق الآمن عبر الصوت
+- دعم الأشخاص ذوي صعوبات النطق
+- بناء منصة قابلة للتوسع في التعليم، الصحة، والخدمات
 
-## المشاريع الرئيسية
+## مشروع تجريبي داخل هذا المستودع
+- ملف صفحة العرض: `m5mosh-voice-nexus.html`
+- ملف الوصف: `M5mOsH-Voice-Nexus.md`
+- ملف الحزمة البصرية: `M5mOsH-Complete-Brand-Pack.md`
+- مشروع تجريبي كامل داخل `sada-voice/`
 
-| المشروع | المهمة | المستودع | المعاينة المسجلة في Render |
-|---|---|---|---|
-| صَدَى / SADA | خدمات المساعد والذاكرة والأدوات؛ المستودع الحالي يحتوي API تشخيص/echo واختبارات وعميل Pythonista | [SADA](https://github.com/m5moshbk/SADA) | [مركز التحكم](https://m5mosh-control-center.onrender.com) |
-| Elite Console X | لوحة إدارة وبوت Telegram مع حماية دخول وإعدادات بيئة | [Elite Console X](https://github.com/m5moshbk/m5moshbk-Elite-Console-X) | [فتح المعاينة](https://elite-console-x.onrender.com) |
-| Sawa Play Monitor | لوحة عربية لاستقبال أحداث ومتابعة تقارير الحالة والتحليل | [Sawa Play Monitor](https://github.com/m5moshbk/Sawa-Play-Monitor) | [فتح المعاينة](https://sawa-play-monitor.onrender.com) |
-| AUS Luxe | واجهة متجر لإكسسوارات السيارات | [المستودع الأساسي الحالي](https://github.com/m5moshbk/super-duper-octo-adventure) | [فتح المعاينة](https://aus-luxe-auto-store.onrender.com) |
-| بوابة الأعمال/الدفع | نموذج تكامل أولي لبوابات الدفع؛ وضع المعاينة لا يعني تنفيذ مدفوعات حقيقية | [Tamara Business Site](https://github.com/m5moshbk/Tamara-Business-Site) | [خدمة Render المسجلة](https://beefitness-payments-gateway.onrender.com) |
-| منصة الأعمال | واجهات وتجارب متعددة؛ يجب تحديد الفرع الصحيح قبل اعتماد أي معاينة كنسخة رئيسية | [bizweb-platform](https://github.com/m5moshbk/bizweb-platform) | [معاينة المحفظة](https://m5mosh-final-portfolio-preview.onrender.com) |
+## الهوية
+- الاسم الرسمي: M5mOsH Voice Nexus
+- الاسم العربي: صدى الحرف
+- الشعار: Voice • Identity • Access • Future
+- الملكية: © M5mOsH — All rights reserved
 
-## قواعد الحالة
-- **منشور**: توجد خدمة أو معاينة مسجلة.
-- **تم التحقق**: اجتاز اختبارًا وظيفيًا موثقًا.
-- **تجريبي**: واجهة أو مسار تجريبي، أو لم يكتمل التكامل.
-- **مرشح للتوحيد**: يوجد احتمال تداخل مع مشروع آخر، ويحتاج مقارنة قبل أرشفته.
+## التشغيل السريع
+### قاعدة البيانات
+```bash
+docker-compose up -d
+```
 
-لا تساوِ بين وجود رابط Render وبين عمل جميع الوظائف. سجّل نتيجة اختبار الصحة والوظائف الفعلية وتاريخها قبل تغيير الحالة إلى «تم التحقق».
+### Backend
+```bash
+cd sada-voice/backend
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
 
-## سياسة تنظيم المستودعات
-1. احتفظ بمصدر أساسي واحد لكل منتج.
-2. لا تحذف مستودعًا متشابه الاسم قبل مقارنة الملفات والتاريخ والفروع وروابط النشر.
-3. انقل التجارب إلى فروع واضحة أو أرشفها بعد التأكد من عدم وجود محتوى فريد.
-4. لا تضع مفاتيح API أو كلمات المرور أو بيانات العملاء في المستودع.
-5. وثّق الهدف، والمتطلبات، وطريقة التشغيل، ومتغيرات البيئة، والاختبارات، والقيود في README كل مشروع.
+### Frontend
+```bash
+cd sada-voice/frontend
+npm install
+npm run dev
+```
 
-## المالك
-M5mOsH
+## متغيرات البيئة
+```env
+DATABASE_URL=postgresql://postgres:password@localhost:5432/sada_voice
+SECRET_KEY=change-me
+JWT_ALGORITHM=HS256
+OPENAI_API_KEY=
+GEMINI_API_KEY=
+AZURE_SPEECH_KEY=
+AZURE_SPEECH_REGION=
+NEXT_PUBLIC_API_URL=http://localhost:8000
+```
+
+## الخلاصة
+هذا المشروع يجمع بين الصوت، الهوية، والأمان، ويشكل قاعدة قوية لمنصة عربية ذكية متكاملة قادرة على خدمة الإنسان والقطاع المؤسسي.
+
+© M5mOsH — All rights reserved
