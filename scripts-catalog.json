@@ -1,0 +1,32 @@
+{
+  "schemaVersion": "1.0",
+  "generatedAt": "2026-10-31T14:05:07.164Z",
+  "repositories": {},
+  "localPythonista": [
+    {
+      "name": "Nexus 2.7.6",
+      "status": "local_reported_not_scanned",
+      "note": "Local Pythonista inventory and verification reports; source files not mounted in this GitHub repository."
+    },
+    {
+      "name": "M5mOsH Twin Guardian 3.0",
+      "status": "local_reported_not_scanned",
+      "note": "50 completed cycles reported in the user's supplied audit; source file path not confirmed here."
+    },
+    {
+      "name": "Sawa Forensics 4.3",
+      "status": "local_reported_not_scanned",
+      "note": "Prior local forensics report; exact source path not confirmed here."
+    },
+    {
+      "name": "Sawa V4",
+      "status": "local_reported_not_scanned",
+      "note": "Local SQLite workflow; exact source path not confirmed here."
+    },
+    {
+      "name": "M5mOsH_NEXUS_SYNC_DIAGNOSTICS_2_7_1.py",
+      "status": "reported_local_file",
+      "note": "Previously identified single hash mismatch in the local Nexus report."
+    }
+  ]
+}
