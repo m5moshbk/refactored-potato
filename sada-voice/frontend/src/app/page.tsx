@@ -21,7 +21,11 @@ type SpeechWindow = Window & {
   webkitSpeechRecognition?: new () => SpeechRecognitionLike;
 };
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API_URL = (
+  process.env.NEXT_PUBLIC_API_URL ||
+  (process.env.NODE_ENV === "development" ? "http://localhost:8000" : "")
+).replace(/\/+$/, "");
+
 const phrases = [
   "نعم",
   "لا",
@@ -47,6 +51,10 @@ export default function HomePage() {
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
 
   async function handleAuth() {
+    if (!API_URL) {
+      setAuthMessage("عنوان API غير مضبوط. أضف NEXT_PUBLIC_API_URL إلى إعدادات الواجهة ثم أعد البناء.");
+      return;
+    }
     setBusy(true);
     setAuthMessage("");
     try {
@@ -61,9 +69,8 @@ export default function HomePage() {
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.detail || "تعذر إتمام الطلب.");
-      sessionStorage.setItem("voice-nexus-token", data.access_token);
       setToken(data.access_token);
-      setAuthMessage("تم تسجيل الدخول لهذه الجلسة.");
+      setAuthMessage("تم تسجيل الدخول. الرمز محفوظ في ذاكرة الصفحة فقط.");
     } catch (error) {
       setAuthMessage(error instanceof Error ? error.message : "حدث خطأ غير متوقع.");
     } finally {
@@ -125,9 +132,8 @@ export default function HomePage() {
   }
 
   function logout() {
-    sessionStorage.removeItem("voice-nexus-token");
     setToken("");
-    setAuthMessage("تم إنهاء الجلسة على هذا الجهاز.");
+    setAuthMessage("تم إنهاء حالة الدخول في هذه الصفحة.");
   }
 
   return (
@@ -204,7 +210,7 @@ export default function HomePage() {
             </div>
             <label className="consent-line">
               <input type="checkbox" checked={consent} onChange={(event) => setConsent(event.target.checked)} />
-              <span>أوافق على استخدام الميكروفون ومعالجة الكلام بواسطة خدمة التعرف التي يوفرها المتصفح.</span>
+              <span>أوافق على استخدام الميكروفون. قد يعالج المتصفح الصوت عبر خدمة تابعة لمزوده؛ راجع سياسة الخصوصية لديه قبل المتابعة.</span>
             </label>
             <div className="button-row">
               <button className="button-primary" onClick={startListening} disabled={listening}>ابدأ الاستماع</button>
@@ -213,7 +219,7 @@ export default function HomePage() {
             </div>
             <label className="field-label" htmlFor="transcript">النص الناتج</label>
             <textarea id="transcript" value={transcript} onChange={(event) => setTranscript(event.target.value)} placeholder="سيظهر النص هنا، ويمكنك تعديله..." rows={5} />
-            <p className="helper">{speechMessage || "التعرف الصوتي يعتمد على دعم المتصفح واللغة وإعدادات الخصوصية لديه."}</p>
+            <p className="helper" role="status">{speechMessage || "التعرف الصوتي يعتمد على دعم المتصفح واللغة وإعدادات الخصوصية لديه."}</p>
           </article>
 
           <article className="panel access-panel">
@@ -242,7 +248,7 @@ export default function HomePage() {
         <div className="account-panel">
           {token ? (
             <div className="account-success">
-              <div><strong>الجلسة نشطة</strong><p>تم حفظ رمز الجلسة في ذاكرة الجلسة لهذا التبويب فقط.</p></div>
+              <div><strong>الجلسة نشطة</strong><p>رمز الدخول محفوظ في ذاكرة الصفحة فقط، ويُمسح عند إعادة التحميل أو إغلاق الصفحة.</p></div>
               <button className="button-quiet" onClick={logout}>تسجيل الخروج</button>
             </div>
           ) : (
