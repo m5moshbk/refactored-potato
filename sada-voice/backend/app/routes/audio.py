@@ -46,10 +46,7 @@ async def transcribe(
 
 
 @router.post("/voiceprint", status_code=status.HTTP_501_NOT_IMPLEMENTED)
-async def create_voiceprint(
-    _: UploadFile = File(...),
-    __: User = Depends(get_current_user),
-):
+async def create_voiceprint(_: User = Depends(get_current_user)):
     raise HTTPException(
         status_code=status.HTTP_501_NOT_IMPLEMENTED,
         detail="Voice identity enrollment is disabled until a consent-based biometric model is integrated and evaluated.",
@@ -57,10 +54,7 @@ async def create_voiceprint(
 
 
 @router.post("/verify", status_code=status.HTTP_501_NOT_IMPLEMENTED)
-async def verify_voice(
-    _: UploadFile = File(...),
-    __: User = Depends(get_current_user),
-):
+async def verify_voice(_: User = Depends(get_current_user)):
     raise HTTPException(
         status_code=status.HTTP_501_NOT_IMPLEMENTED,
         detail="Voice identity verification is not available. No audio hash is used as a biometric identity.",
