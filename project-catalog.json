@@ -1,12 +1,12 @@
 {
   "schemaVersion": "1.0",
-  "generatedAt": "2026-10-31T14:12:55.450Z",
+  "generatedAt": "2026-10-31T14:13:41.221Z",
   "sourceScope": "GitHub repositories for owner m5moshbk plus known bizweb-platform reference; Render workspace services",
   "counts": {
     "githubRepositories": 40,
     "renderServices": 23,
     "localProjectRecords": 8,
-    "scriptFilesIndexed": 5661,
+    "scriptFilesIndexed": 5663,
     "emptyRepositories": 13,
     "accessBlockedRepositories": 1
   },
