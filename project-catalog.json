@@ -19,7 +19,9 @@
       "visibility": "public",
       "archived": false,
       "description": "مستودع مسجل في GitHub؛ الوصف الوظيفي يحتاج مراجعة ملفات المشروع قبل التصنيف النهائي.",
-      "scriptInventory": "pending"
+      "scriptInventory": "pending",
+      "scriptCount": 1,
+      "scriptScanStatus": "complete"
     },
     {
       "name": "instainsane",
@@ -29,7 +31,9 @@
       "visibility": "public",
       "archived": false,
       "description": "مستودع مسجل في GitHub؛ الوصف الوظيفي يحتاج مراجعة ملفات المشروع قبل التصنيف النهائي.",
-      "scriptInventory": "pending"
+      "scriptInventory": "pending",
+      "scriptCount": 2,
+      "scriptScanStatus": "complete"
     },
     {
       "name": "Ttb3",
@@ -39,7 +43,9 @@
       "visibility": "public",
       "archived": false,
       "description": "مستودع مسجل في GitHub؛ الوصف الوظيفي يحتاج مراجعة ملفات المشروع قبل التصنيف النهائي.",
-      "scriptInventory": "pending"
+      "scriptInventory": "pending",
+      "scriptCount": 0,
+      "scriptScanStatus": "complete"
     },
     {
       "name": "Ahmed",
@@ -49,7 +55,9 @@
       "visibility": "public",
       "archived": false,
       "description": "مستودع مسجل في GitHub؛ الوصف الوظيفي يحتاج مراجعة ملفات المشروع قبل التصنيف النهائي.",
-      "scriptInventory": "pending"
+      "scriptInventory": "pending",
+      "scriptCount": 0,
+      "scriptScanStatus": "complete"
     },
     {
       "name": "rouat-aljory",
@@ -59,7 +67,9 @@
       "visibility": "public",
       "archived": false,
       "description": "مستودع مسجل في GitHub؛ الوصف الوظيفي يحتاج مراجعة ملفات المشروع قبل التصنيف النهائي.",
-      "scriptInventory": "pending"
+      "scriptInventory": "pending",
+      "scriptCount": 0,
+      "scriptScanStatus": "empty_repository"
     },
     {
       "name": "Jizan1448-site",
@@ -69,7 +79,9 @@
       "visibility": "public",
       "archived": false,
       "description": "موقع جازان 1448.",
-      "scriptInventory": "pending"
+      "scriptInventory": "pending",
+      "scriptCount": 0,
+      "scriptScanStatus": "complete"
     },
     {
       "name": "wedding-invite",
@@ -79,7 +91,9 @@
       "visibility": "public",
       "archived": false,
       "description": "مستودع مسجل في GitHub؛ الوصف الوظيفي يحتاج مراجعة ملفات المشروع قبل التصنيف النهائي.",
-      "scriptInventory": "pending"
+      "scriptInventory": "pending",
+      "scriptCount": 0,
+      "scriptScanStatus": "access_blocked"
     },
     {
       "name": "urban-octo-couscous",
@@ -89,7 +103,9 @@
       "visibility": "public",
       "archived": false,
       "description": "مستودع مسجل في GitHub؛ الوصف الوظيفي يحتاج مراجعة ملفات المشروع قبل التصنيف النهائي.",
-      "scriptInventory": "pending"
+      "scriptInventory": "pending",
+      "scriptCount": 0,
+      "scriptScanStatus": "complete"
     },
     {
       "name": "Tuwami-X",
@@ -99,7 +115,9 @@
       "visibility": "public",
       "archived": false,
       "description": "مستودع مسجل في GitHub؛ الوصف الوظيفي يحتاج مراجعة ملفات المشروع قبل التصنيف النهائي.",
-      "scriptInventory": "pending"
+      "scriptInventory": "pending",
+      "scriptCount": 0,
+      "scriptScanStatus": "empty_repository"
     },
     {
       "name": "nSr-ftns",
@@ -109,7 +127,9 @@
       "visibility": "public",
       "archived": false,
       "description": "مستودع مسجل في GitHub؛ الوصف الوظيفي يحتاج مراجعة ملفات المشروع قبل التصنيف النهائي.",
-      "scriptInventory": "pending"
+      "scriptInventory": "pending",
+      "scriptCount": 0,
+      "scriptScanStatus": "empty_repository"
     },
     {
       "name": "Modat",
@@ -119,7 +139,9 @@
       "visibility": "public",
       "archived": false,
       "description": "مستودع كبير يضم ملفات TypeScript/React وأدوات وواجهات.",
-      "scriptInventory": "pending"
+      "scriptInventory": "pending",
+      "scriptCount": 163,
+      "scriptScanStatus": "complete"
     },
     {
       "name": "Tamara-Business-Site",
@@ -129,7 +151,9 @@
       "visibility": "public",
       "archived": false,
       "description": "موقع وتكاملات أعمال ومدفوعات؛ يلزم التحقق من sandbox والإنتاج.",
-      "scriptInventory": "pending"
+      "scriptInventory": "pending",
+      "scriptCount": 1,
+      "scriptScanStatus": "complete"
     },
     {
       "name": "Sentinel-Brain",
@@ -139,7 +163,9 @@
       "visibility": "public",
       "archived": false,
       "description": "مستودع مسجل في GitHub؛ الوصف الوظيفي يحتاج مراجعة ملفات المشروع قبل التصنيف النهائي.",
-      "scriptInventory": "pending"
+      "scriptInventory": "pending",
+      "scriptCount": 0,
+      "scriptScanStatus": "empty_repository"
     },
     {
       "name": "SADA",
@@ -149,7 +175,9 @@
       "visibility": "private",
       "archived": false,
       "description": "منظومة صدى: API وذاكرة ومكونات Human-AI وعميل Pythonista.",
-      "scriptInventory": "pending"
+      "scriptInventory": "pending",
+      "scriptCount": 13,
+      "scriptScanStatus": "complete"
     },
     {
       "name": "Crispy-Seeka",
@@ -159,7 +187,9 @@
       "visibility": "private",
       "archived": false,
       "description": "مشروع المتصفح والخصوصية والفحص؛ له عدة خدمات Render، ويُعامل كأولوية تطوير.",
-      "scriptInventory": "pending"
+      "scriptInventory": "pending",
+      "scriptCount": 3,
+      "scriptScanStatus": "complete"
     },
     {
       "name": "m5moshbk-Elite-Console-X",
@@ -169,7 +199,9 @@
       "visibility": "private",
       "archived": false,
       "description": "Elite Console X.",
-      "scriptInventory": "pending"
+      "scriptInventory": "pending",
+      "scriptCount": 2,
+      "scriptScanStatus": "complete"
     },
     {
       "name": "Sawa-Play-Monitor",
@@ -179,7 +211,9 @@
       "visibility": "private",
       "archived": false,
       "description": "مراقبة وتحليل أحداث وخدمات Sawa؛ توجد عدة نسخ وخدمات.",
-      "scriptInventory": "pending"
+      "scriptInventory": "pending",
+      "scriptCount": 4,
+      "scriptScanStatus": "complete"
     },
     {
       "name": "refactored-potato",
@@ -189,7 +223,9 @@
       "visibility": "public",
       "archived": false,
       "description": "المستودع المحوري لـ Nexus ومكونات SADA Voice وTelegram.",
-      "scriptInventory": "pending"
+      "scriptInventory": "pending",
+      "scriptCount": 22,
+      "scriptScanStatus": "complete"
     },
     {
       "name": "redesigned-dollop",
@@ -199,7 +235,9 @@
       "visibility": "public",
       "archived": false,
       "description": "مستودع مسجل في GitHub؛ الوصف الوظيفي يحتاج مراجعة ملفات المشروع قبل التصنيف النهائي.",
-      "scriptInventory": "pending"
+      "scriptInventory": "pending",
+      "scriptCount": 0,
+      "scriptScanStatus": "complete"
     },
     {
       "name": "didactic-parakeet",
@@ -209,7 +247,9 @@
       "visibility": "public",
       "archived": false,
       "description": "مستودع مسجل في GitHub؛ الوصف الوظيفي يحتاج مراجعة ملفات المشروع قبل التصنيف النهائي.",
-      "scriptInventory": "pending"
+      "scriptInventory": "pending",
+      "scriptCount": 0,
+      "scriptScanStatus": "empty_repository"
     },
     {
       "name": "crispy-spork",
@@ -219,7 +259,9 @@
       "visibility": "public",
       "archived": false,
       "description": "مستودع مسجل في GitHub؛ الوصف الوظيفي يحتاج مراجعة ملفات المشروع قبل التصنيف النهائي.",
-      "scriptInventory": "pending"
+      "scriptInventory": "pending",
+      "scriptCount": 0,
+      "scriptScanStatus": "empty_repository"
     },
     {
       "name": "jubilant-barnacle",
@@ -229,7 +271,9 @@
       "visibility": "public",
       "archived": false,
       "description": "مستودع مسجل في GitHub؛ الوصف الوظيفي يحتاج مراجعة ملفات المشروع قبل التصنيف النهائي.",
-      "scriptInventory": "pending"
+      "scriptInventory": "pending",
+      "scriptCount": 0,
+      "scriptScanStatus": "empty_repository"
     },
     {
       "name": "super-engine",
@@ -239,7 +283,9 @@
       "visibility": "public",
       "archived": false,
       "description": "مستودع مسجل في GitHub؛ الوصف الوظيفي يحتاج مراجعة ملفات المشروع قبل التصنيف النهائي.",
-      "scriptInventory": "pending"
+      "scriptInventory": "pending",
+      "scriptCount": 0,
+      "scriptScanStatus": "empty_repository"
     },
     {
       "name": "special-carnival",
@@ -249,7 +295,9 @@
       "visibility": "public",
       "archived": false,
       "description": "مستودع مسجل في GitHub؛ الوصف الوظيفي يحتاج مراجعة ملفات المشروع قبل التصنيف النهائي.",
-      "scriptInventory": "pending"
+      "scriptInventory": "pending",
+      "scriptCount": 0,
+      "scriptScanStatus": "empty_repository"
     },
     {
       "name": "psychic-octo-palm-tree",
@@ -259,7 +307,9 @@
       "visibility": "public",
       "archived": false,
       "description": "مستودع مسجل في GitHub؛ الوصف الوظيفي يحتاج مراجعة ملفات المشروع قبل التصنيف النهائي.",
-      "scriptInventory": "pending"
+      "scriptInventory": "pending",
+      "scriptCount": 0,
+      "scriptScanStatus": "empty_repository"
     },
     {
       "name": "studious-adventure",
@@ -269,7 +319,9 @@
       "visibility": "public",
       "archived": false,
       "description": "مستودع مسجل في GitHub؛ الوصف الوظيفي يحتاج مراجعة ملفات المشروع قبل التصنيف النهائي.",
-      "scriptInventory": "pending"
+      "scriptInventory": "pending",
+      "scriptCount": 0,
+      "scriptScanStatus": "complete"
     },
     {
       "name": "automatic-fortnight",
@@ -279,7 +331,9 @@
       "visibility": "public",
       "archived": false,
       "description": "مستودع مسجل في GitHub؛ الوصف الوظيفي يحتاج مراجعة ملفات المشروع قبل التصنيف النهائي.",
-      "scriptInventory": "pending"
+      "scriptInventory": "pending",
+      "scriptCount": 0,
+      "scriptScanStatus": "complete"
     },
     {
       "name": "probable-fortnight",
@@ -289,7 +343,9 @@
       "visibility": "public",
       "archived": false,
       "description": "مستودع مسجل في GitHub؛ الوصف الوظيفي يحتاج مراجعة ملفات المشروع قبل التصنيف النهائي.",
-      "scriptInventory": "pending"
+      "scriptInventory": "pending",
+      "scriptCount": 0,
+      "scriptScanStatus": "complete"
     },
     {
       "name": "aus-luxe-auto-store",
@@ -299,7 +355,9 @@
       "visibility": "public",
       "archived": false,
       "description": "مستودع مسجل في GitHub؛ الوصف الوظيفي يحتاج مراجعة ملفات المشروع قبل التصنيف النهائي.",
-      "scriptInventory": "pending"
+      "scriptInventory": "pending",
+      "scriptCount": 0,
+      "scriptScanStatus": "complete"
     },
     {
       "name": "todo-list-app",
@@ -309,7 +367,9 @@
       "visibility": "public",
       "archived": false,
       "description": "مستودع مسجل في GitHub؛ الوصف الوظيفي يحتاج مراجعة ملفات المشروع قبل التصنيف النهائي.",
-      "scriptInventory": "pending"
+      "scriptInventory": "pending",
+      "scriptCount": 0,
+      "scriptScanStatus": "complete"
     },
     {
       "name": "scaling-computing-machine",
@@ -319,7 +379,9 @@
       "visibility": "public",
       "archived": false,
       "description": "مستودع مسجل في GitHub؛ الوصف الوظيفي يحتاج مراجعة ملفات المشروع قبل التصنيف النهائي.",
-      "scriptInventory": "pending"
+      "scriptInventory": "pending",
+      "scriptCount": 0,
+      "scriptScanStatus": "complete"
     },
     {
       "name": "bookish-octo-eureka",
@@ -329,7 +391,9 @@
       "visibility": "private",
       "archived": false,
       "description": "مستودع Python صغير مع اختبارات.",
-      "scriptInventory": "pending"
+      "scriptInventory": "pending",
+      "scriptCount": 2,
+      "scriptScanStatus": "complete"
     },
     {
       "name": "curly-octo-adventure",
@@ -339,7 +403,9 @@
       "visibility": "private",
       "archived": false,
       "description": "مستودع مسجل في GitHub؛ الوصف الوظيفي يحتاج مراجعة ملفات المشروع قبل التصنيف النهائي.",
-      "scriptInventory": "pending"
+      "scriptInventory": "pending",
+      "scriptCount": 0,
+      "scriptScanStatus": "empty_repository"
     },
     {
       "name": "super-duper-octo-adventure",
@@ -349,7 +415,9 @@
       "visibility": "private",
       "archived": false,
       "description": "يضم واجهات Mailer Inbox ومتجر AUS Luxe وبعض مكونات الخدمات.",
-      "scriptInventory": "pending"
+      "scriptInventory": "pending",
+      "scriptCount": 2,
+      "scriptScanStatus": "complete"
     },
     {
       "name": "crispy-octo-fortnight",
@@ -359,7 +427,9 @@
       "visibility": "public",
       "archived": false,
       "description": "مستودع مسجل في GitHub؛ الوصف الوظيفي يحتاج مراجعة ملفات المشروع قبل التصنيف النهائي.",
-      "scriptInventory": "pending"
+      "scriptInventory": "pending",
+      "scriptCount": 0,
+      "scriptScanStatus": "empty_repository"
     },
     {
       "name": "musical-couscous",
@@ -369,7 +439,9 @@
       "visibility": "public",
       "archived": false,
       "description": "مستودع مسجل في GitHub؛ الوصف الوظيفي يحتاج مراجعة ملفات المشروع قبل التصنيف النهائي.",
-      "scriptInventory": "pending"
+      "scriptInventory": "pending",
+      "scriptCount": 0,
+      "scriptScanStatus": "empty_repository"
     },
     {
       "name": "openbot",
@@ -379,7 +451,9 @@
       "visibility": "public",
       "archived": false,
       "description": "مستودع تطبيق OpenBot كبير؛ يحتاج فصل مكونات المشروع الأصلي عن أي إضافات خاصة.",
-      "scriptInventory": "pending"
+      "scriptInventory": "pending",
+      "scriptCount": 5407,
+      "scriptScanStatus": "complete"
     },
     {
       "name": "M5mOsH-Team-",
@@ -389,7 +463,9 @@
       "visibility": "private",
       "archived": false,
       "description": "مشروع فريق/تنسيق يحتوي ملفات تشغيل واختبارات.",
-      "scriptInventory": "pending"
+      "scriptInventory": "pending",
+      "scriptCount": 8,
+      "scriptScanStatus": "complete"
     },
     {
       "name": "M5mOsH_Team-",
@@ -399,7 +475,9 @@
       "visibility": "private",
       "archived": false,
       "description": "مستودع مسجل في GitHub؛ الوصف الوظيفي يحتاج مراجعة ملفات المشروع قبل التصنيف النهائي.",
-      "scriptInventory": "pending"
+      "scriptInventory": "pending",
+      "scriptCount": 0,
+      "scriptScanStatus": "complete"
     },
     {
       "name": "bizweb-platform",
@@ -409,7 +487,9 @@
       "visibility": "private",
       "archived": false,
       "description": "منصة التجار وSmart Marketer؛ مرتبطة بعدة خدمات ومعاينات Render.",
-      "scriptInventory": "pending"
+      "scriptInventory": "pending",
+      "scriptCount": 33,
+      "scriptScanStatus": "complete"
     }
   ],
   "services": [
@@ -846,5 +926,40 @@
       "evidence": "migration 010 أنشأت store_product_click_events لكن server.js لم يكن يحتوي route لتسجيل النقرات. PR #46 يضيف route واختبار تكامل.",
       "next": "دمج التغييرات ونشر API ثم ربط صفحة العرض بـ ?store=slug."
     }
-  ]
+  ],
+  "localPythonista": [
+    {
+      "name": "Nexus 2.7.6",
+      "status": "local_reported_not_scanned",
+      "note": "Local Pythonista inventory and verification reports; source files not mounted in this GitHub repository."
+    },
+    {
+      "name": "M5mOsH Twin Guardian 3.0",
+      "status": "local_reported_not_scanned",
+      "note": "50 completed cycles reported in the user's supplied audit; source file path not confirmed here."
+    },
+    {
+      "name": "Sawa Forensics 4.3",
+      "status": "local_reported_not_scanned",
+      "note": "Prior local forensics report; exact source path not confirmed here."
+    },
+    {
+      "name": "Sawa V4",
+      "status": "local_reported_not_scanned",
+      "note": "Local SQLite workflow; exact source path not confirmed here."
+    },
+    {
+      "name": "M5mOsH_NEXUS_SYNC_DIAGNOSTICS_2_7_1.py",
+      "status": "reported_local_file",
+      "note": "Previously identified single hash mismatch in the local Nexus report."
+    }
+  ],
+  "scriptSummary": {
+    "repositoriesIndexed": 40,
+    "scriptFilesIndexed": 5663,
+    "emptyRepositories": 13,
+    "accessBlocked": 1,
+    "scanErrors": 0,
+    "notes": "Default branch trees indexed for all 40 repository records, plus the Mailer runtime feature branch. Other non-default branches and device-local Pythonista files are not fully scanned. Counts include tests, migrations and source files; not every item is an executable script."
+  }
 }
