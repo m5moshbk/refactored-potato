@@ -22,7 +22,7 @@ def health():
             "organization_dashboard": False,
         },
         "security": {
-            "voice_biometrics_enabled": settings.voice_identity_enabled,
+            "voice_biometrics_enabled": False,
             "raw_audio_persistence": False,
         },
     }
