@@ -44,16 +44,13 @@ def get_current_user(
         detail="Invalid or expired access token",
         headers={"WWW-Authenticate": "Bearer"},
     )
+    key = _signing_key()
     try:
-        payload = jwt.decode(
-            token,
-            _signing_key(),
-            algorithms=[settings.jwt_algorithm],
-        )
+        payload = jwt.decode(token, key, algorithms=[settings.jwt_algorithm])
         email = payload.get("sub")
         if not email:
             raise unauthorized
-    except (JWTError, HTTPException):
+    except JWTError:
         raise unauthorized
 
     user = db.query(User).filter(User.email == email).first()
@@ -64,6 +61,7 @@ def get_current_user(
 
 @router.post("/signup", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
 def signup(payload: UserCreate, db: Session = Depends(get_db)):
+    key = _signing_key()
     email = payload.email.lower()
     if db.query(User).filter(User.email == email).first():
         raise HTTPException(status_code=409, detail="An account with this email already exists.")
@@ -85,6 +83,7 @@ def signup(payload: UserCreate, db: Session = Depends(get_db)):
 
 @router.post("/login", response_model=TokenResponse)
 def login(payload: UserLogin, db: Session = Depends(get_db)):
+    _signing_key()
     user = db.query(User).filter(User.email == payload.email.lower()).first()
     if not user or not pwd_context.verify(payload.password, user.password_hash) or not user.is_active:
         raise HTTPException(
