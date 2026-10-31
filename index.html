@@ -822,18 +822,45 @@ status.textContent='تم فتح مساحة التحكم تلقائيًا. اخت
  const $=id=>document.getElementById(id);
  const overlay=$('nxCockpitOverlay'),content=$('nxSheetContent'),search=$('nxAssetSearch'),tabs=[...document.querySelectorAll('.nx-sheet-tab')],dock=[...document.querySelectorAll('.nx-dock-btn')];
  let projects=null,scripts=null,services=[],active='projects',scriptLimit=80;
+ let projectLoading=null,scriptLoading=null;
  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const safeUrl=u=>{try{const x=new URL(u);return ['http:','https:'].includes(x.protocol)?x.href:'#'}catch{return '#'}};
  const setPanel=p=>{active=p;tabs.forEach(t=>t.classList.toggle('active',t.dataset.panel===p));dock.forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.openPanel===p)));search.value='';scriptLimit=80;render()};
- const open=p=>{setPanel(p);overlay.classList.add('open');overlay.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';$('nxSheetClose').focus()};
+ const open=p=>{setPanel(p);overlay.classList.add('open');overlay.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';$('nxSheetClose').focus();ensureLoaded()};
  const close=()=>{overlay.classList.remove('open');overlay.setAttribute('aria-hidden','true');document.body.style.overflow='';dock.forEach(b=>b.setAttribute('aria-pressed','false'))};
- async function load(){
-  try{
-   const [p,s]=await Promise.all([fetch('project-catalog.json',{cache:'no-store'}),fetch('scripts-catalog.json',{cache:'no-store'})]);
-   if(!p.ok||!s.ok)throw new Error('catalog_http_error');
-   projects=await p.json();scripts=await s.json();services=projects.services||[];
+ async function loadProjects(){
+  if(projects)return projects;
+  if(projectLoading)return projectLoading;
+  projectLoading=(async()=>{
+   const response=await fetch('project-catalog.json',{cache:'no-store'});
+   if(!response.ok)throw new Error('project_catalog_http_error');
+   projects=await response.json();services=projects.services||[];
    $('nxCatalogStatus').textContent='تم تحميل الفهرس · '+(projects.counts?.githubRepositories||0)+' مستودع · '+services.length+' خدمة';
-  }catch(e){$('nxCatalogStatus').textContent='تعذر تحميل الفهرس؛ تحقق من نشر ملفات catalog JSON.';content.innerHTML='<div class="nx-sheet-empty">لم أستطع تحميل ملفات الفهرس. بقية واجهة Nexus ما زالت متاحة.</div>'}
+   return projects;
+  })();
+  try{return await projectLoading}finally{projectLoading=null}
+ }
+ async function loadScripts(){
+  if(scripts)return scripts;
+  if(scriptLoading)return scriptLoading;
+  scriptLoading=(async()=>{
+   const response=await fetch('scripts-catalog.json',{cache:'no-store'});
+   if(!response.ok)throw new Error('script_catalog_http_error');
+   scripts=await response.json();
+   $('nxCatalogStatus').textContent='تم تحميل فهرس السكريبتات · '+(scripts.summary?.scriptFilesIndexed||0)+' ملف';
+   return scripts;
+  })();
+  try{return await scriptLoading}finally{scriptLoading=null}
+ }
+ async function ensureLoaded(){
+  try{
+   await loadProjects();
+   if(active==='scripts')await loadScripts();
+   render();
+  }catch(error){
+   $('nxCatalogStatus').textContent='تعذر تحميل أحد ملفات الفهرس؛ تحقق من نشر ملفات JSON.';
+   content.innerHTML='<div class="nx-sheet-empty">تعذر تحميل بيانات هذا القسم. بقية واجهة Nexus ما زالت متاحة.</div>';
+  }
  }
  function projectCards(){
   if(!projects)return '<div class="nx-sheet-empty">الفهرس غير متاح.</div>';
@@ -842,8 +869,8 @@ status.textContent='تم فتح مساحة التحكم تلقائيًا. اخت
   const local=(projects.localProjects||[]).filter(r=>(r.name+' '+r.description).toLowerCase().includes(q));
   const total=rows.length+local.length;
   return '<div class="nx-catalog-summary"><span>'+rows.length+' مستودع مطابق</span><span>'+local.length+' سجل مشروع محلي</span><span>'+services.length+' خدمة مرتبطة</span></div><div class="nx-sheet-grid">'+rows.map(r=>{
-   const inv=scripts?.repositories?.[r.name];const count=inv?.scriptCount??'—';
-   const state=inv?.scanStatus==='empty_repository'?'مستودع فارغ':inv?.scanStatus==='access_blocked'?'الوصول محجوب':'مفهرس';
+   const count=r.scriptCount??'—';
+   const state=r.scriptScanStatus==='empty_repository'?'مستودع فارغ':r.scriptScanStatus==='access_blocked'?'الوصول محجوب':r.scriptScanStatus==='complete'?'مفهرس':'لم يُفحص';
    return '<article class="nx-asset-card"><strong>'+esc(r.name)+'</strong><p>'+esc(r.description)+'</p><div class="nx-asset-meta"><span class="nx-asset-pill">'+esc(r.visibility)+'</span><span class="nx-asset-pill">'+esc(r.defaultBranch)+'</span><span class="nx-asset-pill">'+esc(state)+'</span><span class="nx-asset-pill">'+esc(count)+' سكريبت</span></div><div class="nx-asset-actions"><a href="'+safeUrl(r.url)+'" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></article>'
   }).join('')+local.map(r=>'<article class="nx-asset-card"><strong>'+esc(r.name)+'</strong><p>'+esc(r.description)+'</p><div class="nx-asset-meta"><span class="nx-asset-pill warn">سجل مشروع — الملفات المحلية لم تُفحص</span></div></article>').join('')+'</div>'+(total?'':'<div class="nx-sheet-empty">لا توجد نتائج مطابقة.</div>');
  }
@@ -867,7 +894,7 @@ status.textContent='تم فتح مساحة التحكم تلقائيًا. اخت
  }
  function localCards(){
   const q=search.value.trim().toLowerCase();
-  const rows=(scripts?.localPythonista||[]).filter(r=>(r.name+' '+r.note).toLowerCase().includes(q));
+  const rows=(projects?.localPythonista||[]).filter(r=>(r.name+' '+r.note).toLowerCase().includes(q));
   return '<div class="nx-catalog-summary"><span>'+rows.length+' سجلات محلية معروفة</span><span>لم يتم فحص جهاز Pythonista الآن</span></div><div class="nx-sheet-grid">'+rows.map(r=>'<article class="nx-asset-card"><strong>'+esc(r.name)+'</strong><p>'+esc(r.note)+'</p><div class="nx-asset-meta"><span class="nx-asset-pill warn">'+esc(r.status)+'</span></div></article>').join('')+'</div><div class="nx-sheet-empty">هذا القسم يسجل الأعمال المحلية المعروفة فقط؛ لا يدّعي أنه نسخ ملفات جهازك إلى GitHub.</div>';
  }
  function issueCards(){
@@ -882,19 +909,19 @@ status.textContent='تم فتح مساحة التحكم تلقائيًا. اخت
   return '<div class="nx-quick-section"><h3>المتابعة</h3><div class="nx-quick-links"><button type="button" data-show-issues>فتح سجل الأعطال</button></div></div><div class="nx-quick-section"><h3>الأقسام الحالية</h3><div class="nx-quick-links"><a href="#projects" data-jump>مكتبة المشاريع الحالية</a><a href="#operatorPanel" data-jump>مركز المهام</a><a href="#nexusWorkbench" data-jump>مساحة المشغل</a><a href="#nxRepairCenter" data-jump>مركز الإصلاح</a><a href="#nxVision" data-jump>مختبر الرؤية</a><a href="design-system.html">استوديو التصميم</a></div></div><div class="nx-quick-section"><h3>البريد والمتجر</h3><div class="nx-quick-links"><a href="https://m5mosh-mailer-inbox.onrender.com/" target="_blank" rel="noopener noreferrer">Mailer Inbox — واجهة حالية</a><a href="https://aus-luxe-auto-store.onrender.com/" target="_blank" rel="noopener noreferrer">AUS Luxe — نموذج المتجر</a></div><p class="note">البريد والإرسال وOTP والدفع تحتاج ربطاً خلفياً واختبارات مستقلة؛ الروابط لا تعني أن هذه الوظائف جاهزة.</p></div>';
  }
  function render(){
-  if(!projects||!scripts)return;
+  if(!projects){content.innerHTML='<div class="nx-sheet-empty">جارٍ تحميل المشاريع…</div>';return;}
+  if(active==='scripts'&&!scripts){content.innerHTML='<div class="nx-sheet-empty">جارٍ تحميل فهرس السكريبتات عند الطلب…</div>';return;}
   content.innerHTML=active==='projects'?projectCards():active==='services'?serviceCards():active==='scripts'?scriptCards():active==='local'?localCards():active==='issues'?issueCards():moreCards();
   $('nxMoreScripts')?.addEventListener('click',()=>{scriptLimit+=80;render()});
   content.querySelectorAll('[data-jump]').forEach(a=>a.addEventListener('click',()=>close()));content.querySelector('[data-show-issues]')?.addEventListener('click',()=>setPanel('issues'));
  }
  dock.forEach(b=>b.addEventListener('click',()=>open(b.dataset.openPanel)));
- tabs.forEach(b=>b.addEventListener('click',()=>setPanel(b.dataset.panel)));
+ tabs.forEach(b=>b.addEventListener('click',()=>{setPanel(b.dataset.panel);ensureLoaded()}));
  $('nxSheetClose').addEventListener('click',close);
  overlay.addEventListener('click',e=>{if(e.target===overlay)close()});
  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&overlay.classList.contains('open'))close()});
  search.addEventListener('input',()=>{scriptLimit=80;render()});
- $('nxCatalogStatus').textContent='تحميل الفهرس…';
- load().then(()=>render());
+ $('nxCatalogStatus').textContent='الفهرس جاهز · تُحمّل التفاصيل عند فتح القسم';
 })();
 </script>
 
