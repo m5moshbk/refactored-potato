@@ -757,6 +757,232 @@
         }
       ],
       "scanStatus": "complete"
+    },
+    "Sentinel-Brain": {
+      "branch": "main",
+      "scanStatus": "empty_repository",
+      "error": "CONFLICT: Error code: CONFLICT; Error: GitHub API error 409: {\"message\":\"Git Repository is empty.\",\"documentation_url\":\"https://docs.github.com/rest/git/trees#get-a-tree\",\"status\":\"409\"}"
+    },
+    "SADA": {
+      "branch": "main",
+      "treeTruncated": false,
+      "totalFiles": 20,
+      "scriptCount": 13,
+      "scripts": [
+        {
+          "path": "app/__init__.py",
+          "size": null
+        },
+        {
+          "path": "app/main.py",
+          "size": 3847
+        },
+        {
+          "path": "human_ai/__init__.py",
+          "size": 104
+        },
+        {
+          "path": "human_ai/agent.py",
+          "size": 1181
+        },
+        {
+          "path": "human_ai/api.py",
+          "size": 3702
+        },
+        {
+          "path": "human_ai/brain.py",
+          "size": 470
+        },
+        {
+          "path": "human_ai/core.py",
+          "size": 2068
+        },
+        {
+          "path": "human_ai/memory.py",
+          "size": 2367
+        },
+        {
+          "path": "human_ai/model_adapter.py",
+          "size": 2984
+        },
+        {
+          "path": "human_ai/postgres_memory.py",
+          "size": 2586
+        },
+        {
+          "path": "pythonista/sada_client.py",
+          "size": 741
+        },
+        {
+          "path": "tests/test_echo.py",
+          "size": 1211
+        },
+        {
+          "path": "tests/test_human_ai.py",
+          "size": 831
+        }
+      ],
+      "scanStatus": "complete"
+    },
+    "Crispy-Seeka": {
+      "branch": "main",
+      "treeTruncated": false,
+      "totalFiles": 12,
+      "scriptCount": 3,
+      "scripts": [
+        {
+          "path": "app.py",
+          "size": 16475
+        },
+        {
+          "path": "test_runtime_smoke.py",
+          "size": 4078
+        },
+        {
+          "path": "test_session_secret.py",
+          "size": 1441
+        }
+      ],
+      "scanStatus": "complete"
+    },
+    "m5moshbk-Elite-Console-X": {
+      "branch": "main",
+      "treeTruncated": false,
+      "totalFiles": 10,
+      "scriptCount": 2,
+      "scripts": [
+        {
+          "path": "app.py",
+          "size": 79695
+        },
+        {
+          "path": "test_dashboard_auth.py",
+          "size": 1610
+        }
+      ],
+      "scanStatus": "complete"
+    },
+    "Sawa-Play-Monitor": {
+      "branch": "main",
+      "treeTruncated": false,
+      "totalFiles": 7,
+      "scriptCount": 4,
+      "scripts": [
+        {
+          "path": "app.py",
+          "size": 14314
+        },
+        {
+          "path": "sitecustomize.py",
+          "size": 693
+        },
+        {
+          "path": "tawami_engine.py",
+          "size": 6115
+        },
+        {
+          "path": "tawami_extensions.py",
+          "size": 10987
+        }
+      ],
+      "scanStatus": "complete"
+    },
+    "refactored-potato": {
+      "branch": "main",
+      "treeTruncated": false,
+      "totalFiles": 49,
+      "scriptCount": 22,
+      "scripts": [
+        {
+          "path": "sada-voice/backend/app/__init__.py",
+          "size": 15
+        },
+        {
+          "path": "sada-voice/backend/app/config.py",
+          "size": 471
+        },
+        {
+          "path": "sada-voice/backend/app/db.py",
+          "size": 298
+        },
+        {
+          "path": "sada-voice/backend/app/main.py",
+          "size": 98
+        },
+        {
+          "path": "sada-voice/backend/app/models.py",
+          "size": 1279
+        },
+        {
+          "path": "sada-voice/backend/app/routes/audio.py",
+          "size": 1730
+        },
+        {
+          "path": "sada-voice/backend/app/routes/auth.py",
+          "size": 1797
+        },
+        {
+          "path": "sada-voice/backend/app/routes/evolution.py",
+          "size": 429
+        },
+        {
+          "path": "sada-voice/backend/app/routes/health.py",
+          "size": 149
+        },
+        {
+          "path": "sada-voice/backend/app/schemas.py",
+          "size": 557
+        },
+        {
+          "path": "sada-voice/backend/app/services/self_evolution.py",
+          "size": 3432
+        },
+        {
+          "path": "sada-voice/backend/app/services/speech_to_text.py",
+          "size": 1426
+        },
+        {
+          "path": "sada-voice/backend/app/services/voiceprint.py",
+          "size": 319
+        },
+        {
+          "path": "sada-voice/frontend/next-env.d.ts",
+          "size": 123
+        },
+        {
+          "path": "sada-voice/frontend/next.config.js",
+          "size": 120
+        },
+        {
+          "path": "sada-voice/frontend/postcss.config.js",
+          "size": 83
+        },
+        {
+          "path": "sada-voice/frontend/src/app/layout.tsx",
+          "size": 400
+        },
+        {
+          "path": "sada-voice/frontend/src/app/page.tsx",
+          "size": 5009
+        },
+        {
+          "path": "sada-voice/frontend/tailwind.config.ts",
+          "size": 296
+        },
+        {
+          "path": "telegram_bot/bot.py",
+          "size": 103122
+        },
+        {
+          "path": "telegram_bot/sitecustomize.py",
+          "size": 4155
+        },
+        {
+          "path": "telegram_bot/store_audit.py",
+          "size": 16744
+        }
+      ],
+      "scanStatus": "complete"
     }
   },
   "localPythonista": [
