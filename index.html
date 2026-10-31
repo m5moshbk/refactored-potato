@@ -858,7 +858,7 @@ status.textContent='تم فتح مساحة التحكم تلقائيًا. اخت
   for(const [repo,entry] of Object.entries(scripts.repositories||{})){
    for(const f of (entry.scripts||[])){
     const label=repo+' '+f.path;
-    if(!q||label.toLowerCase().includes(q))rows.push({repo,path:f.path,branch:entry.branch||'main'});
+    if(!q||label.toLowerCase().includes(q))rows.push({repo,path:f.path,branch:f.branch||entry.branch||'main'});
    }
   }
   const shown=rows.slice(0,scriptLimit);
