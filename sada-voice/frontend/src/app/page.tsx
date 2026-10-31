@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type SpeechAlternative = { transcript: string };
 type SpeechResult = ArrayLike<SpeechAlternative>;
@@ -49,6 +49,15 @@ export default function HomePage() {
   const [speechMessage, setSpeechMessage] = useState("");
   const [spokenText, setSpokenText] = useState("");
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
+
+  useEffect(() => {
+    return () => {
+      recognitionRef.current?.stop();
+      if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, []);
 
   async function handleAuth() {
     if (!API_URL) {
@@ -209,7 +218,11 @@ export default function HomePage() {
               <span className={listening ? "status live" : "status"}>{listening ? "يستمع الآن" : "متوقف"}</span>
             </div>
             <label className="consent-line">
-              <input type="checkbox" checked={consent} onChange={(event) => setConsent(event.target.checked)} />
+              <input type="checkbox" checked={consent} onChange={(event) => {
+                const allowed = event.target.checked;
+                setConsent(allowed);
+                if (!allowed) stopListening();
+              }} />
               <span>أوافق على استخدام الميكروفون. قد يعالج المتصفح الصوت عبر خدمة تابعة لمزوده؛ راجع سياسة الخصوصية لديه قبل المتابعة.</span>
             </label>
             <div className="button-row">
