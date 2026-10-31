@@ -1096,8 +1096,19 @@
       "branch": "main",
       "treeTruncated": false,
       "totalFiles": 5,
-      "scriptCount": 0,
-      "scripts": [],
+      "scriptCount": 2,
+      "scripts": [
+        {
+          "path": "mailer-inbox/backend/app.py",
+          "size": 7982,
+          "branch": "feature/mailer-inbox-runtime"
+        },
+        {
+          "path": "mailer-inbox/tools/webhook_setup_pythonista.py",
+          "size": 3573,
+          "branch": "feature/mailer-inbox-runtime"
+        }
+      ],
       "scanStatus": "complete",
       "branches": {
         "feature/mailer-inbox-runtime": {
@@ -22984,10 +22995,10 @@
   ],
   "summary": {
     "repositoriesIndexed": 40,
-    "scriptFilesIndexed": 5661,
+    "scriptFilesIndexed": 5663,
     "emptyRepositories": 13,
     "accessBlocked": 1,
     "scanErrors": 0,
-    "notes": "Counts include tracked source/script extensions in repository trees, including tests and migrations; not every file is executable. Local Pythonista inventory remains separate."
+    "notes": "Default branch trees indexed for all 40 repository records, plus the Mailer runtime feature branch. Other non-default branches and device-local Pythonista files are not fully scanned. Counts include tests, migrations and source files; not every item is an executable script."
   }
 }
