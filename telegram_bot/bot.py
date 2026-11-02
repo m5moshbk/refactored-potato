@@ -986,13 +986,13 @@ def ask_gpt(user_text, chat_id=None):
                                     block.get("text", "") for block in content
                                     if isinstance(block, dict) and block.get("text")
                                 )
-                        fallback_answer = "\\n".join(fallback_parts).strip()
+                        fallback_answer = "\n".join(fallback_parts).strip()
                     if fallback_answer:
                         print("Gemini fallback succeeded without Google Search grounding; model=" +
                               fallback_model, flush=True)
                         return review_response(
                             fallback_answer +
-                            "\\n\\nملاحظة: تعذّر تفعيل بحث Google في هذا الطلب؛ أُجيب دون بحث ويب."
+                            "\n\nملاحظة: تعذّر تفعيل بحث Google في هذا الطلب؛ أُجيب دون بحث ويب."
                         )
                     print("Gemini fallback returned no text; model=" + fallback_model, flush=True)
                 except HTTPError as retry_exc:
