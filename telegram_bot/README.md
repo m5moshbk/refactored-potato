@@ -37,3 +37,11 @@ Environment هي إعدادات تشغيل خاصة بالخدمة. أضفها �
 ## نطاق الفهرس
 
 الكتالوج يضم مستودعات GitHub الـ34 التي ظهرت في الجرد، و18 خدمة Render ظاهرة في مساحة العمل وقت آخر جرد. يشمل ذلك معاينات فروع متعددة وخدمات موقوفة؛ وجودها في القائمة لا يعني أنها تعمل. الأوامر للقراءة فقط ولا تنفذ deploy أو restart أو حذفًا أو تعديلًا.
+
+
+## AI provider reliability
+
+- Gemini options use model IDs listed for the Google Gemini Interactions API; legacy 2.5 entries and the Vertex-only Argon option are not offered in this AI Studio integration.
+- If a Gemini request fails with a model, grounding, quota, or transient capacity status, Nexus makes at most one retry with a different supported model and without optional Google Search grounding.
+- Retries are bounded to avoid loops and unexpected API usage. If the retry also fails, Nexus reports the provider failure and uses its existing local fallback; it does not switch to a potentially billable OpenAI request automatically.
+- Run the reliability tests with `python -m pytest -q telegram_bot/test_bot_*.py`.
