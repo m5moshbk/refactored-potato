@@ -1581,6 +1581,11 @@ input.addEventListener('input',()=>{const q=input.value.trim().toLowerCase();let
         print("HTTP:", fmt % args, flush=True)
 
 def main():
+    # Bind Render's assigned port before database initialization or background work.
+    # This makes the web process visible to Render's port scanner as early as possible.
+    server = HTTPServer(("0.0.0.0", PORT), Handler)
+    print("HTTP server listening on 0.0.0.0:" + str(PORT), flush=True)
+
     init_memory()
     print("Nexus conversation memory initialized; storage=" + MEMORY_DB, flush=True)
     if ENABLE_BACKGROUND_INVENTORY:
@@ -1593,7 +1598,7 @@ def main():
         print("Telegram polling started; inline menu enabled; automatic free fallback enabled; startup AI calls disabled.", flush=True)
     else:
         print("TELEGRAM_BOT_TOKEN missing; health only until configured.", flush=True)
-    HTTPServer(("0.0.0.0", PORT), Handler).serve_forever()
+    server.serve_forever()
 
 
 if __name__ == "__main__":
