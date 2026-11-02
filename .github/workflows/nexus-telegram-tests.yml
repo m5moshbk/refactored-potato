@@ -3,11 +3,12 @@ name: Nexus Telegram bot access tests
 on:
   push:
     branches:
-      - fix/nexus-telegram-public-mode-opt-in
+      - 'fix/nexus-telegram-*'
   pull_request:
     paths:
       - "telegram_bot/bot.py"
       - "telegram_bot/test_bot_access.py"
+      - "telegram_bot/test_bot_reliability.py"
       - "telegram_bot/README.md"
       - ".github/workflows/nexus-telegram-tests.yml"
   workflow_dispatch:
@@ -28,4 +29,4 @@ jobs:
       - name: Install test dependency
         run: python -m pip install pytest
       - name: Run bot access tests
-        run: python -m pytest -q telegram_bot/test_bot_access.py
+        run: python -m pytest -q telegram_bot/test_bot_*.py
