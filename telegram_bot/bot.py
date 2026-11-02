@@ -85,15 +85,32 @@ OPENAI_MODELS = [
     ("gpt-6-luna", "GPT-6 Luna — اقتصادي وسريع"),
 ]
 GEMINI_MODELS = [
-    ("gemini-4-argon", "Gemini 4 Argon — الأحدث والأقوى"),
     ("gemini-3.8-flash", "Gemini 3.8 Flash — سريع ومتوازن"),
+    ("gemini-3.7-flash", "Gemini 3.7 Flash — بديل متوازن"),
     ("gemini-3.6-flash", "Gemini 3.6 Flash — سريع"),
     ("gemini-3.1-pro-preview", "Gemini 3.1 Pro — معاينة للاستدلال"),
+    ("gemini-3.5-flash", "Gemini 3.5 Flash — متوازن"),
     ("gemini-3.5-flash-lite", "Gemini 3.5 Flash-Lite — اقتصادي"),
     ("gemini-3.1-flash-lite", "Gemini 3.1 Flash-Lite — خفيف"),
-    ("gemini-2.5-pro", "Gemini 2.5 Pro — توافق أقدم"),
-    ("gemini-2.5-flash", "Gemini 2.5 Flash — توافق أقدم"),
 ]
+
+# Ordered, documented Interactions API alternatives. Only one alternate request
+# is attempted per failed Gemini request to keep retries bounded and costs predictable.
+GEMINI_FALLBACK_MODELS = (
+    "gemini-3.8-flash",
+    "gemini-3.7-flash",
+    "gemini-3.6-flash",
+    "gemini-3.1-pro-preview",
+    "gemini-3.5-flash",
+    "gemini-3.5-flash-lite",
+    "gemini-3.1-flash-lite",
+)
+
+
+def gemini_fallback_model(selected_model):
+    """Choose one supported alternate model without repeating the failed model."""
+    return next((model for model in GEMINI_FALLBACK_MODELS if model != selected_model), None)
+
 
 
 def _get_setting(chat_id, key, default):
@@ -937,58 +954,60 @@ def ask_gpt(user_text, chat_id=None):
             pass
         print(provider + " HTTP error: status=" + str(exc.code) + " message=" + details[:180], flush=True)
 
-        # Search grounding can be unavailable even when text generation works.
-        # Retry Gemini once without the optional Google Search tool.
-        if provider == "gemini" and exc.code in (400, 404) and payload.get("tools"):
-            try:
-                fallback_payload = dict(payload)
-                fallback_payload.pop("tools", None)
-                fallback_model = "gemini-3.8-flash" if (exc.code in (404, 429) or selected_model == "gemini-4-argon") else selected_model
-                fallback_payload["model"] = fallback_model
-                fallback_req = Request(
-                    "https://generativelanguage.googleapis.com/v1beta/interactions",
-                    data=json.dumps(fallback_payload, ensure_ascii=False).encode("utf-8"),
-                    headers={"x-goog-api-key": GEMINI_API_KEY, "Content-Type": "application/json"}
-                )
-                with urlopen(fallback_req, timeout=15) as response:
-                    fallback_result = json.loads(response.read().decode("utf-8"))
-                fallback_answer = (fallback_result.get("output_text") or "").strip()
-                if not fallback_answer:
-                    fallback_parts = []
-                    for step in fallback_result.get("steps", []) or fallback_result.get("output", []) or []:
-                        if isinstance(step, dict):
+        # A failed model/grounding request gets one bounded retry using a
+        # documented alternative model and no optional search tool. This also
+        # handles transient 429/5xx capacity errors without unbounded retries.
+        retryable_gemini_statuses = (400, 404, 408, 429, 500, 502, 503, 504)
+        if provider == "gemini" and exc.code in retryable_gemini_statuses and payload.get("tools"):
+            fallback_model = gemini_fallback_model(selected_model)
+            if fallback_model:
+                try:
+                    fallback_payload = dict(payload)
+                    fallback_payload.pop("tools", None)
+                    fallback_payload["model"] = fallback_model
+                    fallback_req = Request(
+                        "https://generativelanguage.googleapis.com/v1beta/interactions",
+                        data=json.dumps(fallback_payload, ensure_ascii=False).encode("utf-8"),
+                        headers={"x-goog-api-key": GEMINI_API_KEY, "Content-Type": "application/json"}
+                    )
+                    with urlopen(fallback_req, timeout=20) as response:
+                        fallback_result = json.loads(response.read().decode("utf-8"))
+                    fallback_answer = (fallback_result.get("output_text") or "").strip()
+                    if not fallback_answer:
+                        fallback_parts = []
+                        for step in fallback_result.get("steps", []) or fallback_result.get("output", []) or []:
+                            if not isinstance(step, dict):
+                                continue
                             content = step.get("content", step.get("text", ""))
                             if isinstance(content, str) and content:
                                 fallback_parts.append(content)
                             elif isinstance(content, list):
-                                fallback_parts.extend(block.get("text", "") for block in content
-                                                      if isinstance(block, dict) and block.get("text"))
-                    fallback_answer = "\n".join(fallback_parts).strip()
-                if fallback_answer:
-                    print("Gemini fallback succeeded without Google Search grounding; model=" + fallback_model, flush=True)
-                    return review_response(
-                        fallback_answer +
-                        "\n\nملاحظة: تعذّر تفعيل بحث Google في هذا الطلب؛ أُجيب دون بحث ويب."
-                    )
-                print("Gemini fallback returned no text.", flush=True)
-            except HTTPError as retry_exc:
-                retry_details = ""
-                try:
-                    retry_body = json.loads(retry_exc.read().decode("utf-8", errors="replace"))
-                    retry_details = ((retry_body.get("error") or {}).get("message") or "")
-                except Exception:
-                    pass
-                print("Gemini fallback HTTP error: status=" + str(retry_exc.code) +
-                      " message=" + retry_details[:180], flush=True)
-                if retry_exc.code == 429:
-                    return "Gemini رفض الطلب بسبب حد الاستخدام أو الحصة. تحقق من حدود وفوترة Google AI Studio."
-                if retry_exc.code in (400, 404):
-                    return ("Gemini لم يقبل النموذج أو صيغة الطلب حتى دون البحث (HTTP " +
-                            str(retry_exc.code) + "). تحقق من اسم النموذج وإتاحته لمفتاحك؛ راجع سجل Render.")
-                if retry_exc.code in (401, 403):
-                    return "تعذر توثيق Gemini. تحقق من صلاحية GEMINI_API_KEY وإعدادات المشروع في Google AI Studio."
-            except Exception as retry_exc:
-                print("Gemini fallback error:", type(retry_exc).__name__, flush=True)
+                                fallback_parts.extend(
+                                    block.get("text", "") for block in content
+                                    if isinstance(block, dict) and block.get("text")
+                                )
+                        fallback_answer = "\\n".join(fallback_parts).strip()
+                    if fallback_answer:
+                        print("Gemini fallback succeeded without Google Search grounding; model=" +
+                              fallback_model, flush=True)
+                        return review_response(
+                            fallback_answer +
+                            "\\n\\nملاحظة: تعذّر تفعيل بحث Google في هذا الطلب؛ أُجيب دون بحث ويب."
+                        )
+                    print("Gemini fallback returned no text; model=" + fallback_model, flush=True)
+                except HTTPError as retry_exc:
+                    retry_details = ""
+                    try:
+                        retry_body = json.loads(retry_exc.read().decode("utf-8", errors="replace"))
+                        retry_details = ((retry_body.get("error") or {}).get("message") or "")
+                    except Exception:
+                        pass
+                    print("Gemini fallback HTTP error: status=" + str(retry_exc.code) +
+                          " message=" + retry_details[:180], flush=True)
+                    if retry_exc.code in (401, 403):
+                        return "تعذر توثيق Gemini. تحقق من صلاحية GEMINI_API_KEY وإعدادات المشروع في Google AI Studio."
+                except Exception as retry_exc:
+                    print("Gemini fallback error:", type(retry_exc).__name__, flush=True)
 
         if exc.code in (401, 403):
             return ("تعذر توثيق المحرك أو لا يملك صلاحية الطلب. تحقق من مفتاح " +
@@ -1375,6 +1394,47 @@ def handle_message(chat_id, text, forwarded=False):
         remember_explicit_project_context(chat_id, user_text)
 
 
+def _telegram_error_description(exc):
+    """Return a short API description without ever logging request URLs or tokens."""
+    try:
+        body = json.loads(exc.read().decode("utf-8", errors="replace"))
+        if isinstance(body, dict):
+            return str(body.get("description") or "")[:160]
+    except Exception:
+        pass
+    return ""
+
+
+def process_callback(callback):
+    """Acknowledge callbacks independently so an expired acknowledgement cannot drop the action."""
+    callback_id = callback.get("id")
+    if callback_id:
+        try:
+            api("answerCallbackQuery", {"callback_query_id": callback_id}, 10)
+        except HTTPError as exc:
+            description = _telegram_error_description(exc)
+            print("Telegram callback acknowledgement HTTP error: status=" + str(exc.code) +
+                  (" description=" + description if description else ""), flush=True)
+        except Exception as exc:
+            print("Telegram callback acknowledgement error:", type(exc).__name__, flush=True)
+
+    msg = callback.get("message") or {}
+    chat = msg.get("chat") or {}
+    chat_id = chat.get("id")
+    if chat_id is None or not callback.get("data"):
+        return
+    if not ADMIN or str(chat_id) != ADMIN:
+        return
+    try:
+        on_callback(chat_id, msg.get("message_id"), callback["data"])
+    except HTTPError as exc:
+        description = _telegram_error_description(exc)
+        print("Telegram callback action HTTP error: status=" + str(exc.code) +
+              (" description=" + description if description else ""), flush=True)
+    except Exception as exc:
+        print("Telegram callback action error:", type(exc).__name__, flush=True)
+
+
 def polling():
     global OFFSET
     retry_delay = 3
@@ -1388,15 +1448,7 @@ def polling():
                 OFFSET = max(OFFSET, int(item.get("update_id", 0)) + 1)
                 callback = item.get("callback_query")
                 if callback:
-                    try:
-                        api("answerCallbackQuery", {"callback_query_id": callback["id"]}, 10)
-                        msg = callback.get("message") or {}
-                        chat = msg.get("chat") or {}
-                        if chat.get("id") is not None and callback.get("data"):
-                            if ADMIN and str(chat["id"]) == ADMIN:
-                                on_callback(chat["id"], msg.get("message_id"), callback["data"])
-                    except Exception as exc:
-                        print("Telegram callback error:", type(exc).__name__, flush=True)
+                    process_callback(callback)
                     continue
                 msg = item.get("message") or item.get("edited_message")
                 if msg and msg.get("chat") and msg.get("text"):
