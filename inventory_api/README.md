@@ -56,7 +56,5 @@ gunicorn -w 1 -b 0.0.0.0:$PORT inventory_api.app:app
 
 Review [DEPLOYMENT.md](DEPLOYMENT.md) and [STATUS.md](STATUS.md) before deployment. A successful `/healthz` response does not prove a successful Pythonista sync.
 
-## بصمة المشروع | Project fingerprint
-- Owner: Ahmed jafari
-- Signature / rights tag: M5mOsH
-- Contact: +99507190799
+## الحقوق | Rights
+© M5mOsH — All rights reserved.
