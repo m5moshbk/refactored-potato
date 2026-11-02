@@ -31,8 +31,8 @@
 4. لا تضع مفاتيح API أو كلمات المرور أو بيانات العملاء في المستودع.
 5. وثّق الهدف، والمتطلبات، وطريقة التشغيل، ومتغيرات البيئة، والاختبارات، والقيود في README كل مشروع.
 
-## المالك
-M5mOsH
+## الحقوق
+© M5mOsH — All rights reserved.
 
 
 ---
@@ -61,6 +61,4 @@ M5mOsH Nexus is a project index and preview directory. A Render URL or a success
 5. Do not automatically resume suspended services or promote preview branches without reviewing the changes.
 
 ## Project fingerprint
-- Owner: Ahmed jafari
-- Signature / rights tag: M5mOsH
-- Contact: +99507190799
+- Rights: © M5mOsH — All rights reserved.
