@@ -26,7 +26,5 @@ This API is intentionally separate from the existing static Nexus site. Do not a
 7. Verify `/healthz` and `/api/v1/status`, then test metadata ingestion using a disposable test token only.
 8. Do not merge this branch or deploy it to the live service until tests pass and secret/storage settings are reviewed.
 
-## بصمة المشروع | Project fingerprint
-- Owner: Ahmed jafari
-- Signature / rights tag: M5mOsH
-- Contact: +99507190799
+## الحقوق | Rights
+© M5mOsH — All rights reserved.
