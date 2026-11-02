@@ -6,7 +6,7 @@
 
 - **المستودع:** `m5moshbk/refactored-potato`
 - **فرع العمل المعزول:** `fix/nexus-inventory-api-validation`
-- **طلب الدمج:** [PR #9](https://github.com/m5moshbk/refactored-potato/pull/9) — مفتوح كمسودة، غير مدمج.
+- **طلب الدمج:** [PR #9](https://github.com/m5moshbk/refactored-potato/pull/9) — مفتوح للمراجعة، غير مدمج.
 - **الخدمة الحالية:** [m5mosh-nexus-inventory-api](https://m5mosh-nexus-inventory-api.onrender.com) تعمل على الفرع `feature/nexus-code-inventory-sync`. لم تُنشر تغييرات هذا الفرع عليها.
 - **التغييرات:** تشديد التحقق من المسارات النسبية المعيارية ورفض المسارات المطلقة بصيغة Windows، ورفض القيم المنطقية كأحجام ملفات؛ إضافة اختبارات API وسير عمل CI مستقل وتوثيق عربي/إنجليزي.
 - **الاختبار:** نجح تشغيل [GitHub Actions #40653017103](https://github.com/m5moshbk/refactored-potato/actions/runs/40653017103) على رأس الفرع `ae15002abf2bebee3fad20c9615d3517f8ff5646`، بما يشمل اختبارات API. يجب التأكد من نتيجة CI لأي تعديل لاحق قبل الدمج.
@@ -23,7 +23,7 @@
 
 - **Repository:** `m5moshbk/refactored-potato`
 - **Isolated work branch:** `fix/nexus-inventory-api-validation`
-- **Pull request:** [PR #9](https://github.com/m5moshbk/refactored-potato/pull/9) — open draft, not merged.
+- **Pull request:** [PR #9](https://github.com/m5moshbk/refactored-potato/pull/9) — open for review, not merged.
 - **Current service:** [m5mosh-nexus-inventory-api](https://m5mosh-nexus-inventory-api.onrender.com) runs from `feature/nexus-code-inventory-sync`. This branch has not been deployed to it.
 - **Changes:** strengthened normalized relative-path validation, rejected Windows absolute paths and boolean file sizes, and added API tests, a dedicated CI workflow, and bilingual documentation.
 - **Tests:** [GitHub Actions run #40653017103](https://github.com/m5moshbk/refactored-potato/actions/runs/40653017103) passed on branch head `ae15002abf2bebee3fad20c9615d3517f8ff5646`, including API tests. Any later change must pass CI before merging.
@@ -36,7 +36,5 @@
 2. Review `INGEST_TOKEN` and persistent-storage settings.
 3. Review the pull request before merging; do not automatically deploy this branch to the live service.
 
-## بصمة المشروع | Project fingerprint
-- Owner: Ahmed jafari
-- Signature / rights tag: M5mOsH
-- Contact: +99507190799
+## الحقوق | Rights
+© M5mOsH — All rights reserved.
