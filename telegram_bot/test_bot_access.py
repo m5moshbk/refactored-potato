@@ -294,3 +294,42 @@ def test_channel_post_alert_is_private_deduplicated_and_never_publishes(tmp_path
     assert sent[0][0] == "12345"
     assert "https://t.me/SallaAPI/77" in sent[0][1]
     assert "تحليل تجريبي" in sent[0][1]
+
+
+
+def test_edited_channel_post_revisions_are_deduplicated_separately(tmp_path, monkeypatch):
+    module = load_bot(tmp_path, monkeypatch)
+    module.init_memory()
+    module.ADMIN = "12345"
+    module.NEXUS_MONITOR_CHANNELS = {"sallaapi"}
+    sent = []
+    monkeypatch.setattr(module, "send", lambda chat_id, text, keyboard=None: sent.append((str(chat_id), text)))
+    monkeypatch.setattr(module, "ask_gpt_resilient", lambda prompt, chat_id=None: "تحليل")
+
+    post = {
+        "message_id": 77,
+        "edit_date": 1762149000,
+        "text": "Updated API details",
+        "chat": {"id": -100123, "title": "Salla API", "username": "SallaAPI"}
+    }
+    module.handle_channel_post(post, edited=True)
+    module.handle_channel_post(post, edited=True)
+    assert len(sent) == 1
+    assert "تعديل منشور قناة" in sent[0][1]
+
+    next_revision = dict(post, edit_date=1762149060, text="Second edit")
+    module.handle_channel_post(next_revision, edited=True)
+    assert len(sent) == 2
+
+
+def test_edited_channel_post_without_edit_date_is_ignored(tmp_path, monkeypatch):
+    module = load_bot(tmp_path, monkeypatch)
+    module.init_memory()
+    module.ADMIN = "12345"
+    module.NEXUS_MONITOR_CHANNELS = set()
+    sent = []
+    monkeypatch.setattr(module, "send", lambda chat_id, text, keyboard=None: sent.append((str(chat_id), text)))
+    module.handle_channel_post({
+        "message_id": 77, "text": "edited", "chat": {"id": -100123}
+    }, edited=True)
+    assert sent == []
