@@ -240,3 +240,53 @@ def test_openai_fallback_does_not_call_gemini_during_cooldown(tmp_path, monkeypa
     assert calls == [None]
     assert "وضع Nexus المجاني الاحتياطي" in answer
     assert module.get_ai_provider("12345") == "openai"
+
+
+
+def test_channel_post_text_supports_text_and_caption(tmp_path, monkeypatch):
+    module = load_bot(tmp_path, monkeypatch)
+    assert module.channel_post_text({"text": "new post"}) == "new post"
+    assert module.channel_post_text({"caption": "photo caption"}) == "photo caption"
+    assert module.channel_post_text({}) == ""
+
+
+def test_channel_post_allowlist_matches_channel_id_and_username(tmp_path, monkeypatch):
+    module = load_bot(tmp_path, monkeypatch)
+    module.NEXUS_MONITOR_CHANNELS = {"-100123", "sallaapi"}
+    assert module.channel_post_is_allowed({"chat": {"id": -100123}})
+    assert module.channel_post_is_allowed({"chat": {"id": -9, "username": "SallaAPI"}})
+    assert not module.channel_post_is_allowed({"chat": {"id": -9, "username": "other"}})
+
+
+def test_channel_post_secret_redaction(tmp_path, monkeypatch):
+    module = load_bot(tmp_path, monkeypatch)
+    source = 'bot123456:ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789 access_token="abcd123456789012345" Bearer abcdefghijklmnop'
+    safe = module.redact_channel_secrets(source)
+    assert "ABCDEFGHIJKLMNOPQRSTUVWXYZ" not in safe
+    assert "abcd123456789012345" not in safe
+    assert "Bearer abcdefghijklmnop" not in safe
+
+
+def test_channel_post_alert_is_private_deduplicated_and_never_publishes(tmp_path, monkeypatch):
+    module = load_bot(tmp_path, monkeypatch)
+    module.init_memory()
+    module.ADMIN = "12345"
+    module.NEXUS_MONITOR_CHANNELS = {"sallaapi"}
+    sent = []
+    analyzed = []
+    monkeypatch.setattr(module, "send", lambda chat_id, text, keyboard=None: sent.append((str(chat_id), text)))
+    monkeypatch.setattr(module, "ask_gpt_resilient", lambda prompt, chat_id=None: analyzed.append((prompt, chat_id)) or "تحليل تجريبي")
+    post = {
+        "message_id": 77,
+        "text": "Example API update",
+        "chat": {"id": -100123, "title": "Salla API", "username": "SallaAPI"}
+    }
+
+    module.handle_channel_post(post)
+    module.handle_channel_post(post)
+
+    assert len(analyzed) == 1
+    assert len(sent) == 1
+    assert sent[0][0] == "12345"
+    assert "https://t.me/SallaAPI/77" in sent[0][1]
+    assert "تحليل تجريبي" in sent[0][1]
