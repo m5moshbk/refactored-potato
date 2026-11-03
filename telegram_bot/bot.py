@@ -93,6 +93,15 @@ def init_memory():
                 PRIMARY KEY(channel_id, message_id)
             )
         """)
+        db.execute("""
+            CREATE TABLE IF NOT EXISTS nexus_channel_post_edits (
+                channel_id TEXT NOT NULL,
+                message_id TEXT NOT NULL,
+                edit_date TEXT NOT NULL,
+                created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                PRIMARY KEY(channel_id, message_id, edit_date)
+            )
+        """)
 
 
 
@@ -1363,17 +1372,25 @@ def redact_channel_secrets(value):
     return value
 
 
-def claim_channel_post(channel_id, message_id):
-    """Persist a deduplication key so Telegram retries do not create duplicate alerts."""
+def claim_channel_post(channel_id, message_id, edited=False, edit_date=None):
+    """Persist an idempotency key for original posts or each distinct edit revision."""
     with sqlite3.connect(MEMORY_DB, timeout=10) as db:
-        cursor = db.execute(
-            "INSERT OR IGNORE INTO nexus_channel_posts(channel_id, message_id) VALUES (?, ?)",
-            (str(channel_id), str(message_id))
-        )
+        if edited:
+            if edit_date is None:
+                return False
+            cursor = db.execute(
+                "INSERT OR IGNORE INTO nexus_channel_post_edits(channel_id, message_id, edit_date) VALUES (?, ?, ?)",
+                (str(channel_id), str(message_id), str(edit_date))
+            )
+        else:
+            cursor = db.execute(
+                "INSERT OR IGNORE INTO nexus_channel_posts(channel_id, message_id) VALUES (?, ?)",
+                (str(channel_id), str(message_id))
+            )
         return cursor.rowcount == 1
 
 
-def handle_channel_post(post):
+def handle_channel_post(post, edited=False):
     """Analyze a delivered channel post and send a private alert to the configured admin."""
     if not ADMIN:
         print("Channel post ignored: TELEGRAM_ADMIN_CHAT_ID is not configured.", flush=True)
@@ -1383,7 +1400,9 @@ def handle_channel_post(post):
     message_id = post.get("message_id")
     if channel_id is None or message_id is None or not channel_post_is_allowed(post):
         return
-    if not claim_channel_post(channel_id, message_id):
+    if not claim_channel_post(
+        channel_id, message_id, edited=edited, edit_date=post.get("edit_date")
+    ):
         return
 
     raw_text = channel_post_text(post)
@@ -1414,7 +1433,8 @@ def handle_channel_post(post):
         + safe_text
     )
     analysis = ask_gpt_resilient(prompt, chat_id=ADMIN)
-    alert = ("📡 M5mOsH Intelligence — منشور قناة جديد"
+    event_label = "تعديل منشور قناة" if edited else "منشور قناة جديد"
+    alert = ("📡 M5mOsH Intelligence — " + event_label
              + "\nالقناة: " + str(title)
              + "\nمعرّف المنشور: " + str(message_id)
              + source_link
@@ -1602,16 +1622,28 @@ def polling():
     while True:
         try:
             result = api("getUpdates", {"timeout": 25, "offset": OFFSET,
-                                        "allowed_updates": ["message", "edited_message", "channel_post", "callback_query"]}, 35)
+                                        "allowed_updates": ["message", "edited_message", "channel_post", "edited_channel_post", "callback_query"]}, 35)
             retry_delay = 3
             for item in result.get("result", []):
                 OFFSET = max(OFFSET, int(item.get("update_id", 0)) + 1)
                 channel_post = item.get("channel_post")
-                if channel_post:
+                edited_channel_post = item.get("edited_channel_post")
+                if channel_post or edited_channel_post:
                     try:
-                        handle_channel_post(channel_post)
+                        handle_channel_post(
+                            channel_post or edited_channel_post,
+                            edited=bool(edited_channel_post)
+                        )
                     except Exception as exc:
                         print("Telegram channel post processing error:", type(exc).__name__, flush=True)
+                        if ADMIN:
+                            try:
+                                send(ADMIN,
+                                     "⚠️ تعذر تحليل منشور قناة أو إرسال تنبيهه. "
+                                     "النوع: " + type(exc).__name__ +
+                                     "\nلم تُعرض تفاصيل الاستثناء أو أي أسرار في التنبيه.")
+                            except Exception:
+                                pass
                     continue
                 callback = item.get("callback_query")
                 if callback:
