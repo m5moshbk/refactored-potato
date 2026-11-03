@@ -35,14 +35,14 @@ footer{border-top:1px solid var(--line);margin-top:32px;padding:18px 0 28px;colo
  <div class="hero-actions"><a class="btn primary" href="#projects">استعراض المشاريع ↓</a><a class="btn" href="https://github.com/m5moshbk/refactored-potato">مستودع Nexus على GitHub ↗</a></div>
 </section>
 <section class="stats" aria-label="ملخص اللوحة">
- <div class="stat"><small>المشاريع المعروضة</small><strong id="total">8</strong><span>عناصر مختارة من المحفظة</span></div>
+ <div class="stat"><small>المشاريع المعروضة</small><strong id="total">9</strong><span>عناصر مختارة من المحفظة</span></div>
  <div class="stat"><small>روابط Render</small><strong>7</strong><span>روابط خدمات معروفة</span></div>
  <div class="stat"><small>وضع البيانات</small><strong>Snapshot</strong><span>لقطة جرد وليست بثاً مباشراً</span></div>
  <div class="stat"><small>سياسة الأمان</small><strong>Read-only</strong><span>لا توجد مفاتيح أو بيانات دخول</span></div>
 </section>
 <section class="section" id="projects">
  <div class="section-head"><div><h3>محفظة المشاريع</h3><div class="sub">ابحث أو صفِّ البطاقات حسب المجال</div></div><span class="sub">M5mOsH · Project Portfolio</span></div>
- <div class="tools"><input id="search" class="search" type="search" placeholder="ابحث عن مشروع أو خدمة..." aria-label="البحث في المشاريع"><div class="filters" id="filters"><button class="filter active" data-filter="all">الكل</button><button class="filter" data-filter="core">المنظومة</button><button class="filter" data-filter="cloud">السحابة</button><button class="filter" data-filter="security">الأمن</button><button class="filter" data-filter="business">الأعمال</button><button class="filter" data-filter="access">إمكانية الوصول</button></div></div>
+ <div class="tools"><input id="search" class="search" type="search" placeholder="ابحث عن مشروع أو خدمة..." aria-label="البحث في المشاريع"><div class="filters" id="filters"><button class="filter active" data-filter="all">الكل</button><button class="filter" data-filter="core">المنظومة</button><button class="filter" data-filter="cloud">السحابة</button><button class="filter" data-filter="security">الأمن</button><button class="filter" data-filter="business">الأعمال</button><button class="filter" data-filter="access">إمكانية الوصول</button><button class="filter" data-filter="ai">الذكاء الاصطناعي</button></div></div>
  <div class="projects" id="cards">
   <article class="card" data-category="core" data-search="nexus archive inventory api code catalog">
    <div class="card-top"><div class="icon">◈</div><span class="status info">خدمة معروفة</span></div><h4>M5mOsH Nexus</h4><p>الأرشيف المركزي وفهرسة المشاريع والملفات وسجل المعرفة.</p><div class="meta"><span>Static dashboard</span><span>·</span><span>Render</span></div><div class="links"><a href="https://m5mosh-nexus.onrender.com" target="_blank" rel="noopener">فتح اللوحة ↗</a><a href="https://github.com/m5moshbk/refactored-potato" target="_blank" rel="noopener">GitHub ↗</a></div>
@@ -65,6 +65,9 @@ footer{border-top:1px solid var(--line);margin-top:32px;padding:18px 0 28px;colo
   <article class="card" data-category="security" data-search="batmania dfir cybersecurity forensics">
    <div class="card-top"><div class="icon">⬡</div><span class="status">ضمن المحفظة</span></div><h4>BATMANIA DFIR</h4><p>مسار الأمن والتحليل الجنائي الرقمي؛ حالة الاستضافة والاختبارات غير متحققة في هذه النسخة.</p><div class="meta"><span>Security</span><span>·</span><span>Evidence required</span></div><div class="links"><a href="https://github.com/m5moshbk" target="_blank" rel="noopener">مستودعات GitHub ↗</a></div>
   </article>
+  <article class="card" data-category="ai" data-search="openai api platform models developer tools الذكاء الاصطناعي">
+   <div class="card-top"><div class="icon">✳</div><span class="status">تكامل غير مربوط</span></div><h4>OpenAI · AI Platform</h4><p>بوابة خدمات الذكاء الاصطناعي وواجهات API والنماذج. روابط المطورين متاحة؛ لا يوجد اتصال API أو مفتاح محفوظ في هذه اللوحة حالياً.</p><div class="meta"><span>AI Platform</span><span>·</span><span>Integration planned</span></div><div class="links"><a href="https://platform.openai.com/" target="_blank" rel="noopener">OpenAI Platform ↗</a><a href="https://developers.openai.com/api/docs" target="_blank" rel="noopener">API Documentation ↗</a></div>
+  </article>
   <article class="card" data-category="access" data-search="wasl ai human bridge accessibility sign language">
    <div class="card-top"><div class="icon">◎</div><span class="status">مسار تطوير</span></div><h4>WASL AI · Human Bridge</h4><p>مشروع التواصل المساعد وإمكانية الوصول؛ الأولوية للغة الإشارة السعودية والصوت العربي.</p><div class="meta"><span>Accessibility</span><span>·</span><span>Roadmap</span></div><div class="links"><a href="https://github.com/m5moshbk" target="_blank" rel="noopener">مستودعات GitHub ↗</a></div>
   </article>
@@ -77,7 +80,7 @@ footer{border-top:1px solid var(--line);margin-top:32px;padding:18px 0 28px;colo
   <div class="event"><i class="dot"></i><div><strong>تثبيت نهج Read-only</strong><p>عدم تعديل الخدمات أو قواعد البيانات أو الإعدادات ضمن عملية الجرد.</p></div></div>
   <div class="event"><i class="dot"></i><div><strong>تجميع واجهة موحدة</strong><p>هذه نسخة عرض أولية تجمع روابط ومعلومات مختارة؛ الربط الحي مع APIs مرحلة لاحقة.</p></div></div>
  </div></div>
- <div class="notice"><h4>حدود النسخة الحالية</h4><ul><li>لا يوجد تسجيل دخول أو صلاحيات مستخدمين.</li><li>لا توجد مراقبة لحظية أو استدعاءات API للخدمات.</li><li>حالات البطاقات مبنية على آخر جرد معروف وليست health checks.</li><li>لا تعرض أسراراً أو متغيرات بيئة أو بيانات قواعد بيانات.</li></ul><span class="tag">Static frontend</span><span class="tag">No secrets</span><span class="tag">No writes</span><span class="tag">Mobile friendly</span></div>
+ <div class="notice"><h4>حدود النسخة الحالية</h4><ul><li>لا يوجد تسجيل دخول أو صلاحيات مستخدمين.</li><li>لا توجد مراقبة لحظية أو استدعاءات API للخدمات.</li><li>OpenAI ظاهر كروابط تعريفية فقط؛ لم تُربط API ولم يُضف أي مفتاح.</li><li>حالات البطاقات مبنية على آخر جرد معروف وليست health checks.</li><li>لا تعرض أسراراً أو متغيرات بيئة أو بيانات قواعد بيانات.</li></ul><span class="tag">Static frontend</span><span class="tag">No secrets</span><span class="tag">No writes</span><span class="tag">Mobile friendly</span></div>
 </section>
 </main>
 <footer><span>© M5mOsH · All Rights Reserved</span><span>Owner: Ahmed jafari · Signature: M5mOsH</span><span>Build: 0.1.0 · Snapshot UI</span></footer>
