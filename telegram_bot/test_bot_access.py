@@ -105,3 +105,62 @@ def test_callback_action_runs_even_if_acknowledgement_is_expired(tmp_path, monke
         pass
 
     assert actions == [(12345, 77, "diagnostics")]
+
+
+def test_gemini_quota_429_does_not_retry_an_alternate_model(tmp_path, monkeypatch):
+    module = load_bot(tmp_path, monkeypatch)
+    calls = []
+
+    def fake_urlopen(request, timeout=0):
+        calls.append(json.loads(request.data.decode("utf-8")))
+        raise HTTPError(
+            request.full_url, 429, "Too Many Requests", None,
+            io.BytesIO(b'{"error":{"message":"quota exhausted"}}')
+        )
+
+    monkeypatch.setattr(module, "urlopen", fake_urlopen)
+    answer = module.ask_gpt("hello", chat_id=None)
+
+    assert len(calls) == 1
+    assert "429" in answer
+    assert "المحاولات الإضافية" in answer
+
+
+def test_openai_to_gemini_fallback_is_request_scoped(tmp_path, monkeypatch):
+    module = load_bot(tmp_path, monkeypatch, provider="openai")
+    module.init_memory()
+    module.set_ai_provider("12345", "openai")
+    module.GEMINI_API_KEY = "test-key"
+    calls = []
+
+    def fake_ask(user_text, chat_id=None, provider_override=None):
+        calls.append(provider_override)
+        if len(calls) == 1:
+            return "تعذر الاتصال بالمحرك المحدد"
+        return "Gemini temporary answer"
+
+    monkeypatch.setattr(module, "ask_gpt", fake_ask)
+    answer = module.ask_gpt_resilient("hello", chat_id="12345")
+
+    assert calls == [None, "gemini"]
+    assert answer.endswith("Gemini temporary answer")
+    assert module.get_ai_provider("12345") == "openai"
+
+
+def test_failed_gemini_never_falls_back_to_openai(tmp_path, monkeypatch):
+    module = load_bot(tmp_path, monkeypatch, provider="gemini")
+    module.init_memory()
+    module.set_ai_provider("12345", "gemini")
+    module.OPENAI_API_KEY = "test-openai-key"
+    calls = []
+
+    def fake_ask(user_text, chat_id=None, provider_override=None):
+        calls.append(provider_override)
+        return "وصل المحرك المحدد إلى حد الاستخدام"
+
+    monkeypatch.setattr(module, "ask_gpt", fake_ask)
+    answer = module.ask_gpt_resilient("hello", chat_id="12345")
+
+    assert calls == [None]
+    assert "وضع Nexus المجاني الاحتياطي" in answer
+    assert module.get_ai_provider("12345") == "gemini"
