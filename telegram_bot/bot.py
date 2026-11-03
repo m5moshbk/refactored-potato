@@ -34,6 +34,9 @@ API = "https://api.telegram.org/bot"
 # to survive a redeploy; use a persistent disk or managed database for durable memory.
 MEMORY_DB = os.getenv("NEXUS_MEMORY_DB", os.path.join(ROOT, "nexus_memory.sqlite3"))
 MEMORY_TURNS = max(2, min(12, int(os.getenv("NEXUS_MEMORY_TURNS", "8"))))
+GEMINI_QUOTA_COOLDOWN_SECONDS = max(
+    60, min(86400, int(os.getenv("NEXUS_GEMINI_QUOTA_COOLDOWN_SECONDS", "1800")))
+)
 
 
 def init_memory():
@@ -120,6 +123,78 @@ def _set_setting(chat_id, key, value):
                 setting_value=excluded.setting_value, updated_at=CURRENT_TIMESTAMP
         """, (str(chat_id), key, value))
     return True
+
+
+def _get_monitor_state(key, default=None):
+    """Read a small global operational state value from the local SQLite store."""
+    try:
+        with sqlite3.connect(MEMORY_DB, timeout=10) as db:
+            db.execute("""
+                CREATE TABLE IF NOT EXISTS nexus_monitor_state (
+                    state_key TEXT PRIMARY KEY,
+                    state_value TEXT NOT NULL,
+                    updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+            row = db.execute(
+                "SELECT state_value FROM nexus_monitor_state WHERE state_key=?",
+                (key,)
+            ).fetchone()
+        return row[0] if row else default
+    except Exception as exc:
+        print("Nexus monitor state read error:", key, type(exc).__name__, flush=True)
+        return default
+
+
+def _set_monitor_state(key, value):
+    """Persist a global operational state value without storing provider credentials."""
+    try:
+        with sqlite3.connect(MEMORY_DB, timeout=10) as db:
+            db.execute("""
+                CREATE TABLE IF NOT EXISTS nexus_monitor_state (
+                    state_key TEXT PRIMARY KEY,
+                    state_value TEXT NOT NULL,
+                    updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+            db.execute("""
+                INSERT INTO nexus_monitor_state(state_key, state_value, updated_at)
+                VALUES (?, ?, CURRENT_TIMESTAMP)
+                ON CONFLICT(state_key) DO UPDATE SET
+                    state_value=excluded.state_value, updated_at=CURRENT_TIMESTAMP
+            """, (key, str(value)))
+        return True
+    except Exception as exc:
+        print("Nexus monitor state write error:", key, type(exc).__name__, flush=True)
+        return False
+
+
+def gemini_quota_cooldown_remaining():
+    """Return remaining seconds in the global Gemini quota cooldown, or zero."""
+    raw_until = _get_monitor_state("gemini_quota_cooldown_until")
+    try:
+        remaining = int(float(raw_until) - time.time())
+    except (TypeError, ValueError):
+        return 0
+    if remaining <= 0:
+        try:
+            with sqlite3.connect(MEMORY_DB, timeout=10) as db:
+                db.execute(
+                    "DELETE FROM nexus_monitor_state WHERE state_key=?",
+                    ("gemini_quota_cooldown_until",)
+                )
+        except Exception as exc:
+            print("Nexus monitor state expiry cleanup error:", type(exc).__name__, flush=True)
+        return 0
+    return remaining
+
+
+def mark_gemini_quota_cooldown():
+    """Persist a cooldown after Gemini returns HTTP 429."""
+    until = time.time() + GEMINI_QUOTA_COOLDOWN_SECONDS
+    if _set_monitor_state("gemini_quota_cooldown_until", until):
+        print("Nexus Gemini quota cooldown enabled for " +
+              str(GEMINI_QUOTA_COOLDOWN_SECONDS) + " seconds.", flush=True)
 
 
 def get_ai_provider(chat_id=None):
@@ -934,6 +1009,8 @@ def ask_gpt(user_text, chat_id=None, provider_override=None):
         except Exception:
             pass
         print(provider + " HTTP error: status=" + str(exc.code) + " message=" + details[:180], flush=True)
+        if provider == "gemini" and exc.code == 429:
+            mark_gemini_quota_cooldown()
 
         # Search grounding can be unavailable even when text generation works.
         # Retry without Google Search; use a stable alternate when the provider is overloaded.
@@ -989,6 +1066,7 @@ def ask_gpt(user_text, chat_id=None, provider_override=None):
                 print("Gemini fallback HTTP error: status=" + str(retry_exc.code) +
                       " message=" + retry_details[:180], flush=True)
                 if retry_exc.code == 429:
+                    mark_gemini_quota_cooldown()
                     return "Gemini ما زال يرفض الطلب بسبب حد الاستخدام أو الحصة. انتظر تجدد الحصة أو تحقق من إعدادات Google AI Studio."
                 if retry_exc.code in (503, 504):
                     return "خدمة Gemini مشغولة مؤقتًا حتى عبر النموذج الاحتياطي. حاول لاحقًا؛ لم يتم التحويل إلى مزوّد مدفوع."
@@ -1046,6 +1124,9 @@ def local_free_fallback(user_text, reason=""):
     header = "🟢 وضع Nexus المجاني الاحتياطي\n"
     status = ("تعذر الحصول على إجابة من مزوّد الذكاء الاصطناعي حاليًا؛ لم أستخدم رصيدًا مدفوعًا إضافيًا.\n"
               "الأوامر والجرد المحلي/المتاح ما زالت تعمل، لكن هذا الرد محلي وليس توليدًا من نموذج AI.\n\n")
+    if reason == "gemini_quota_cooldown":
+        status += ("تم إيقاف طلبات Gemini مؤقتًا بعد HTTP 429؛ لن يرسل Nexus طلبًا جديدًا "
+                   "خلال فترة التوقف لتجنب المحاولات المتكررة.\n\n")
     if intent == "technical" or any(k in value.casefold() for k in ("خطأ", "تعطل", "لا يعمل", "ما يشتغل", "error", "429", "503")):
         steps = ("خطوات التشخيص الآمنة:\n"
                  "1. استخدم /diagnostics لفحص حالة البوت والإعدادات دون إظهار المفاتيح.\n"
@@ -1068,6 +1149,13 @@ def local_free_fallback(user_text, reason=""):
 def ask_gpt_resilient(user_text, chat_id=None):
     """Use a request-scoped free Gemini fallback without mutating saved preferences."""
     provider = get_ai_provider(chat_id)
+    if provider == "gemini":
+        remaining = gemini_quota_cooldown_remaining()
+        if remaining > 0:
+            print("Nexus skipped Gemini request: quota cooldown active (" +
+                  str(remaining) + " seconds remaining).", flush=True)
+            return local_free_fallback(user_text, "gemini_quota_cooldown")
+
     first_answer = ask_gpt(user_text, chat_id=chat_id)
     if not _provider_failed(first_answer):
         return first_answer
@@ -1075,6 +1163,11 @@ def ask_gpt_resilient(user_text, chat_id=None):
     # Only fall back from an explicitly selected OpenAI route to configured Gemini.
     # The override applies to this request only; the user's saved provider remains unchanged.
     if provider == "openai" and GEMINI_API_KEY:
+        remaining = gemini_quota_cooldown_remaining()
+        if remaining > 0:
+            print("Nexus skipped Gemini fallback: quota cooldown active (" +
+                  str(remaining) + " seconds remaining).", flush=True)
+            return local_free_fallback(user_text, "gemini_quota_cooldown")
         try:
             print("Nexus temporary fallback: OpenAI failed; trying configured Gemini for this request.", flush=True)
             second_answer = ask_gpt(user_text, chat_id=chat_id, provider_override="gemini")
