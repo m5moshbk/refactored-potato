@@ -260,10 +260,14 @@ def test_channel_post_allowlist_matches_channel_id_and_username(tmp_path, monkey
 
 def test_channel_post_secret_redaction(tmp_path, monkeypatch):
     module = load_bot(tmp_path, monkeypatch)
-    source = 'bot123456:ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789 access_token="abcd123456789012345" Bearer abcdefghijklmnop'
+    source = ('bot123456:ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789 '
+              'access_token="abcd123456789012345" '
+              'Authorization: "Bearer bearercredential123456789" '
+              'Bearer abcdefghijklmnop')
     safe = module.redact_channel_secrets(source)
     assert "ABCDEFGHIJKLMNOPQRSTUVWXYZ" not in safe
     assert "abcd123456789012345" not in safe
+    assert "bearercredential123456789" not in safe
     assert "Bearer abcdefghijklmnop" not in safe
 
 
