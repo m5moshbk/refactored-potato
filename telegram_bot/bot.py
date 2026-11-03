@@ -1356,7 +1356,7 @@ def redact_channel_secrets(value):
     value = re.sub(r"(?i)\b(?:sk-[A-Za-z0-9_-]{16,}|gh[pousr]_[A-Za-z0-9_]{20,}|"
                    r"xox[baprs]-[A-Za-z0-9-]{12,})\b", "[REDACTED_SECRET]", value)
     value = re.sub(
-        r"""(?i)(["']?(?:client_secret|access_token|refresh_token|api_key|bot_token|password|authorization)["']?\s*[:=]\s*["']?)[^"'\s,;}\]]+""",
+        r"""(?i)(["']?(?:client[_-]?secret|access[_-]?token|refresh[_-]?token|api[_-]?key|bot[_-]?token|password|authorization)["']?\s*[:=]\s*)(?:"[^"]*"|'[^']*'|[^,\s;}\]]+)""",
         r"\1[REDACTED]", value
     )
     value = re.sub(r"(?i)\bBearer\s+[A-Za-z0-9._~+/-]{12,}", "Bearer [REDACTED]", value)
