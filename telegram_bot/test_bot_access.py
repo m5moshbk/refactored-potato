@@ -156,7 +156,7 @@ def test_failed_gemini_never_falls_back_to_openai(tmp_path, monkeypatch):
 
     def fake_ask(user_text, chat_id=None, provider_override=None):
         calls.append(provider_override)
-        return "وصل المحرك المحدد إلى حد الاستخدام"
+        return "وصل المحرك المحدد إلى حد الحصة (HTTP 429)"
 
     monkeypatch.setattr(module, "ask_gpt", fake_ask)
     answer = module.ask_gpt_resilient("hello", chat_id="12345")
