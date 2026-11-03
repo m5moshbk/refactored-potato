@@ -333,3 +333,60 @@ def test_edited_channel_post_without_edit_date_is_ignored(tmp_path, monkeypatch)
         "message_id": 77, "text": "edited", "chat": {"id": -100123}
     }, edited=True)
     assert sent == []
+
+
+
+def test_forwarded_channel_post_is_analyzed_privately_without_channel_allowlist(tmp_path, monkeypatch):
+    module = load_bot(tmp_path, monkeypatch)
+    module.init_memory()
+    module.ADMIN = "12345"
+    module.NEXUS_MONITOR_CHANNELS = {"only-this-channel"}
+    sent = []
+    prompts = []
+    monkeypatch.setattr(module, "send", lambda chat_id, text, keyboard=None: sent.append((str(chat_id), text)))
+    monkeypatch.setattr(module, "ask_gpt_resilient",
+                        lambda prompt, chat_id=None: prompts.append((prompt, chat_id)) or "تحليل المصدر")
+
+    forwarded = {
+        "message_id": 900,
+        "text": "Public API announcement",
+        "forward_origin": {
+            "type": "channel",
+            "date": 1762149000,
+            "chat": {"id": -100987, "title": "External API", "username": "externalapi"},
+            "message_id": 77
+        }
+    }
+    module.handle_forwarded_message("12345", forwarded)
+
+    assert len(prompts) == 1
+    assert prompts[0][1] == "12345"
+    assert "Public API announcement" in prompts[0][0]
+    assert "externalapi" in prompts[0][0]
+    assert len(sent) == 1
+    assert sent[0][0] == "12345"
+    assert "https://t.me/externalapi/77" in sent[0][1]
+    assert "تحليل المصدر" in sent[0][1]
+
+
+def test_forwarded_message_from_non_admin_is_ignored(tmp_path, monkeypatch):
+    module = load_bot(tmp_path, monkeypatch)
+    module.ADMIN = "12345"
+    calls = []
+    monkeypatch.setattr(module, "ask_gpt_resilient", lambda *args, **kwargs: calls.append(args))
+    monkeypatch.setattr(module, "send", lambda *args, **kwargs: calls.append(args))
+    module.handle_forwarded_message("99999", {"text": "private forwarded content"})
+    assert calls == []
+
+
+def test_forwarded_media_without_caption_requests_manual_review(tmp_path, monkeypatch):
+    module = load_bot(tmp_path, monkeypatch)
+    module.ADMIN = "12345"
+    sent = []
+    monkeypatch.setattr(module, "send", lambda chat_id, text, keyboard=None: sent.append((str(chat_id), text)))
+    module.handle_forwarded_message("12345", {
+        "photo": [{"file_id": "not-used"}],
+        "forward_origin": {"type": "channel", "chat": {"title": "Media source"}}
+    })
+    assert len(sent) == 1
+    assert "لا يوجد نص أو وصف" in sent[0][1]
