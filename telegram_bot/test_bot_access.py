@@ -240,3 +240,153 @@ def test_openai_fallback_does_not_call_gemini_during_cooldown(tmp_path, monkeypa
     assert calls == [None]
     assert "وضع Nexus المجاني الاحتياطي" in answer
     assert module.get_ai_provider("12345") == "openai"
+
+
+
+def test_channel_post_text_supports_text_and_caption(tmp_path, monkeypatch):
+    module = load_bot(tmp_path, monkeypatch)
+    assert module.channel_post_text({"text": "new post"}) == "new post"
+    assert module.channel_post_text({"caption": "photo caption"}) == "photo caption"
+    assert module.channel_post_text({}) == ""
+
+
+def test_channel_post_allowlist_matches_channel_id_and_username(tmp_path, monkeypatch):
+    module = load_bot(tmp_path, monkeypatch)
+    module.NEXUS_MONITOR_CHANNELS = {"-100123", "sallaapi"}
+    assert module.channel_post_is_allowed({"chat": {"id": -100123}})
+    assert module.channel_post_is_allowed({"chat": {"id": -9, "username": "SallaAPI"}})
+    assert not module.channel_post_is_allowed({"chat": {"id": -9, "username": "other"}})
+
+
+def test_channel_post_secret_redaction(tmp_path, monkeypatch):
+    module = load_bot(tmp_path, monkeypatch)
+    source = ('bot123456:ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789 '
+              'access_token="abcd123456789012345" '
+              'Authorization: "Bearer bearercredential123456789" '
+              'Bearer abcdefghijklmnop')
+    safe = module.redact_channel_secrets(source)
+    assert "ABCDEFGHIJKLMNOPQRSTUVWXYZ" not in safe
+    assert "abcd123456789012345" not in safe
+    assert "bearercredential123456789" not in safe
+    assert "Bearer abcdefghijklmnop" not in safe
+
+
+def test_channel_post_alert_is_private_deduplicated_and_never_publishes(tmp_path, monkeypatch):
+    module = load_bot(tmp_path, monkeypatch)
+    module.init_memory()
+    module.ADMIN = "12345"
+    module.NEXUS_MONITOR_CHANNELS = {"sallaapi"}
+    sent = []
+    analyzed = []
+    monkeypatch.setattr(module, "send", lambda chat_id, text, keyboard=None: sent.append((str(chat_id), text)))
+    monkeypatch.setattr(module, "ask_gpt_resilient", lambda prompt, chat_id=None: analyzed.append((prompt, chat_id)) or "تحليل تجريبي")
+    post = {
+        "message_id": 77,
+        "text": "Example API update",
+        "chat": {"id": -100123, "title": "Salla API", "username": "SallaAPI"}
+    }
+
+    module.handle_channel_post(post)
+    module.handle_channel_post(post)
+
+    assert len(analyzed) == 1
+    assert len(sent) == 1
+    assert sent[0][0] == "12345"
+    assert "https://t.me/SallaAPI/77" in sent[0][1]
+    assert "تحليل تجريبي" in sent[0][1]
+
+
+
+def test_edited_channel_post_revisions_are_deduplicated_separately(tmp_path, monkeypatch):
+    module = load_bot(tmp_path, monkeypatch)
+    module.init_memory()
+    module.ADMIN = "12345"
+    module.NEXUS_MONITOR_CHANNELS = {"sallaapi"}
+    sent = []
+    monkeypatch.setattr(module, "send", lambda chat_id, text, keyboard=None: sent.append((str(chat_id), text)))
+    monkeypatch.setattr(module, "ask_gpt_resilient", lambda prompt, chat_id=None: "تحليل")
+
+    post = {
+        "message_id": 77,
+        "edit_date": 1762149000,
+        "text": "Updated API details",
+        "chat": {"id": -100123, "title": "Salla API", "username": "SallaAPI"}
+    }
+    module.handle_channel_post(post, edited=True)
+    module.handle_channel_post(post, edited=True)
+    assert len(sent) == 1
+    assert "تعديل منشور قناة" in sent[0][1]
+
+    next_revision = dict(post, edit_date=1762149060, text="Second edit")
+    module.handle_channel_post(next_revision, edited=True)
+    assert len(sent) == 2
+
+
+def test_edited_channel_post_without_edit_date_is_ignored(tmp_path, monkeypatch):
+    module = load_bot(tmp_path, monkeypatch)
+    module.init_memory()
+    module.ADMIN = "12345"
+    module.NEXUS_MONITOR_CHANNELS = set()
+    sent = []
+    monkeypatch.setattr(module, "send", lambda chat_id, text, keyboard=None: sent.append((str(chat_id), text)))
+    module.handle_channel_post({
+        "message_id": 77, "text": "edited", "chat": {"id": -100123}
+    }, edited=True)
+    assert sent == []
+
+
+
+def test_forwarded_channel_post_is_analyzed_privately_without_channel_allowlist(tmp_path, monkeypatch):
+    module = load_bot(tmp_path, monkeypatch)
+    module.init_memory()
+    module.ADMIN = "12345"
+    module.NEXUS_MONITOR_CHANNELS = {"only-this-channel"}
+    sent = []
+    prompts = []
+    monkeypatch.setattr(module, "send", lambda chat_id, text, keyboard=None: sent.append((str(chat_id), text)))
+    monkeypatch.setattr(module, "ask_gpt_resilient",
+                        lambda prompt, chat_id=None: prompts.append((prompt, chat_id)) or "تحليل المصدر")
+
+    forwarded = {
+        "message_id": 900,
+        "text": "Public API announcement",
+        "forward_origin": {
+            "type": "channel",
+            "date": 1762149000,
+            "chat": {"id": -100987, "title": "External API", "username": "externalapi"},
+            "message_id": 77
+        }
+    }
+    module.handle_forwarded_message("12345", forwarded)
+
+    assert len(prompts) == 1
+    assert prompts[0][1] == "12345"
+    assert "Public API announcement" in prompts[0][0]
+    assert "External API" in prompts[0][0]
+    assert len(sent) == 1
+    assert sent[0][0] == "12345"
+    assert "https://t.me/externalapi/77" in sent[0][1]
+    assert "تحليل المصدر" in sent[0][1]
+
+
+def test_forwarded_message_from_non_admin_is_ignored(tmp_path, monkeypatch):
+    module = load_bot(tmp_path, monkeypatch)
+    module.ADMIN = "12345"
+    calls = []
+    monkeypatch.setattr(module, "ask_gpt_resilient", lambda *args, **kwargs: calls.append(args))
+    monkeypatch.setattr(module, "send", lambda *args, **kwargs: calls.append(args))
+    module.handle_forwarded_message("99999", {"text": "private forwarded content"})
+    assert calls == []
+
+
+def test_forwarded_media_without_caption_requests_manual_review(tmp_path, monkeypatch):
+    module = load_bot(tmp_path, monkeypatch)
+    module.ADMIN = "12345"
+    sent = []
+    monkeypatch.setattr(module, "send", lambda chat_id, text, keyboard=None: sent.append((str(chat_id), text)))
+    module.handle_forwarded_message("12345", {
+        "photo": [{"file_id": "not-used"}],
+        "forward_origin": {"type": "channel", "chat": {"title": "Media source"}}
+    })
+    assert len(sent) == 1
+    assert "لا يوجد نص أو وصف" in sent[0][1]
