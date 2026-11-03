@@ -794,9 +794,9 @@ def on_callback(chat_id, message_id, data):
 
 
 
-def ask_gpt(user_text, chat_id=None):
-    """Generate a response using the selected OpenAI or Gemini provider."""
-    provider = get_ai_provider(chat_id)
+def ask_gpt(user_text, chat_id=None, provider_override=None):
+    """Generate a response using the selected provider or a request-scoped override."""
+    provider = provider_override if provider_override in ("openai", "gemini") else get_ai_provider(chat_id)
     selected_model = get_ai_model(chat_id, provider)
     if provider == "gemini":
         if not GEMINI_API_KEY:
@@ -937,15 +937,20 @@ def ask_gpt(user_text, chat_id=None):
 
         # Search grounding can be unavailable even when text generation works.
         # Retry without Google Search; use a stable alternate when the provider is overloaded.
-        if provider == "gemini" and payload.get("tools") and exc.code in (400, 404, 429, 503, 504):
+        # HTTP 429 is a quota/rate-limit signal: do not spend another request retrying it.
+        if provider == "gemini" and payload.get("tools") and exc.code in (400, 404, 503, 504):
             try:
                 fallback_payload = dict(payload)
                 fallback_payload.pop("tools", None)
                 if exc.code == 404 or selected_model == "gemini-4-argon":
                     fallback_model = "gemini-3.8-flash"
-                elif exc.code in (429, 503, 504):
-                    fallback_model = "gemini-3.6-flash"
+                elif exc.code in (503, 504):
+                    fallback_model = {
+                        "gemini-3.8-flash": "gemini-3.6-flash",
+                        "gemini-3.6-flash": "gemini-3.5-flash-lite",
+                    }.get(selected_model, "gemini-3.6-flash")
                 else:
+                    # For HTTP 400, retry the same model only without search grounding.
                     fallback_model = selected_model
                 fallback_payload["model"] = fallback_model
                 fallback_req = Request(
@@ -1002,7 +1007,8 @@ def ask_gpt(user_text, chat_id=None):
                     ("OPENAI_API_KEY" if provider == "openai" else "GEMINI_API_KEY") +
                     " وإعدادات المشروع في مزود الخدمة.")
         if exc.code == 429:
-            return ("وصل المحرك المحدد إلى حد الاستخدام أو لا يتوفر رصيد. تحقق من الفوترة وحدود الحساب لدى " +
+            return ("وصل المحرك المحدد إلى حد الحصة أو معدل الطلبات (HTTP 429). أوقف Nexus المحاولات الإضافية "
+                    "لتجنب طلبات غير مفيدة؛ انتظر تجدد الحصة أو تحقق من حدود الحساب لدى " +
                     ("OpenAI" if provider == "openai" else "Google AI Studio") + ".")
         if exc.code in (400, 404):
             return ("رفض " + ("OpenAI" if provider == "openai" else "Gemini") +
@@ -1059,31 +1065,31 @@ def local_free_fallback(user_text, reason=""):
 
 
 def ask_gpt_resilient(user_text, chat_id=None):
-    """Prefer the chosen engine; on failure, switch to Gemini once, then use offline mode."""
+    """Use a request-scoped free Gemini fallback without mutating saved preferences."""
     provider = get_ai_provider(chat_id)
     first_answer = ask_gpt(user_text, chat_id=chat_id)
     if not _provider_failed(first_answer):
         return first_answer
 
-    # Only fall back from OpenAI to the free-tier Gemini route; never switch from
-    # a failed free Gemini request to a potentially billable OpenAI API request.
+    # Only fall back from an explicitly selected OpenAI route to configured Gemini.
+    # The override applies to this request only; the user's saved provider remains unchanged.
     if provider == "openai" and GEMINI_API_KEY:
         try:
-            set_ai_provider(chat_id, "gemini")
-            print("Nexus automatic fallback: OpenAI failed; switched chat to Gemini.", flush=True)
-            second_answer = ask_gpt(user_text, chat_id=chat_id)
+            print("Nexus temporary fallback: OpenAI failed; trying configured Gemini for this request.", flush=True)
+            second_answer = ask_gpt(user_text, chat_id=chat_id, provider_override="gemini")
             if not _provider_failed(second_answer):
-                return ("🔄 تم التحويل تلقائيًا إلى Gemini بعد تعذّر OpenAI.\n\n" +
+                return ("🔄 تعذّر OpenAI؛ أُجيب مؤقتًا عبر Gemini دون تغيير اختيار المحرك المحفوظ.\\n\\n" +
                         second_answer)
-            print("Nexus free-provider fallback unavailable; entering local mode.", flush=True)
+            print("Nexus Gemini fallback unavailable; entering local mode.", flush=True)
             return local_free_fallback(user_text, "gemini_unavailable")
         except Exception as exc:
             print("Nexus automatic fallback error:", type(exc).__name__, flush=True)
             return local_free_fallback(user_text, "fallback_exception")
 
-    # A failed Gemini/free request must not trigger a paid OpenAI request.
+    # A failed Gemini request must never trigger a potentially billable OpenAI request.
     print("Nexus free mode: selected provider unavailable; using local fallback.", flush=True)
     return local_free_fallback(user_text, "free_provider_unavailable")
+
 
 def auto_test_ai_providers():
     """Test provider generation and Gemini search grounding, then notify the admin."""
@@ -1148,7 +1154,8 @@ def auto_test_ai_providers():
                 pass
             print("AI startup test failed:", provider, "HTTP", exc.code,
                   "message=" + details[:180], flush=True)
-            if provider == "gemini" and exc.code in (400, 404, 429, 503, 504):
+            # Do not retry quota/rate-limit failures during startup diagnostics.
+            if provider == "gemini" and exc.code in (400, 404, 503, 504):
                 try:
                     fallback_model = ("gemini-3.8-flash" if exc.code == 404 or model == "gemini-4-argon"
                                       else "gemini-3.6-flash" if exc.code in (429, 503, 504) else model)
