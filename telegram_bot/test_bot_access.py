@@ -28,6 +28,18 @@ def load_bot(tmp_path, monkeypatch, provider="gemini"):
     return module
 
 
+def test_public_chat_is_disabled_when_mode_is_unset(tmp_path, monkeypatch):
+    monkeypatch.delenv("NEXUS_PUBLIC_MODE", raising=False)
+    module = load_bot(tmp_path, monkeypatch)
+    assert module.PUBLIC_BOT_MODE is False
+
+
+def test_public_chat_requires_explicit_opt_in(tmp_path, monkeypatch):
+    monkeypatch.setenv("NEXUS_PUBLIC_MODE", "1")
+    module = load_bot(tmp_path, monkeypatch)
+    assert module.PUBLIC_BOT_MODE is True
+
+
 def test_legacy_saved_gemini_model_falls_back_to_supported_default(tmp_path, monkeypatch):
     module = load_bot(tmp_path, monkeypatch)
     module.init_memory()
