@@ -1,40 +1,49 @@
 # حالة Nexus Inventory API | Nexus Inventory API Status
 
-> آخر تحديث / Last updated: 2026-10-28 UTC
+> آخر تحديث / Last updated: 2026-11-03 UTC
 
 ## العربية
 
 - **المستودع:** `m5moshbk/refactored-potato`
-- **فرع العمل المعزول:** `fix/nexus-inventory-api-validation`
-- **طلب الدمج:** [PR #9](https://github.com/m5moshbk/refactored-potato/pull/9) — مفتوح للمراجعة، غير مدمج.
-- **الخدمة الحالية:** [m5mosh-nexus-inventory-api](https://m5mosh-nexus-inventory-api.onrender.com) تعمل على الفرع `feature/nexus-code-inventory-sync`. لم تُنشر تغييرات هذا الفرع عليها.
-- **التغييرات:** تشديد التحقق من المسارات النسبية المعيارية ورفض المسارات المطلقة بصيغة Windows، ورفض القيم المنطقية كأحجام ملفات؛ إضافة اختبارات API وسير عمل CI مستقل وتوثيق عربي/إنجليزي.
-- **الاختبار:** نجح تشغيل [GitHub Actions #40653017103](https://github.com/m5moshbk/refactored-potato/actions/runs/40653017103) على رأس الفرع `ae15002abf2bebee3fad20c9615d3517f8ff5646`، بما يشمل اختبارات API. يجب التأكد من نتيجة CI لأي تعديل لاحق قبل الدمج.
-- **الخصوصية:** يقبل API بيانات وصفية محدودة ويخزن ملخصات إجمالية فقط؛ لا يُفترض حفظ محتوى المصدر أو مسارات الملفات.
-- **التخزين:** قاعدة SQLite الافتراضية تحت `/tmp` مؤقتة.
-- **الأسرار:** يجب ضبط `INGEST_TOKEN` في Render دون كشف قيمته.
+- **فرع الخدمة:** `feature/nexus-code-inventory-sync`.
+- **الخدمة:** [m5mosh-nexus-inventory-api](https://m5mosh-nexus-inventory-api.onrender.com).
+- **حالة Render المؤكدة:** الخدمة غير معلّقة، وتعمل بإعداد Auto-deploy مفعّل على فرع الخدمة. أحدث نشر ظاهر في سجل Render انتهى بالحالة `live` على commit `c6d9674d84dbc46b04ab2d0f2a3cac045ac944f7` بتاريخ 2026-11-03 03:10:42 UTC.
+- **PR #9:** [Fix Nexus inventory API path validation and add tests](https://github.com/m5moshbk/refactored-potato/pull/9) — مدمج في 2026-11-02، وcommit الدمج `c6d9674d84dbc46b04ab2d0f2a3cac045ac944f7`. الحالة السابقة التي وصفته بأنه مفتوح وغير مدمج كانت قديمة.
+- **التغييرات المدمجة:** تشديد التحقق من المسارات النسبية المعيارية ورفض المسارات المطلقة بصيغة Windows، ورفض القيم المنطقية كأحجام ملفات؛ إضافة اختبارات API وسير عمل CI وتوثيق عربي/إنجليزي.
+- **الاختبارات:** سجل PR #9 التاريخي يذكر نجاح CI على رأس سابق للفرع. فحص commit الدمج نفسه عبر GitHub أظهر عدم وجود check runs أو statuses منشورة في الاستعلام الحالي؛ لذلك لا نصف commit الدمج بأنه اجتاز CI مستقلاً. على فرع المشغّل المعزول، نجح تشغيل الاختبارات رقم [41596920011](https://github.com/m5moshbk/refactored-potato/actions/runs/41596920011) بتاريخ 2026-11-03، وشملت الخطوات تثبيت الاعتماديات وتشغيل `pytest` على `inventory_api/tests`.
+- **PR #23:** [M5mOsH Autonomous Operator guardrails](https://github.com/m5moshbk/refactored-potato/pull/23) — مفتوح للمراجعة، غير مدمج؛ يستهدف فرع الخدمة. يجب عدم دمجه دون موافقة منفصلة لأن الفرع مرتبط بـ Render Auto-deploy.
+- **الخصوصية:** يقبل API بيانات وصفية محدودة ويخزن ملخصات إجمالية فقط؛ لا يُفترض حفظ محتوى المصدر أو مسارات الملفات التفصيلية.
+- **التخزين:** قاعدة SQLite الافتراضية تحت `/tmp/nexus_inventory.sqlite3` مؤقتة؛ استمرارية البيانات بعد إعادة التشغيل أو النشر غير مضمونة دون إعداد تخزين دائم والتحقق منه.
+- **الأسرار:** التطبيق يتطلب `INGEST_TOKEN` لإدخال البيانات. لم تُقرأ قيمة السر ولم يتم التحقق من وجوده في Render ضمن هذا التحديث.
 
-### المتبقي قبل النشر
-1. التأكد من نجاح CI على أحدث رأس للفرع.
-2. مراجعة إعدادات `INGEST_TOKEN` والتخزين الدائم.
-3. مراجعة طلب الدمج قبل أي دمج؛ لا تنشر هذا الفرع تلقائيًا على الخدمة الحية.
+### المتبقي قبل أي تغيير إنتاجي
+
+1. مراجعة سياسة التخزين الدائم وخياراته؛ لا تغيّر قاعدة البيانات أو القرص دون موافقة منفصلة.
+2. التحقق من وجود إعداد `INGEST_TOKEN` دون كشف قيمته، عند توفر مراجعة إعدادات مصرح بها.
+3. اختبار استجابة HTTP الفعلية ونقطة `/api/v1/status` بأداة وصول مناسبة؛ تعذر تأكيد الاستجابة الحية في فحص المتصفح الحالي.
+4. مراجعة PR #23؛ لا دمج ولا نشر دون موافقة منفصلة.
 
 ## English
 
-- **Repository:** `m5moshbk/refactored-potato`
-- **Isolated work branch:** `fix/nexus-inventory-api-validation`
-- **Pull request:** [PR #9](https://github.com/m5moshbk/refactored-potato/pull/9) — open for review, not merged.
-- **Current service:** [m5mosh-nexus-inventory-api](https://m5mosh-nexus-inventory-api.onrender.com) runs from `feature/nexus-code-inventory-sync`. This branch has not been deployed to it.
-- **Changes:** strengthened normalized relative-path validation, rejected Windows absolute paths and boolean file sizes, and added API tests, a dedicated CI workflow, and bilingual documentation.
-- **Tests:** [GitHub Actions run #40653017103](https://github.com/m5moshbk/refactored-potato/actions/runs/40653017103) passed on branch head `ae15002abf2bebee3fad20c9615d3517f8ff5646`, including API tests. Any later change must pass CI before merging.
-- **Privacy:** the API accepts limited metadata and stores aggregate summaries only; source contents and detailed paths are not intended to be persisted.
-- **Storage:** the default SQLite database under `/tmp` is ephemeral.
-- **Secrets:** configure `INGEST_TOKEN` in Render without disclosing its value.
+- **Repository:** `m5moshbk/refactored-potato`.
+- **Service branch:** `feature/nexus-code-inventory-sync`.
+- **Service:** [m5mosh-nexus-inventory-api](https://m5mosh-nexus-inventory-api.onrender.com).
+- **Confirmed Render metadata:** the service is not suspended and has Auto-deploy enabled for its service branch. The latest deployment visible in Render's deployment list completed as `live` on commit `c6d9674d84dbc46b04ab2d0f2a3cac045ac944f7` at 2026-11-03 03:10:42 UTC.
+- **PR #9:** [Fix Nexus inventory API path validation and add tests](https://github.com/m5moshbk/refactored-potato/pull/9) — merged on 2026-11-02; merge commit `c6d9674d84dbc46b04ab2d0f2a3cac045ac944f7`. The previous open/not-merged statement was stale.
+- **Merged changes:** stricter normalized relative-path validation, rejection of Windows absolute paths and boolean file sizes, API regression tests, CI workflow, and bilingual documentation.
+- **Tests:** the historical PR #9 record reports a successful CI run on an earlier branch head. The current GitHub query for the merge commit returned no check runs or status contexts, so this document does not claim an independently verified CI result for the merge commit. On the isolated operator branch, [GitHub Actions run #41596920011](https://github.com/m5moshbk/refactored-potato/actions/runs/41596920011) completed successfully on 2026-11-03; its steps included dependency installation and `pytest` for `inventory_api/tests`.
+- **PR #23:** [M5mOsH Autonomous Operator guardrails](https://github.com/m5moshbk/refactored-potato/pull/23) — open for review, not merged; it targets the service branch. Do not merge without separate approval because Render Auto-deploy watches that branch.
+- **Privacy:** the API accepts limited metadata and stores aggregate summaries only; detailed source contents and file paths are not intended to be retained.
+- **Storage:** the default SQLite database at `/tmp/nexus_inventory.sqlite3` is ephemeral; persistence across restarts or deployments is not guaranteed without a separately verified persistent-storage configuration.
+- **Secrets:** the application requires `INGEST_TOKEN` for ingestion. Its value was not read, and its presence in Render was not verified in this update.
 
-### Release blockers
-1. Confirm CI passes on the latest branch head.
-2. Review `INGEST_TOKEN` and persistent-storage settings.
-3. Review the pull request before merging; do not automatically deploy this branch to the live service.
+### Remaining before any production change
+
+1. Review persistent-storage options; do not change the database or disk without separate approval.
+2. Verify whether `INGEST_TOKEN` is configured without revealing its value, when an authorized configuration review is available.
+3. Verify live HTTP responses and `/api/v1/status` using a suitable access method; the current browser check could not confirm live responses.
+4. Review PR #23; no merge or deployment without separate approval.
 
 ## الحقوق | Rights
-© M5mOsH — All rights reserved.
+
+© M5mOsH All Rights Reserved
