@@ -164,3 +164,79 @@ def test_failed_gemini_never_falls_back_to_openai(tmp_path, monkeypatch):
     assert calls == [None]
     assert "وضع Nexus المجاني الاحتياطي" in answer
     assert module.get_ai_provider("12345") == "gemini"
+
+
+
+def test_gemini_quota_429_persists_cooldown(tmp_path, monkeypatch):
+    module = load_bot(tmp_path, monkeypatch)
+    calls = []
+
+    def fake_urlopen(request, timeout=0):
+        calls.append(request)
+        raise HTTPError(
+            request.full_url, 429, "Too Many Requests", None,
+            io.BytesIO(b'{"error":{"message":"quota exhausted"}}')
+        )
+
+    monkeypatch.setattr(module, "urlopen", fake_urlopen)
+    answer = module.ask_gpt("hello", chat_id=None)
+
+    assert len(calls) == 1
+    assert "429" in answer
+    assert module.gemini_quota_cooldown_remaining() > 0
+
+
+def test_gemini_cooldown_skips_subsequent_provider_request(tmp_path, monkeypatch):
+    module = load_bot(tmp_path, monkeypatch)
+    module.init_memory()
+    module.mark_gemini_quota_cooldown()
+    calls = []
+
+    def fake_ask(*args, **kwargs):
+        calls.append((args, kwargs))
+        return "Unexpected provider call"
+
+    monkeypatch.setattr(module, "ask_gpt", fake_ask)
+    answer = module.ask_gpt_resilient("مرحبا", chat_id="12345")
+
+    assert calls == []
+    assert "وضع Nexus المجاني الاحتياطي" in answer
+    assert "إيقاف طلبات Gemini مؤقتًا" in answer
+
+
+def test_expired_gemini_cooldown_allows_provider_retry(tmp_path, monkeypatch):
+    module = load_bot(tmp_path, monkeypatch)
+    module.init_memory()
+    module._set_monitor_state(
+        "gemini_quota_cooldown_until", module.time.time() - 1
+    )
+    calls = []
+
+    def fake_ask(*args, **kwargs):
+        calls.append((args, kwargs))
+        return "Provider recovered"
+
+    monkeypatch.setattr(module, "ask_gpt", fake_ask)
+    answer = module.ask_gpt_resilient("hello", chat_id="12345")
+
+    assert answer == "Provider recovered"
+    assert len(calls) == 1
+
+
+def test_openai_fallback_does_not_call_gemini_during_cooldown(tmp_path, monkeypatch):
+    module = load_bot(tmp_path, monkeypatch, provider="openai")
+    module.init_memory()
+    module.set_ai_provider("12345", "openai")
+    module.mark_gemini_quota_cooldown()
+    calls = []
+
+    def fake_ask(user_text, chat_id=None, provider_override=None):
+        calls.append(provider_override)
+        return "تعذر الاتصال بالمحرك المحدد"
+
+    monkeypatch.setattr(module, "ask_gpt", fake_ask)
+    answer = module.ask_gpt_resilient("hello", chat_id="12345")
+
+    assert calls == [None]
+    assert "وضع Nexus المجاني الاحتياطي" in answer
+    assert module.get_ai_provider("12345") == "openai"
