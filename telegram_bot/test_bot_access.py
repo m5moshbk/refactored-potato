@@ -362,7 +362,7 @@ def test_forwarded_channel_post_is_analyzed_privately_without_channel_allowlist(
     assert len(prompts) == 1
     assert prompts[0][1] == "12345"
     assert "Public API announcement" in prompts[0][0]
-    assert "externalapi" in prompts[0][0]
+    assert "External API" in prompts[0][0]
     assert len(sent) == 1
     assert sent[0][0] == "12345"
     assert "https://t.me/externalapi/77" in sent[0][1]
