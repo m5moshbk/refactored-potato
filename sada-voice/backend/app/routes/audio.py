@@ -1,54 +1,61 @@
-from fastapi import APIRouter, File, Form, UploadFile
-from fastapi.responses import JSONResponse
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 
-from app.db import SessionLocal
-from app.models import VoiceProfile
-from app.services.speech_to_text import SpeechToTextService
-from app.services.voiceprint import VoicePrintService
+from app.config import settings
+from app.models import User
+from app.routes.auth import get_current_user
 
-router = APIRouter(prefix="/api/v1")
+router = APIRouter(prefix="/api/v1", tags=["audio"])
+
+ALLOWED_AUDIO_TYPES = {
+    "audio/wav",
+    "audio/x-wav",
+    "audio/mpeg",
+    "audio/mp4",
+    "audio/webm",
+    "audio/ogg",
+    "audio/aac",
+}
+
+
+async def _validate_upload(file: UploadFile) -> bytes:
+    content_type = (file.content_type or "").lower().split(";")[0].strip()
+    if content_type not in ALLOWED_AUDIO_TYPES:
+        raise HTTPException(status_code=415, detail="Unsupported audio format.")
+
+    content = await file.read(settings.max_audio_bytes + 1)
+    if not content:
+        raise HTTPException(status_code=400, detail="The audio file is empty.")
+    if len(content) > settings.max_audio_bytes:
+        raise HTTPException(status_code=413, detail="Audio file exceeds the configured size limit.")
+    return content
+
 
 @router.post("/transcribe")
-async def transcribe(file: UploadFile = File(...)):
-    content = await file.read()
-    service = SpeechToTextService()
-    result = await service.transcribe_audio(content, file.filename)
-    return result
+async def transcribe(
+    file: UploadFile = File(...),
+    _: User = Depends(get_current_user),
+):
+    await _validate_upload(file)
+    raise HTTPException(
+        status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+        detail=(
+            "Server transcription is not configured. Use the browser speech feature "
+            "or connect an approved speech provider before enabling this endpoint."
+        ),
+    )
 
-@router.post("/voiceprint")
-async def create_voiceprint(file: UploadFile = File(...), user_id: str = Form(...)):
-    content = await file.read()
-    fingerprint = VoicePrintService().create_fingerprint(content)
 
-    db = SessionLocal()
-    record = VoiceProfile(user_id=int(user_id), fingerprint=fingerprint)
-    db.add(record)
-    db.commit()
-    db.close()
+@router.post("/voiceprint", status_code=status.HTTP_501_NOT_IMPLEMENTED)
+async def create_voiceprint(_: User = Depends(get_current_user)):
+    raise HTTPException(
+        status_code=status.HTTP_501_NOT_IMPLEMENTED,
+        detail="Voice identity enrollment is disabled until a consent-based biometric model is integrated and evaluated.",
+    )
 
-    return {
-        "user_id": user_id,
-        "voiceprint_status": "stored",
-        "fingerprint": fingerprint,
-    }
 
-@router.post("/verify")
-async def verify_voice(file: UploadFile = File(...), user_id: str = Form(...)):
-    content = await file.read()
-    candidate_hash = VoicePrintService().create_fingerprint(content)
-
-    db = SessionLocal()
-    profile = db.query(VoiceProfile).filter(VoiceProfile.user_id == int(user_id)).first()
-    db.close()
-
-    if not profile:
-        return JSONResponse(status_code=404, content={"detail": "voice profile not found"})
-
-    score = VoicePrintService().compare(profile.fingerprint, candidate_hash)
-
-    return {
-        "user_id": user_id,
-        "matched": score >= 0.9,
-        "score": score,
-        "status": "verified" if score >= 0.9 else "mismatch",
-    }
+@router.post("/verify", status_code=status.HTTP_501_NOT_IMPLEMENTED)
+async def verify_voice(_: User = Depends(get_current_user)):
+    raise HTTPException(
+        status_code=status.HTTP_501_NOT_IMPLEMENTED,
+        detail="Voice identity verification is not available. No audio hash is used as a biometric identity.",
+    )
