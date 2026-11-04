@@ -3,6 +3,41 @@
 **Purpose:** A verified snapshot of Render deployment metadata and a safe order for completing the project portfolio.  
 **Important:** Render deploy state `live` means the deployment completed; it does not prove every application feature, database connection, authentication flow, or payment flow is healthy. This document is a snapshot, not a live monitor.
 
+## 2026-11-04 — Current Nexus Core Services Snapshot
+
+**Evidence source:** GitHub repository metadata and Render service/deployment/event metadata retrieved during this cycle. This section supersedes the older October 13 snapshot for the three core Nexus services only. Other portfolio rows below remain historical until re-audited.
+
+| Service | Type | Branch | Auto-deploy | Current Render state | Latest deployment |
+|---|---|---|---|---|---|
+| [m5mosh-nexus](https://m5mosh-nexus.onrender.com) | Static site | `main` | Enabled | Not suspended | `live` on `244b82de577cf9e62407103e0f126f97348d0416`, 2026-11-03 11:12:39 UTC |
+| [m5mosh-nexus-inventory-api](https://m5mosh-nexus-inventory-api.onrender.com) | Web service | `feature/nexus-code-inventory-sync` | Enabled | Not suspended; health check `/healthz` | `live` on `c6d9674d84dbc46b04ab2d0f2a3cac045ac944f7`, 2026-11-03 03:10:42 UTC |
+| [m5mosh-nexus-telegram-catalog](https://m5mosh-nexus-telegram-catalog.onrender.com) | Web service | `main` | Enabled | Not suspended | `live` on `244b82de577cf9e62407103e0f126f97348d0416`, 2026-11-03 06:16:06 UTC |
+
+### GitHub and review state
+- PR #9 is merged; merge commit is `c6d9674d84dbc46b04ab2d0f2a3cac045ac944f7`.
+- PR #2 remains an open draft targeting `main`.
+- PR #19 (dashboard live-inventory panel) remains an open draft targeting `main`; browser/runtime validation is still required.
+- PR #23 (operator guardrails and ISO-8601 validation) remains open and targets `feature/nexus-code-inventory-sync`; CI run #41597541892 succeeded.
+- PR #24 (Telegram public mode opt-in) remains an open draft targeting `main`; CI run #41625483266 succeeded.
+- PR #25 (Unified Command Center home entry) remains an open draft targeting `main`; no workflow run was returned for its head commit in this inspection.
+- PR #26 adds CORS regression tests and remains an open draft targeting the Render-watched feature branch; CI run #41779214033 succeeded with 18 tests passing.
+
+### Verification boundaries and risks
+- Render `live` is deployment metadata, not end-to-end application health.
+- Live HTTP checks were **NOT_TESTED**: the available web fetch returned cache/access errors and container `curl` could not resolve the Render hosts (HTTP 000). This is an access-environment limitation, not evidence that the services are down.
+- `inventory_api/STATUS.md` on the service branch is dated 2026-10-28 and incorrectly says PR #9 is still open/not merged. PR #23 proposes a corrected version, but it is not merged.
+- `WORKLOG.md` and this audit were previously dated 2026-10-13; this section is the newer evidence snapshot for the three core Nexus services.
+- The API's default SQLite path is under ephemeral `/tmp`; persistence across restarts/deploys is not verified.
+- The presence of `INGEST_TOKEN` was not checked; no secret value was read.
+- The Inventory API branch has Auto-deploy enabled. Merging PR #23 or PR #26 may trigger a production deployment. No merge or deployment was performed in this cycle.
+
+### Next review
+1. Obtain a working HTTP/browser path and verify the three safe GET endpoints.
+2. Validate PR #19's browser integration and CORS behavior without publishing it.
+3. Review persistence options and secret-presence checks separately; do not change production configuration without explicit approval.
+
+---
+
 ## Portfolio overview
 - Render services reviewed: 16
 - Latest deployment state reported as `live`: 14
