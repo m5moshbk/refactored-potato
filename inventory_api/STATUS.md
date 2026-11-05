@@ -126,3 +126,13 @@
 - **VERIFIED — PR #10 duplicate:** older public-mode branch is explicitly marked superseded by PR #24; it remains open and mergeable=false. Do not merge both.
 - **VERIFIED — PR #14:** still open and mergeable=false due to branch divergence; no rebase/merge attempted.
 - No production changes or deployment actions.
+
+
+## Render metadata recheck — 2026-11-05
+
+- **VERIFIED:** `m5mosh-nexus` remains a static site on `main`, Auto-deploy enabled, not suspended; latest returned deployment remains `live` on `244b82de577cf9e62407103e0f126f97348d0416` (2026-11-03).
+- **VERIFIED:** `m5mosh-nexus-inventory-api` remains on `feature/nexus-code-inventory-sync`, Auto-deploy enabled, not suspended; latest returned deployment remains `live` on `c6d9674d84dbc46b04ab2d0f2a3cac045ac944f7` (2026-11-03), health check `/healthz`.
+- **VERIFIED:** `m5mosh-nexus-telegram-catalog` remains on `main`, Auto-deploy enabled, not suspended; latest returned deployment remains `live` on `244b82de577cf9e62407103e0f126f97348d0416` (2026-11-03).
+- **VERIFIED — preview blocker:** Render metadata for the static Nexus dashboard reports `pullRequestPreviewsEnabled=no` and preview generation off. This explains why PR #19/#25 cannot currently be validated using a Render PR Preview. No setting was changed.
+- **NOT_TESTED:** live HTTP response for the three service URLs; metadata inspection is not an endpoint health test.
+- No production changes, deployments, or restarts occurred.
