@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 """
 M5mOsH Nexus Sync — Privacy-Safe Local Preview
-Version: 1.0.0
+Version: 1.1.0
 Pythonista 3 / Python 3.10+
 READ-ONLY PREVIEW: no network transmission.
 
 Reads the existing local inventory JSON and creates a preview payload with
 synthetic file paths. It never sends data to Render or any other endpoint.
+If the default report path is absent, it searches Pythonista Documents and
+allows the user to enter the report path manually.
 """
 
 import os
@@ -18,6 +20,7 @@ REPORT_PATH = os.path.expanduser(
     "~/Documents/M5mOsH_Control/CodeInventory/code_inventory.json"
 )
 MAX_FILES = 5000
+MAX_SEARCH_DIRS = 10000
 ROOT_LABEL = "Pythonista aggregate code inventory (synthetic paths)"
 
 ALLOWED_EXTENSIONS = {
@@ -51,6 +54,62 @@ def get_extension(item):
         return ext if ext.startswith(".") else "." + ext
     path = item.get("path", "")
     return Path(path).suffix.lower() if isinstance(path, str) else ""
+
+
+def find_report_candidates(search_root=None):
+    """Find exact report filenames under Pythonista Documents only."""
+    root = Path(search_root) if search_root else Path.home() / "Documents"
+    if not root.is_dir():
+        return []
+
+    matches = []
+    visited_dirs = 0
+    for current, dirs, files in os.walk(str(root)):
+        visited_dirs += 1
+        if visited_dirs > MAX_SEARCH_DIRS:
+            break
+        dirs[:] = [
+            name for name in dirs
+            if not name.startswith(".")
+            and name not in {"__pycache__", ".git"}
+        ]
+        if "code_inventory.json" in files:
+            matches.append(Path(current) / "code_inventory.json")
+    return sorted(matches, key=lambda item: str(item).lower())
+
+
+def resolve_report_path():
+    default_path = Path(os.path.expanduser(REPORT_PATH))
+    if default_path.is_file():
+        return default_path
+
+    print("\nDefault report path was not found.")
+    print("Searching Pythonista Documents for code_inventory.json ...")
+    candidates = find_report_candidates()
+
+    if len(candidates) == 1:
+        print("Found report:", candidates[0])
+        return candidates[0]
+
+    if len(candidates) > 1:
+        print("\nMultiple reports found:")
+        for index, candidate in enumerate(candidates, 1):
+            print("{}. {}".format(index, candidate))
+        choice = input("Select report number (or press Enter to enter a path): ").strip()
+        if choice.isdigit():
+            selected = int(choice)
+            if 1 <= selected <= len(candidates):
+                return candidates[selected - 1]
+
+    manual = input(
+        "\nPaste the full path to code_inventory.json, or press Enter to cancel: "
+    ).strip().strip('"').strip("'")
+    if not manual:
+        return None
+    candidate = Path(os.path.expanduser(manual))
+    if not candidate.is_file():
+        raise FileNotFoundError("The entered report path does not exist: {}".format(candidate))
+    return candidate
 
 
 def build_privacy_safe_payload(report):
@@ -107,17 +166,16 @@ def build_privacy_safe_payload(report):
     return payload, audit
 
 
-def load_local_report(report_path=REPORT_PATH):
-    path = Path(os.path.expanduser(report_path))
+def load_local_report(report_path):
+    path = Path(report_path)
     if not path.is_file():
         raise FileNotFoundError("Inventory report not found: {}".format(path))
     with path.open("r", encoding="utf-8") as handle:
         return json.load(handle)
 
 
-def save_preview(payload, audit, report_path=REPORT_PATH):
-    folder = Path(os.path.expanduser(report_path)).parent
-    folder.mkdir(parents=True, exist_ok=True)
+def save_preview(payload, audit, report_path):
+    folder = Path(report_path).parent
     stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     output_path = folder / ("nexus_privacy_preview_" + stamp + ".json")
     document = {
@@ -133,7 +191,7 @@ def save_preview(payload, audit, report_path=REPORT_PATH):
 
 
 def main():
-    print("M5mOsH Nexus — Privacy-Safe Preview")
+    print("M5mOsH Nexus — Privacy-Safe Preview v1.1.0")
     print("READ-ONLY / NO NETWORK / NO TOKEN")
     print("1) Build local preview")
     print("2) Exit")
@@ -141,13 +199,18 @@ def main():
         print("Exited; no action taken.")
         return
     try:
-        report = load_local_report()
+        report_path = resolve_report_path()
+        if report_path is None:
+            print("Cancelled; no file was read or created.")
+            return
+        report = load_local_report(report_path)
         payload, audit = build_privacy_safe_payload(report)
-        print("\nSource records:", audit["source_file_count"])
+        print("\nSource report:", report_path)
+        print("Source records:", audit["source_file_count"])
         print("Included code records:", audit["included_code_file_count"])
         print("Skipped records:", audit["skipped_non_code_or_invalid_count"])
         print("Privacy audit:", json.dumps(audit, ensure_ascii=False, indent=2))
-        saved = save_preview(payload, audit)
+        saved = save_preview(payload, audit, report_path)
         print("\nPreview saved:", saved)
         print("No network request was made.")
     except Exception as exc:
