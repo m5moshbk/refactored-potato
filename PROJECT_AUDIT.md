@@ -122,3 +122,10 @@ This audit was compiled from Render service configuration and latest-deployment 
 
 ### Next action
 Confirm the Render workspace containing `m5mosh-nexus`, `m5mosh-nexus-inventory-api`, and `m5mosh-nexus-telegram-catalog`; then perform read-only service/deploy/event inspection. Keep all merges and deployments blocked pending separate approval.
+
+
+## 2026-11-05 — CI after documentation reconciliation
+- **VERIFIED:** `inventory_api/STATUS.md` now correctly identifies PR #9 as merged and records the current PR #26 checkpoint.
+- **VERIFIED:** commit `885d0435905498093ca9068114b3c0932b98ed6f` passed GitHub Actions run [#41981373378](https://github.com/m5moshbk/refactored-potato/actions/runs/41981373378) with 18 tests passing.
+- **VERIFIED:** PR #26 remains open and unmerged; its target is the Render-watched feature branch.
+- **BLOCKED:** Render Nexus service re-check remains blocked because the selected workspace did not contain the three Nexus services; the other workspace requires explicit user selection.
