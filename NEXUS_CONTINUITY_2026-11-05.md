@@ -20,7 +20,7 @@
 - **VERIFIED — PR #24:** مفتوح كمسودة؛ فرعه متقدم 2 commits عن main و0 behind. CI run 41625483266 نجح، وسجل الاختبار يثبت 21 passed in 0.23s. لا توجد مراجعات GitHub أو review threads مسجلة.
 - **VERIFIED — PR #25:** مفتوح كمسودة؛ فرعه متقدم 2 commits عن main و0 behind، وتغييره يقتصر على index.html وunified-command-center/index.html. لم أؤكد نتيجة CI لرأس هذا الفرع في هذه الدورة، ولا توجد مراجعات GitHub أو review threads مسجلة.
 - **VERIFIED — PR #19:** مفتوح كمسودة؛ فرعه متباعد عن main (2 commits ahead و3 behind)، ويتغير فيه index.html وnexus-live-inventory.js. لا توجد مراجعات GitHub أو review threads مسجلة. يلزم تحديث الفرع إلى main قبل إكمال المراجعة، ثم اختبار حالات الواجهة في Preview.
-- **VERIFIED — PR #26 CI الأحدث:** GitHub Actions run 41779438884 مكتمل بنجاح؛ سجل job يثبت 18 passed in 0.23s. التشغيل السابق 41779214033 سجّل 18 passed in 0.24s.
+- **VERIFIED — PR #26 CI:** run 41779438884 نجح مع 18 passed in 0.23s، ثم run 41977383270 على الرأس الحالي f71a437ba27c2ce96b8d2b0d92259909a0604ddb نجح مع 18 passed in 0.20s. التشغيل السابق 41779214033 سجّل 18 passed in 0.24s.
 - **ملاحظة CI:** get_commit_combined_status أعاد statuses فارغة للـ commit المفحوص، لكن workflow run وسجل job يثبتان نجاح الاختبارات. لا أستنتج من statuses الفارغة فشلًا أو نجاحًا.
 
 ## 3. Render — الخدمات الأساسية
