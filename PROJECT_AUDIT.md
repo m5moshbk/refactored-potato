@@ -93,7 +93,7 @@ This audit was compiled from Render service configuration and latest-deployment 
 **Evidence:** GitHub branch/PR comparisons, Actions job logs, and Render service/deploy/event metadata. This update covers only the three core Nexus services; the wider portfolio inventory below remains historical.
 
 - **GitHub:** main latest visible commit is 244b82de577cf9e62407103e0f126f97348d0416. PR #9 is merged at c6d9674d84dbc46b04ab2d0f2a3cac045ac944f7.
-- **CI:** PR #26 run #41779438884 passed 18 tests; PR #23 run #41597541892 passed 23 tests; PR #24 run #41625483266 passed 21 tests. PR #25 and PR #19 CI for the current head was not confirmed in this cycle.
+- **CI:** PR #26 run #41779438884 passed 18 tests, and the updated current head f71a437ba27c2ce96b8d2b0d92259909a0604ddb passed 18 tests in run #41977383270; PR #23 run #41597541892 passed 23 tests; PR #24 run #41625483266 passed 21 tests. PR #25 and PR #19 CI for the current head was not confirmed in this cycle.
 - **Review:** no GitHub review submissions or inline review threads were returned for PRs #19, #23, #24, #25, or #26.
 - **PR #19:** its branch is diverged from main (2 ahead, 3 behind); update before browser/Preview validation.
 - **Render:** all three core services are not suspended and have Auto-deploy enabled. Latest deployments returned as live on 2026-11-03: Nexus 244b82de, Inventory API c6d9674d, Telegram Catalog 244b82de. Inventory API health check is /healthz; the other two have no explicit health-check path.
