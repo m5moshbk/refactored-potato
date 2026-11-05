@@ -402,3 +402,50 @@ def test_forwarded_media_without_caption_requests_manual_review(tmp_path, monkey
     })
     assert len(sent) == 1
     assert "لا يوجد نص أو وصف" in sent[0][1]
+
+
+def test_non_admin_message_never_reaches_ai_when_public_mode_is_unset(tmp_path, monkeypatch):
+    monkeypatch.delenv("NEXUS_PUBLIC_MODE", raising=False)
+    module = load_bot(tmp_path, monkeypatch)
+    sent = []
+    ai_calls = []
+    monkeypatch.setattr(
+        module, "send",
+        lambda chat_id, text, keyboard=None: sent.append((str(chat_id), text))
+    )
+    monkeypatch.setattr(
+        module, "ask_gpt_resilient",
+        lambda *args, **kwargs: ai_calls.append((args, kwargs)) or "unexpected"
+    )
+
+    module.handle_message("99999", "please answer this")
+
+    assert ai_calls == []
+    assert len(sent) == 1
+    assert sent[0][0] == "99999"
+    assert "المشرف فقط" in sent[0][1]
+
+
+def test_public_ai_mode_requires_opt_in_and_enforces_per_chat_limit(tmp_path, monkeypatch):
+    monkeypatch.setenv("NEXUS_PUBLIC_MODE", "1")
+    module = load_bot(tmp_path, monkeypatch)
+    module.init_memory()
+    module.PUBLIC_DAILY_LIMIT = 1
+    sent = []
+    ai_calls = []
+    monkeypatch.setattr(
+        module, "send",
+        lambda chat_id, text, keyboard=None: sent.append((str(chat_id), text))
+    )
+    monkeypatch.setattr(
+        module, "ask_gpt_resilient",
+        lambda text, chat_id=None: ai_calls.append((str(chat_id), text)) or "answer"
+    )
+
+    module.handle_message("99999", "first message")
+    module.handle_message("99999", "second message")
+
+    assert ai_calls == [("99999", "first message")]
+    assert len(sent) == 2
+    assert sent[0][1] == "answer"
+    assert "حد الاستخدام اليومي" in sent[1][1]
