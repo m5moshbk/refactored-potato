@@ -5,7 +5,8 @@
 ## تحديث دورة الاستمرارية — 2026-11-05
 
 - **VERIFIED — PR #9:** مدمج في 2026-11-02؛ commit الدمج `c6d9674d84dbc46b04ab2d0f2a3cac045ac944f7`. الوصف السابق بأنه مفتوح وغير مدمج كان قديماً.
-- **VERIFIED — PR #26:** مفتوح وغير مدمج، ويستهدف `feature/nexus-code-inventory-sync`. الرأس الحالي `35c2857e367583e1b47f28ded6d57a77891d9bd6`. تشغيل CI الجديد [41981331118](https://github.com/m5moshbk/refactored-potato/actions/runs/41981331118) بدأ بعد تحديث التوثيق؛ النتيجة النهائية لم تُؤكد بعد.
+- **VERIFIED — PR #26:** مفتوح وغير مدمج، ويستهدف `feature/nexus-code-inventory-sync`. الرأس الذي تم التحقق منه `885d0435905498093ca9068114b3c0932b98ed6f`. GitHub Actions run [41981373378](https://github.com/m5moshbk/refactored-potato/actions/runs/41981373378) اكتمل بنجاح بعد تحديث التوثيق؛ النتيجة 18 اختبارًا ناجحًا.
+
 - **VERIFIED — PR #23:** مفتوح وغير مدمج، ويستهدف فرع الخدمة نفسه. لا دمج لأي من PR #23 أو #26 دون موافقة منفصلة؛ فرع الخدمة مراقب بواسطة Render Auto-deploy.
 - **BLOCKED — Render re-check:** مساحة Render المحددة للفحص في هذه الدورة لا تعرض خدمات Nexus الثلاث. توجد مساحة أخرى باسم `M5mOsH Team`، ولم تُفحص دون تحديدها صراحة. بيانات Render السابقة تبقى لقطة تاريخية وليست إعادة تحقق اليوم.
 - **NOT_TESTED — HTTP:** لا توجد استجابة HTTP حية جديدة موثقة في هذه الدورة.
