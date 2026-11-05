@@ -93,3 +93,18 @@
 2. تحديث PR #19 من main وفحص Preview، دون نشر.
 3. إعادة CI على الرأس النهائي لفرع PR #26 بعد تحديث التوثيق.
 4. إبقاء PR #23 و#26 دون دمج؛ فرع Inventory API مراقب بواسطة Auto-deploy.
+
+
+## 2026-11-05 — PR #26 CI Final-Head Verification
+
+- **VERIFIED:** PR #26 head commit at the time of this check: `3bb5e6876c52ffa86733e0527e423a5549dc73ed` on `test/nexus-inventory-cors-regressions-20261104`.
+- **VERIFIED:** GitHub Actions workflow `Nexus inventory API tests`, run #37 / run ID `41981807284`, completed with conclusion `success` and was returned for the exact PR head commit above.
+- **VERIFIED:** job `tests` (job ID `127093378818`) completed successfully. The job log records `python -m pytest -q inventory_api/tests` and the result `18 passed in 0.19s`.
+- **CI detail:** the PR-triggered workflow checked out GitHub's synthetic pull-request merge ref (merge commit `e285a2976271a3961f09089b93b9a90a72e45770`); the run is associated by GitHub with the PR head commit above. This is a successful CI result for the PR state at that head, not a production deployment or live HTTP test.
+- **NOT_TESTED:** Render HTTP GET reachability remains unverified because the prior inspection environment could not resolve/access the service URLs. No new HTTP response was obtained in this step.
+- **NOT_CHANGED:** no merge, deploy, restart, Render configuration change, secret access, database access, or production write was performed.
+
+### Updated checkpoint
+1. PR #26 CI on head `3bb5e687` is now **VERIFIED successful** (18 tests passed).
+2. Next technical check remains HTTP GET from a network environment with working DNS and outbound access to Render.
+3. PR #26 remains open and unmerged; the target Inventory API branch is Auto-deploy monitored, so merge still requires separate explicit approval.
