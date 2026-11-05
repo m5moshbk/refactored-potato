@@ -145,3 +145,18 @@
 - **NOT_CHANGED:** لا merge، لا deploy أو restart، لا تغيير إعدادات أو secrets أو environment variables أو domains أو billing أو صلاحيات، لا وصول لبيانات العملاء أو قواعد الإنتاج أو migrations أو backups أو persistent storage، ولا حذف أو إيقاف أو استئناف لأي مورد.
 - **قرار الدورة:** تحديث توثيق الاستمرارية على فرع PR #26 المعزول فقط. لم يظهر في هذه الدورة عيب برمجي محدد يستدعي تغيير كود دون اختبار/بيئة HTTP موثوقة؛ تجنبنا تغييرات تخمينية.
 - **الخطوة التالية الأعلى قيمة:** الحصول على HTTP GET من بيئة فعلية متصلة بـ Render مع status code وزمن الاستجابة، ثم مراجعة PR #19/Preview؛ وبعدها تقييم SQLite وINGEST_TOKEN دون قراءة الأسرار أو تغيير إعداد الإنتاج.
+
+
+## 2026-11-05 — متابعة موسعة بعد طلب عدم إيقاف العمل
+
+- **VERIFIED — PR #24 (Telegram public AI safety):** بقي مفتوحًا كمسودة وغير مدمج على `main`. التغيير الأمني يجعل الوضع العام opt-in افتراضيًا. أُضيف إلى README شرح أن عداد `PUBLIC_USAGE` محفوظ في ذاكرة العملية فقط، ويُصفّر عند restart/redeploy، ولا يمثل سقف تكلفة عالميًا. CI run [#42009848209](https://github.com/m5moshbk/refactored-potato/actions/runs/42009848209) نجح على الرأس `3a477d075d15f78c31626abc551ca1bf4a3ef6e1` وشغّل اختبارات `telegram_bot/test_bot_access.py`. لا يثبت هذا قيمة Render الفعلية.
+- **VERIFIED — PR #27 (rights/privacy docs):** أزيل حقل الاتصال الشخصي من `telegram_bot/STATUS.md`، ووُحّد تذييل Unified Command Center إلى سطر حقوق واحد `© M5mOsH All Rights Reserved`. Commits: `b43edaad1fda021ea43cc7148ceac3d83210db89` و`2c516d4c28019b353f27b0171e3ab2d672be3f1a`. لا workflow CI مهيأ لهذا الفرع؛ فحص نصي فقط، والتحقق البصري غير مختبر. PR مفتوح كمسودة وغير مدمج.
+- **VERIFIED — PR #23:** CI run [#41597541892](https://github.com/m5moshbk/refactored-potato/actions/runs/41597541892) ناجح على الرأس `ff2335377dc9feb392743faa45d60e9e57841a5a`. يستهدف `feature/nexus-code-inventory-sync` المرتبط بـ Render Auto-deploy؛ لا دمج.
+- **VERIFIED — PR #11 (Voice Nexus foundation):** CI run [#41171678912](https://github.com/m5moshbk/refactored-potato/actions/runs/41171678912) ناجح على الرأس `79a30ce6fe03b7b144cd249e2552c943757f9781`. نجح TypeScript check وproduction build، وbackend compile/import/configuration tests وmigration check داخل CI. هذا ليس نشرًا ولا اختبارًا حيًا للخدمة؛ PR واسع وما زال مسودة مفتوحة.
+- **VERIFIED — PR #14:** الفرع متباعد عن `main` (6 commits ahead / 7 behind بحسب آخر مقارنة مسجلة) وGitHub أظهر `mergeable=false`. لا إعادة دمج آلية أو إعادة توجيه دون مراجعة التعارضات.
+- **NOT_TESTED — PR #25:** تعديل واجهة ثابتة صغير لإضافة رابط Unified Command Center؛ لا workflow CI مرتبط بالفرع، والتحقق البصري غير متاح.
+- **BLOCKED / NOT_TESTED — PR #19:** لوحة Nexus Live Inventory تنتظر تحقق Preview وHTTP حيّ لـ `/api/v1/status`؛ لا استجابة حية موثقة.
+- **RISK:** عداد public AI لكل محادثة داخل الذاكرة قابل للتصفير بإعادة تشغيل العملية؛ تم توثيق ذلك في PR #24. لا يُفعّل الوضع العام في الإنتاج بناءً على نجاح CI وحده.
+- **NOT_CHANGED:** لا merge، لا deploy/restart، لا إعدادات Render أو أسرار أو قواعد بيانات إنتاج أو بيانات عملاء أو persistent storage أو موارد.
+- **قرار الاستمرارية:** واصلنا إصلاح/تحديث الوثائق الآمنة على فروع PR #24 و#27، وفحص CI للطلبات المفتوحة الأخرى. تبقى جميع طلبات الدمج والنشر بانتظار المراجعة والصلاحية المنفصلة.
+- **أعلى خطوة تالية:** مراجعة PR #24 و#27 و#26 كطلبات مستقلة، ثم الحصول على اختبار HTTP/Preview من بيئة وصول فعلية؛ لا دمج تلقائي.
