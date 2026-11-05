@@ -31,9 +31,8 @@
 3. Do not enable public mode before setting an appropriate usage/cost policy.
 
 ## بصمة المشروع | Project fingerprint
-- Owner: Ahmed jafari
-- Signature / rights tag: M5mOsH
-- Contact: +99507190799
+- Rights: © M5mOsH All Rights Reserved
+- Rights: © M5mOsH All Rights Reserved
 
 
 ## مرحلة مراقبة القنوات | Channel Intelligence — 2026-11-03
