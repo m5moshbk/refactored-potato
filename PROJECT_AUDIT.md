@@ -108,3 +108,17 @@ This audit was compiled from Render service configuration and latest-deployment 
 2. Update PR #19 from main and validate its UI states in Preview.
 3. Review storage persistence and INGEST_TOKEN presence without exposing the value or changing production configuration.
 4. Keep PRs #23 and #26 unmerged pending separate approval.
+
+
+## 2026-11-05 — Workspace Scope Reconciliation
+
+- **VERIFIED — GitHub:** PR #26 remains open and unmerged, targeting `feature/nexus-code-inventory-sync`; head `9ecdce86b3ee69fad51a5753c3cf36be0c7e6d6e`. Actions run [41977474810](https://github.com/m5moshbk/refactored-potato/actions/runs/41977474810) completed successfully with 18 tests passing.
+- **VERIFIED — PR #23:** open and unmerged; it also targets the Render-watched Inventory API branch.
+- **VERIFIED — PR #19:** open draft targeting `main`; browser/Preview verification remains outstanding.
+- **VERIFIED — documentation:** `inventory_api/STATUS.md` has been corrected on the PR #26 branch to identify PR #9 as merged and record the latest verified CI checkpoint.
+- **BLOCKED — Render scope:** the previously authorized workspace `tea-dblbbk6417fc7382a5v0` did not return the three core Nexus services. A second workspace named `M5mOsH Team` is available, but it was not queried without explicit selection. Earlier Render service/deployment metadata remains a historical snapshot, not a fresh verification for this cycle.
+- **NOT_TESTED:** no fresh live HTTP response or browser Preview result was obtained.
+- **Safety:** no merge, deploy, restart, service/configuration mutation, secret access, database access, or production-data access occurred.
+
+### Next action
+Confirm the Render workspace containing `m5mosh-nexus`, `m5mosh-nexus-inventory-api`, and `m5mosh-nexus-telegram-catalog`; then perform read-only service/deploy/event inspection. Keep all merges and deployments blocked pending separate approval.
