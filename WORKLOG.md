@@ -181,3 +181,15 @@
 - **VERIFIED — preview blocker:** Render metadata for the static Nexus dashboard reports `pullRequestPreviewsEnabled=no` and preview generation off. This explains why PR #19/#25 cannot currently be validated using a Render PR Preview. No setting was changed.
 - **NOT_TESTED:** live HTTP response for the three service URLs; metadata inspection is not an endpoint health test.
 - No production changes, deployments, or restarts occurred.
+
+
+## Cross-project critical infrastructure risk — 2026-11-05 13:30 Asia/Riyadh
+
+- **VERIFIED — Render metadata:** PostgreSQL instance `M5` (`dpg-db4e6gijnfac73b3kf7g-a`) is `available`, plan `free`, and its recorded expiry is `2026-11-08T12:51:14.204289Z` (15:51:14 Asia/Riyadh). At the time of inspection, approximately 3 days, 2 hours, and 21 minutes remained.
+- **VERIFIED — resilience metadata:** `highAvailabilityEnabled=false`; no read replicas are listed; the IP allow-list contains `0.0.0.0/0`.
+- **NEEDS_VERIFICATION:** no evidence in this cycle identifies which application services depend on this database. No database contents, customer data, backups, migrations, or persistent storage were accessed.
+- **VERIFIED — official Render policy:** Free Postgres becomes inaccessible at expiry; a 14-day grace period is available to upgrade before Render deletes the database and its data. Free Postgres does not support managed backups. Reference: https://render.com/docs/free
+- **RISK — CRITICAL / OPEN:** an expiry decision is required before 2026-11-08 15:51:14 Asia/Riyadh. Possible paths require the owner's decision: upgrade the instance or approve a separate data-preservation/migration plan. No option was executed.
+- **NOT_CHANGED:** no upgrade, export, backup, restore, database query, settings change, or service action occurred.
+- **Notification attempt:** attempted parent-thread notification through the available automation action, but the action returned `404 Action not found`; no notification delivery is confirmed.
+- **Next action:** owner to decide the database continuity path before expiry; continue read-only dependency mapping without accessing production data.
