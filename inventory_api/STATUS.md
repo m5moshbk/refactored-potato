@@ -8,8 +8,10 @@
 - **VERIFIED — PR #26:** مفتوح وغير مدمج، ويستهدف `feature/nexus-code-inventory-sync`. الرأس الذي تم التحقق منه `885d0435905498093ca9068114b3c0932b98ed6f`. GitHub Actions run [41981373378](https://github.com/m5moshbk/refactored-potato/actions/runs/41981373378) اكتمل بنجاح بعد تحديث التوثيق؛ النتيجة 18 اختبارًا ناجحًا.
 
 - **VERIFIED — PR #23:** مفتوح وغير مدمج، ويستهدف فرع الخدمة نفسه. لا دمج لأي من PR #23 أو #26 دون موافقة منفصلة؛ فرع الخدمة مراقب بواسطة Render Auto-deploy.
-- **BLOCKED — Render re-check:** مساحة Render المحددة للفحص في هذه الدورة لا تعرض خدمات Nexus الثلاث. توجد مساحة أخرى باسم `M5mOsH Team`، ولم تُفحص دون تحديدها صراحة. بيانات Render السابقة تبقى لقطة تاريخية وليست إعادة تحقق اليوم.
-- **NOT_TESTED — HTTP:** لا توجد استجابة HTTP حية جديدة موثقة في هذه الدورة.
+- **VERIFIED — Render:** أُعيد فحص الخدمات الثلاث في مساحة `M5mOsH Team` المعتمدة؛ بيانات الفروع وAuto-deploy وعدم التعليق وآخر نشر موثقة أدناه.
+
+- **NOT_TESTED — HTTP:** محاولات GET عبر أداة المتصفح للنطاقات والمسارات المحددة أعادت URL inaccessible؛ لم نحصل على status code أو body، ولا يُستنتج تعطل الخدمة.
+
 - **NOT_CHANGED:** لا دمج أو نشر أو إعادة تشغيل أو تعديل إعدادات أو أسرار أو بيانات إنتاج.
 
 
@@ -49,3 +51,22 @@
 
 ## الحقوق | Rights
 © M5mOsH — All rights reserved.
+
+## 2026-11-05 — Render Read-Only Verification (M5mOsH Team)
+
+**Workspace:** `M5mOsH Team` / `tea-dalrf0mk1f9s7397qp00`. The user explicitly approved this workspace for read-only inspection.
+
+| Service | Render service ID | Branch | Auto-deploy | Suspension | Latest deployment metadata |
+|---|---|---|---|---|---|
+| `m5mosh-nexus` | `srv-db6mnhm7bikc73aj3pb0` | `main` | enabled / commit | not suspended | `live`, commit `244b82de577cf9e62407103e0f126f97348d0416`, completed 2026-11-03 11:12:39 UTC |
+| `m5mosh-nexus-inventory-api` | `srv-db7ejh5g1s2s73a85otg` | `feature/nexus-code-inventory-sync` | enabled / commit | not suspended | `live`, commit `c6d9674d84dbc46b04ab2d0f2a3cac045ac944f7`, completed 2026-11-03 03:10:42 UTC |
+| `m5mosh-nexus-telegram-catalog` | `srv-db7eap0473hc73d2rovg` | `main` | enabled / commit | not suspended | `live`, commit `244b82de577cf9e62407103e0f126f97348d0416`, completed 2026-11-03 06:16:06 UTC |
+
+- **VERIFIED:** all three service records belong to the approved workspace and repository `m5moshbk/refactored-potato`.
+- **VERIFIED:** latest returned deploy records for all three services are `live`; their matching deploy details report successful completion. The latest returned build/deploy events are successful and dated 2026-11-03. No failure event appeared in the returned event pages. This does not establish there were no events outside the returned pages.
+- **VERIFIED:** Inventory API alone has configured health check `/healthz`; the static Nexus dashboard and Telegram Catalog have no Render health-check path configured.
+- **VERIFIED:** all three services have IP allow-list entry `0.0.0.0/0`; the network allow-list is therefore not restrictive. No configuration was changed.
+- **NOT_TESTED — HTTP:** read-only browser GET attempts to the three service roots and Inventory API `/healthz` and `/api/v1/status` returned URL inaccessible in this inspection environment. No HTTP status code or response body was obtained. Do not classify services as down from this result.
+- **NOT_CHANGED:** no deploy was triggered; no service was restarted; no settings, environment variables, secrets, domains, billing, permissions, databases, persistent storage, or customer data were read or changed.
+- **Next:** obtain HTTP reachability from an authorized network/browser environment; then validate PR #19 Preview states. Keep PR #23/#26 unmerged because their target is the Auto-deploy branch.
+
