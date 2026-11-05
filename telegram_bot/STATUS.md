@@ -32,8 +32,7 @@
 
 ## بصمة المشروع | Project fingerprint
 - Rights: © M5mOsH All Rights Reserved
-- Signature / rights tag: M5mOsH
-- Contact: +99507190799
+- Rights: © M5mOsH All Rights Reserved
 
 
 ## مرحلة مراقبة القنوات | Channel Intelligence — 2026-11-03
