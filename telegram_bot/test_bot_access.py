@@ -423,7 +423,7 @@ def test_non_admin_message_never_reaches_ai_when_public_mode_is_unset(tmp_path, 
     assert ai_calls == []
     assert len(sent) == 1
     assert sent[0][0] == "99999"
-    assert "المشرف فقط" in sent[0][1]
+    assert "للمشرف فقط" in sent[0][1]
 
 
 def test_public_ai_mode_requires_opt_in_and_enforces_per_chat_limit(tmp_path, monkeypatch):
