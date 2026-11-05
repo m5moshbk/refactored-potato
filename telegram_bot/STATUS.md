@@ -31,7 +31,7 @@
 3. Do not enable public mode before setting an appropriate usage/cost policy.
 
 ## بصمة المشروع | Project fingerprint
-- Owner: Ahmed jafari
+- Rights: © M5mOsH All Rights Reserved
 - Signature / rights tag: M5mOsH
 - Contact: +99507190799
 
