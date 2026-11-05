@@ -201,3 +201,12 @@ Confirm the Render workspace containing `m5mosh-nexus`, `m5mosh-nexus-inventory-
 - **PR state:** PRs #24 و#26 و#27 و#23 و#11 و#19 و#25 و#14 ما زالت مفتوحة/مسودات حسب آخر قراءة، ولم يُدمج أي منها.
 - **حدود التنفيذ:** لم يحدث merge أو deploy/restart أو تغيير Render settings/secrets/env vars أو وصول إلى بيانات العملاء/قواعد الإنتاج/التخزين الدائم.
 - **الخطوة التالية:** انتظار المراجعة البشرية ووسيلة HTTP/Preview فعلية. لا توجد صلاحية لدمج PRs أو نشرها ضمن هذا التفويض.
+
+
+## Static integration review — 2026-11-05
+
+- **VERIFIED — PR #19 contract:** dashboard JS reads only `GET /api/v1/status`; source fields it consumes match the API response shape. API CORS allow-list matches the dashboard origin exactly. API-provided values are inserted as text, not HTML. Live HTTP and Preview remain NOT_TESTED.
+- **VERIFIED — PR #25 route source:** the new home link points to `/unified-command-center/`, and `unified-command-center/index.html` exists on that branch. Static-host directory-index routing remains NOT_TESTED; no CI is configured for PR #25.
+- **VERIFIED — PR #10 duplicate:** older public-mode branch is explicitly marked superseded by PR #24; it remains open and mergeable=false. Do not merge both.
+- **VERIFIED — PR #14:** still open and mergeable=false due to branch divergence; no rebase/merge attempted.
+- No production changes or deployment actions.
