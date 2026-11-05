@@ -108,3 +108,20 @@
 1. PR #26 CI on head `3bb5e687` is now **VERIFIED successful** (18 tests passed).
 2. Next technical check remains HTTP GET from a network environment with working DNS and outbound access to Render.
 3. PR #26 remains open and unmerged; the target Inventory API branch is Auto-deploy monitored, so merge still requires separate explicit approval.
+
+
+## 2026-11-05 — Render HTTP Reachability Follow-up (Read-Only)
+
+**Inspection window:** 2026-11-05 06:11:42–06:41:42 UTC (30 minutes). **Workspace:** M5mOsH Team.
+
+- **NOT_TESTED — direct probe:** attempted to open the following HTTPS GET URLs through the available web retrieval path: dashboard root, Inventory API `/healthz`, Inventory API `/api/v1/status`, and Telegram Catalog root. Each returned `URL is not accessible via this tool`; no HTTP status, response headers, or body were obtained. The connected-browser tab API also could not be used because this session has no originating browser context.
+- **VERIFIED — Render aggregate telemetry query:** queried `http_request_count` and `http_latency` for the three service IDs, filtered to each public host and its root path (Inventory API `/healthz`), across the 30-minute window. All returned empty time-series data arrays.
+- **VERIFIED — Render request-log query:** queried GET request logs for each of the three service IDs over the same 30-minute window. All three returned zero matching records.
+- **Interpretation:** the Render telemetry/log queries provide no evidence of inbound GET requests in that interval; empty metrics/log results do not prove the services are down, nor do they establish DNS resolution or an HTTP response. No active request could be issued from the available execution environment.
+- **BLOCKED:** end-to-end HTTP status/latency validation remains blocked by lack of a network-capable request client in this session. Required evidence is a GET performed from a network environment with outbound DNS/HTTPS access to `onrender.com`, capturing status code, elapsed time, and a limited non-sensitive response summary.
+- **NOT_CHANGED:** no deploy, restart, service configuration change, environment-variable/secret access, database access, customer-data access, or production write occurred.
+
+### Updated reachability checkpoint
+1. Direct GET checks: **NOT_TESTED / inaccessible from current tool environment**.
+2. Render HTTP metrics and GET request logs: **no data / no matching records in the sampled 30-minute window**.
+3. Do not classify any of the three services as healthy or down from these results. Continue with a true external GET probe when a network-capable execution context is available.
