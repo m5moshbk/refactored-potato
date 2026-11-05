@@ -188,3 +188,16 @@ Confirm the Render workspace containing `m5mosh-nexus`, `m5mosh-nexus-inventory-
 
 
 - **تصحيح توثيقي PR #27:** التغيير النهائي لتذييل الحقوق موجود في `unified-command-center/index.html` على commit `e9b78875425e11cf288098b399e806b9e2e263c5`؛ أُعيدت قراءة الملف وتأكد وجود سطر حقوق موحد واحد. كما أُعيدت قراءة `telegram_bot/STATUS.md` وتأكد عدم وجود حقلي `Owner:` أو `Contact:`. PR #27 ما زال مفتوحاً وغير مدمج، ولا يوجد تحقق بصري للواجهة.
+
+
+## إغلاق متابعة التنفيذ الحالية — 2026-11-05
+
+- **VERIFIED — PR #24:** commit `dc92277ace27a7f8317196154e74181f0ce51235`؛ CI run [#42010419052](https://github.com/m5moshbk/refactored-potato/actions/runs/42010419052) ناجح، **23 passed in 0.36s**. أضافت الاختبارات تحققاً سلوكياً أن المستخدم غير الإداري لا يصل إلى مزود AI عند غياب opt-in، وأن الحد لكل محادثة يُفرض عند التفعيل. التشغيل السابق فشل بسبب مطابقة نص عربية في assertion فقط؛ صُحح الاختبار وأعيد CI بنجاح.
+- **VERIFIED — PR #26 final head:** `5b497d6f5d10bb144f692689dd86f394556bd5fd`؛ CI run [#42010287224](https://github.com/m5moshbk/refactored-potato/actions/runs/42010287224) ناجح، **18 passed in 0.24s**. التغييرات في هذا الفرع توثيقية واختبارات CORS السابقة، ولا تغيير في منطق التطبيق.
+- **VERIFIED — PR #27 final head:** `e9b78875425e11cf288098b399e806b9e2e263c5`؛ تمت إعادة قراءة الملفين وتأكيد إزالة حقلي `Owner:` و`Contact:` من `telegram_bot/STATUS.md`، ووجود سطر حقوق واحد في تذييل `unified-command-center/index.html`. لا CI ولا تحقق بصري.
+- **VERIFIED — PR #23:** CI run #41597541892 ناجح على `ff2335377dc9feb392743faa45d60e9e57841a5a`، **23 passed in 0.24s**؛ لا دمج بسبب هدف Auto-deploy.
+- **VERIFIED — PR #11:** CI run #41171678912 ناجح على `79a30ce6fe03b7b144cd249e2552c943757f9781`؛ Frontend typecheck/build وBackend compile/import/configuration/migration checks نجحت في CI. لم يتم اختبار نشر حي.
+- **BLOCKED / NOT_TESTED:** PR #19 يحتاج HTTP/Preview فعلي؛ PR #25 لا يملك CI مهيأ ولا تحقق بصري. PR #14 متباعد عن main وmergeable=false.
+- **PR state:** PRs #24 و#26 و#27 و#23 و#11 و#19 و#25 و#14 ما زالت مفتوحة/مسودات حسب آخر قراءة، ولم يُدمج أي منها.
+- **حدود التنفيذ:** لم يحدث merge أو deploy/restart أو تغيير Render settings/secrets/env vars أو وصول إلى بيانات العملاء/قواعد الإنتاج/التخزين الدائم.
+- **الخطوة التالية:** انتظار المراجعة البشرية ووسيلة HTTP/Preview فعلية. لا توجد صلاحية لدمج PRs أو نشرها ضمن هذا التفويض.
