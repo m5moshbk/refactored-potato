@@ -50,6 +50,18 @@ def init_db():
 def utc_now():
     return datetime.now(timezone.utc).isoformat(timespec="seconds")
 
+def is_valid_iso_datetime(value):
+    """Accept ISO-8601 date-time strings, including a trailing Z or UTC offset."""
+    if not isinstance(value, str) or len(value) > 64:
+        return False
+    if "T" not in value and " " not in value:
+        return False
+    try:
+        datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return False
+    return True
+
 def cors(response):
     origin = request.headers.get("Origin", "")
     if origin == ALLOWED_ORIGIN:
@@ -167,7 +179,7 @@ def receive_inventory():
             return jsonify({"error": "extension_not_allowed"}), 400
         if not isinstance(size, int) or isinstance(size, bool) or size < 0 or size > 2**63 - 1:
             return jsonify({"error": "invalid_size"}), 400
-        if not isinstance(modified, str) or len(modified) > 64:
+        if not is_valid_iso_datetime(modified):
             return jsonify({"error": "invalid_modified_time"}), 400
         extension_counts[ext.lower()] += 1
 
@@ -186,7 +198,7 @@ def receive_inventory():
         return jsonify({"error": "invalid_event_count"}), 400
 
     checked_at = data.get("checked_at")
-    if not isinstance(checked_at, str) or len(checked_at) > 64:
+    if not is_valid_iso_datetime(checked_at):
         return jsonify({"error": "invalid_checked_at"}), 400
 
     root_label = data.get("root_label", "Pythonista accessible code folders")

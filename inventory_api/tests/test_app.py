@@ -142,3 +142,64 @@ def test_ingest_rejects_invalid_metadata_schema(tmp_path, monkeypatch):
     response = ingest(module.app.test_client(), payload(files=[item]))
     assert response.status_code == 400
     assert response.get_json()["error"] == "invalid_file_metadata_schema"
+
+
+@pytest.mark.parametrize(
+    "bad_timestamp",
+    [
+        "not-a-timestamp",
+        "2026-99-99T00:00:00Z",
+        "2026-10-28",
+    ],
+)
+def test_ingest_rejects_invalid_checked_at(tmp_path, monkeypatch, bad_timestamp):
+    module = load_app(tmp_path, monkeypatch)
+    response = ingest(
+        module.app.test_client(),
+        payload(checked_at=bad_timestamp),
+    )
+    assert response.status_code == 400
+    assert response.get_json()["error"] == "invalid_checked_at"
+
+
+@pytest.mark.parametrize(
+    "bad_timestamp",
+    [
+        "not-a-timestamp",
+        "2026-99-99T00:00:00Z",
+        "2026-10-28",
+    ],
+)
+def test_ingest_rejects_invalid_file_modified_time(
+    tmp_path, monkeypatch, bad_timestamp
+):
+    module = load_app(tmp_path, monkeypatch)
+    item = metadata()
+    item["modified"] = bad_timestamp
+    response = ingest(
+        module.app.test_client(),
+        payload(files=[item]),
+    )
+    assert response.status_code == 400
+    assert response.get_json()["error"] == "invalid_modified_time"
+
+
+@pytest.mark.parametrize(
+    "valid_timestamp",
+    [
+        "2026-10-28T00:00:00Z",
+        "2026-10-28T03:00:00+03:00",
+        "2026-10-28T00:00:00",
+    ],
+)
+def test_ingest_accepts_iso8601_timestamps(
+    tmp_path, monkeypatch, valid_timestamp
+):
+    module = load_app(tmp_path, monkeypatch)
+    item = metadata()
+    item["modified"] = valid_timestamp
+    response = ingest(
+        module.app.test_client(),
+        payload(checked_at=valid_timestamp, files=[item]),
+    )
+    assert response.status_code == 202
