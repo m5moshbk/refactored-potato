@@ -76,7 +76,7 @@ INSERT INTO evaluations
     (id, tenant_id, technology_id, version_id, evaluation_type, test_status, critical_findings_count, tested_at)
 VALUES
 ('d5000000-0000-4000-8000-000000000001', 'd0000000-0000-4000-8000-000000000001', 'd1000000-0000-4000-8000-000000000001', 'd2000000-0000-4000-8000-000000000001', 'phase-d', 'passed', 0, NOW()),
-('d5000000-0000-4000-8000-000000000002', 'd00000000-0000-4000-8000-000000000002', 'd1000000-0000-4000-8000-000000000002', 'd2000000-0000-4000-8000-000000000002', 'phase-d', 'passed', 0, NOW());
+('d5000000-0000-4000-8000-000000000002', 'd0000000-0000-4000-8000-000000000002', 'd1000000-0000-4000-8000-000000000002', 'd2000000-0000-4000-8000-000000000002', 'phase-d', 'passed', 0, NOW());
 
 INSERT INTO decisions (id, tenant_id, technology_id, decision, rationale)
 VALUES
@@ -100,15 +100,40 @@ VALUES
 ('d8000000-0000-4000-8000-000000000002', 'd0000000-0000-4000-8000-000000000002', 'd1000000-0000-4000-8000-000000000002', 'phase_d', 'phase_d_test');
 
 -- Create one valid approval snapshot per tenant through the real lifecycle gate.
+SELECT set_config('app.tenant_id', 'd0000000-0000-4000-8000-000000000001', true);
 UPDATE technologies SET lifecycle_status = 'verified'
-WHERE id IN ('d1000000-0000-4000-8000-000000000001', 'd1000000-0000-4000-8000-000000000002');
+WHERE id = 'd1000000-0000-4000-8000-000000000001';
 UPDATE technologies SET lifecycle_status = 'evaluated'
-WHERE id IN ('d1000000-0000-4000-8000-000000000001', 'd1000000-0000-4000-8000-000000000002');
+WHERE id = 'd1000000-0000-4000-8000-000000000001';
 UPDATE technologies SET lifecycle_status = 'approved'
-WHERE id IN ('d1000000-0000-4000-8000-000000000001', 'd1000000-0000-4000-8000-000000000002');
+WHERE id = 'd1000000-0000-4000-8000-000000000001';
+
+SELECT set_config('app.tenant_id', 'd0000000-0000-4000-8000-000000000002', true);
+UPDATE technologies SET lifecycle_status = 'verified'
+WHERE id = 'd1000000-0000-4000-8000-000000000002';
+UPDATE technologies SET lifecycle_status = 'evaluated'
+WHERE id = 'd1000000-0000-4000-8000-000000000002';
+UPDATE technologies SET lifecycle_status = 'approved'
+WHERE id = 'd1000000-0000-4000-8000-000000000002';
+
+SELECT pg_temp.assert_true(
+    (SELECT count(*) = 11
+     FROM pg_class c
+     JOIN pg_namespace n ON n.oid = c.relnamespace
+     WHERE n.nspname = current_schema()
+       AND c.relkind = 'r'
+       AND c.relrowsecurity AND c.relforcerowsecurity
+       AND c.relname IN (
+           'tenants', 'technologies', 'technology_versions', 'capabilities',
+           'sources', 'evaluations', 'capability_evidence', 'integrations',
+           'decisions', 'audit_events', 'approval_evidence_snapshots'
+       )),
+    'all eleven registry tables enable and force row-level security'
+);
 
 -- Non-owner, NOBYPASSRLS role: no tenant context means no visible rows.
 SET LOCAL ROLE registry_tenant_test;
+SELECT set_config('app.tenant_id', '', true);
 SELECT pg_temp.assert_true(
     (SELECT count(*) = 0 FROM technologies),
     'missing tenant context returns no technology rows'
