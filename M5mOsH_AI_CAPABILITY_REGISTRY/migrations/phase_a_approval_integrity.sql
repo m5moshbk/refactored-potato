@@ -199,17 +199,52 @@ CREATE TRIGGER trg_immutable_approved_decision_evidence
 BEFORE UPDATE OR DELETE ON decisions
 FOR EACH ROW EXECUTE FUNCTION prevent_approved_evidence_mutation();
 
+-- Snapshot rows may only be created by the lifecycle approval trigger.
+CREATE OR REPLACE FUNCTION enforce_approval_snapshot_insert_origin()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $
+DECLARE
+    current_lifecycle_status TEXT;
+BEGIN
+    IF pg_trigger_depth() < 2 THEN
+        RAISE EXCEPTION
+            'approval snapshots may only be created by the approval lifecycle transition';
+    END IF;
+
+    SELECT lifecycle_status
+    INTO current_lifecycle_status
+    FROM technologies
+    WHERE id = NEW.technology_id;
+
+    IF current_lifecycle_status IS DISTINCT FROM 'evaluated' THEN
+        RAISE EXCEPTION
+            'approval snapshot creation requires the technology to be transitioning from evaluated';
+    END IF;
+
+    RETURN NEW;
+END;
+$;
+
+CREATE TRIGGER trg_approval_snapshot_insert_origin
+BEFORE INSERT ON approval_evidence_snapshots
+FOR EACH ROW EXECUTE FUNCTION enforce_approval_snapshot_insert_origin();
+
 CREATE OR REPLACE FUNCTION prevent_approval_snapshot_mutation()
 RETURNS TRIGGER
 LANGUAGE plpgsql
-AS $$
+AS $
 BEGIN
     RAISE EXCEPTION 'approval_evidence_snapshots is append-only';
 END;
-$$;
+$;
 
 CREATE TRIGGER trg_approval_snapshot_no_update_delete
 BEFORE UPDATE OR DELETE ON approval_evidence_snapshots
 FOR EACH ROW EXECUTE FUNCTION prevent_approval_snapshot_mutation();
+
+CREATE TRIGGER trg_approval_snapshot_no_truncate
+BEFORE TRUNCATE ON approval_evidence_snapshots
+FOR EACH STATEMENT EXECUTE FUNCTION prevent_approval_snapshot_mutation();
 
 COMMIT;
