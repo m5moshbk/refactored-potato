@@ -31,8 +31,16 @@ jobs:
           cache: pip
           cache-dependency-path: sada-voice/backend/requirements.txt
 
-      - name: Install backend dependencies
-        run: python -m pip install --upgrade pip && pip install -r sada-voice/backend/requirements.txt
+      - name: Install backend and test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r sada-voice/backend/requirements.txt
+          pip install "jsonschema>=4.23,<5"
 
-      - name: Run integration contract tests
-        run: python -m unittest discover -s tests -p "test_integration_contract_examples.py" -v
+      - name: Run root integration contract tests
+        run: python -m unittest discover -s tests -p "test_*integration_contract*.py" -v
+
+      - name: Run Voice Nexus health contract tests
+        env:
+          PYTHONPATH: sada-voice/backend
+        run: python -m unittest discover -s sada-voice/backend/tests -p "test_integration_contract.py" -v
