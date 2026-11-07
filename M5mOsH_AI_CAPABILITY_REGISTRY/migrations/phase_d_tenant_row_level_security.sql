@@ -64,6 +64,12 @@ ALTER TABLE audit_events
 ALTER TABLE approval_evidence_snapshots
     ADD COLUMN tenant_id UUID NOT NULL
         REFERENCES tenants(id) ON DELETE RESTRICT;
+-- The Phase A approval trigger omits tenant_id from its INSERT column list.
+-- Derive it from the trusted transaction-local tenant context; NULL context
+-- fails the NOT NULL constraint and a mismatched context fails the composite FK.
+ALTER TABLE approval_evidence_snapshots
+    ALTER COLUMN tenant_id SET DEFAULT
+    NULLIF(current_setting('app.tenant_id', true), '')::uuid;
 
 -- Parent key used by composite tenant/technology foreign keys.
 ALTER TABLE technologies
