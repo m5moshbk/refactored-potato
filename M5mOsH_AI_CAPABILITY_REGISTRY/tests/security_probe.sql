@@ -7,6 +7,11 @@
 
 BEGIN;
 
+INSERT INTO tenants (id, tenant_key, display_name)
+VALUES ('90000000-0000-4000-8000-000000000001',
+        'security-probe', 'Disposable Security Probe Tenant');
+SELECT set_config('app.tenant_id', '90000000-0000-4000-8000-000000000001', true);
+
 CREATE TEMP TABLE probe_findings (
     severity TEXT NOT NULL,
     probe TEXT NOT NULL,
@@ -27,41 +32,41 @@ AS $fn$
 $fn$;
 
 -- Fixtures: Alpha has a complete evidence chain and is approved.
-INSERT INTO technologies (id, canonical_key, name, category)
+INSERT INTO technologies (id, tenant_id, canonical_key, name, category)
 VALUES
-('91000000-0000-4000-8000-000000000001',
+('91000000-0000-4000-8000-000000000001', '90000000-0000-4000-8000-000000000001',
  'probe.security.alpha', 'Security Probe Alpha', 'probe'),
-('91000000-0000-4000-8000-000000000002',
+('91000000-0000-4000-8000-000000000002', '90000000-0000-4000-8000-000000000001',
  'probe.security.beta', 'Security Probe Beta', 'probe');
 
 INSERT INTO technology_versions
-    (id, technology_id, version_name, support_status, verified_at)
+    (id, tenant_id, technology_id, version_name, support_status, verified_at)
 VALUES
-('92000000-0000-4000-8000-000000000001',
+('92000000-0000-4000-8000-000000000001', '90000000-0000-4000-8000-000000000001',
  '91000000-0000-4000-8000-000000000001', '1.0', 'active', NOW());
 
 INSERT INTO sources
-    (id, technology_id, version_id, source_type, source_url,
+    (id, tenant_id, technology_id, version_id, source_type, source_url,
      verification_status, checked_at)
 VALUES
-('93000000-0000-4000-8000-000000000001',
+('93000000-0000-4000-8000-000000000001', '90000000-0000-4000-8000-000000000001',
  '91000000-0000-4000-8000-000000000001',
  '92000000-0000-4000-8000-000000000001',
  'official_documentation', 'https://example.invalid/probe/alpha',
  'verified', NOW());
 
 INSERT INTO evaluations
-    (id, technology_id, version_id, evaluation_type, test_status,
+    (id, tenant_id, technology_id, version_id, evaluation_type, test_status,
      critical_findings_count, tested_at)
 VALUES
-('94000000-0000-4000-8000-000000000001',
+('94000000-0000-4000-8000-000000000001', '90000000-0000-4000-8000-000000000001',
  '91000000-0000-4000-8000-000000000001',
  '92000000-0000-4000-8000-000000000001',
  'security-probe', 'passed', 0, NOW());
 
-INSERT INTO decisions (id, technology_id, decision, rationale)
+INSERT INTO decisions (id, tenant_id, technology_id, decision, rationale)
 VALUES
-('95000000-0000-4000-8000-000000000001',
+('95000000-0000-4000-8000-000000000001', '90000000-0000-4000-8000-000000000001',
  '91000000-0000-4000-8000-000000000001',
  'approve', 'Disposable security probe fixture');
 
@@ -204,9 +209,9 @@ END;
 $probe$;
 
 -- Probe 6: does the audit trigger also protect against TRUNCATE?
-INSERT INTO audit_events (id, technology_id, event_type, actor)
+INSERT INTO audit_events (id, tenant_id, technology_id, event_type, actor)
 VALUES
-('96000000-0000-4000-8000-000000000001',
+('96000000-0000-4000-8000-000000000001', '90000000-0000-4000-8000-000000000001',
  '91000000-0000-4000-8000-000000000001',
  'security_probe', 'security_probe');
 
@@ -228,9 +233,9 @@ END;
 $probe$;
 
 -- Probe 7: can an integration reach integrated while its technology is not approved?
-INSERT INTO integrations (id, technology_id, target_project)
+INSERT INTO integrations (id, tenant_id, technology_id, target_project)
 VALUES
-('97000000-0000-4000-8000-000000000001',
+('97000000-0000-4000-8000-000000000001', '90000000-0000-4000-8000-000000000001',
  '91000000-0000-4000-8000-000000000002',
  'security-probe-project');
 
@@ -263,7 +268,11 @@ DECLARE
     protected_count INTEGER;
     registry_count INTEGER;
 BEGIN
-    SELECT count(*) FILTER (WHERE c.relrowsecurity),
+    SELECT count(*) FILTER (
+               WHERE c.relrowsecurity
+                 AND c.relforcerowsecurity
+                 AND EXISTS (SELECT 1 FROM pg_policy p WHERE p.polrelid = c.oid)
+           ),
            count(*)
     INTO protected_count, registry_count
     FROM pg_class c
@@ -271,9 +280,9 @@ BEGIN
     WHERE n.nspname = current_schema()
       AND c.relkind = 'r'
       AND c.relname IN (
-          'technologies', 'technology_versions', 'capabilities',
-          'sources', 'evaluations', 'capability_evidence',
-          'integrations', 'decisions', 'audit_events'
+          'tenants', 'technologies', 'technology_versions', 'capabilities',
+          'sources', 'evaluations', 'capability_evidence', 'integrations',
+          'decisions', 'audit_events', 'approval_evidence_snapshots'
       );
 
     IF registry_count > 0 AND protected_count = 0 THEN
@@ -289,7 +298,7 @@ BEGIN
     ELSE
         PERFORM pg_temp.record_probe(
             'INFO', 'tenant-row-level-security', 'PRESENT',
-            format('RLS is enabled on all %s registry tables; policies still require separate validation.', registry_count)
+            format('RLS is enabled, forced, and policy-backed on all %s registry tables.', registry_count)
         );
     END IF;
 END;
