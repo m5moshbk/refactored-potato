@@ -82,16 +82,16 @@ Additional requirements:
 
 ## 5. Audit event integrity
 
-The schema installs a trigger that rejects UPDATE and DELETE operations on `audit_events`. This is an application-level database guardrail, not cryptographic immutability.
+The base schema installs a row-level trigger that rejects UPDATE and DELETE operations on `audit_events`; Phase B adds a statement-level trigger that rejects TRUNCATE. These are database guardrails, not cryptographic immutability.
 
 Important limitations:
 - A database superuser, table owner, or sufficiently privileged administrator may disable triggers or alter the table.
-- The trigger does not prove that an event is truthful or complete.
-- The trigger does not automatically create audit events for changes to other tables.
+- The triggers do not prove that an event is truthful or complete.
+- The triggers do not automatically create audit events for changes to other tables.
 
 Required operational controls:
 1. Application code writes the business change and its audit event in the same database transaction.
-2. The application database role receives INSERT and SELECT on `audit_events`, but not UPDATE, DELETE, TRUNCATE, or ownership.
+2. The application database role receives INSERT and SELECT on `audit_events`, but not UPDATE, DELETE, TRUNCATE, or ownership. The trigger is defense in depth; privilege revocation remains mandatory.
 3. Audit exports or backups are stored under separately controlled retention and access policies.
 4. Administrative changes to schema, triggers, roles, and audit retention are logged outside the application database where feasible.
 5. Audit event payloads must exclude secrets and unnecessary personal data.
@@ -154,7 +154,7 @@ No production deployment, database migration, account change, secret creation, o
 - [ ] Test valid and invalid lifecycle transitions.
 - [ ] Test approval gate with missing source, version, evaluation, or decision.
 - [ ] Test cross-technology composite foreign-key rejection.
-- [ ] Test audit UPDATE and DELETE rejection using the application role.
+- [ ] Test audit UPDATE, DELETE, and TRUNCATE rejection using the application role.
 - [ ] Verify application role cannot disable triggers or alter schema.
 - [ ] Verify no role can read secrets because none are stored here.
 - [ ] Test transaction rollback when audit insertion fails.
@@ -164,7 +164,7 @@ No production deployment, database migration, account change, secret creation, o
 
 ## 10. Known limitations and follow-up design work
 
-- The append-only trigger is not tamper-proof against privileged database administrators.
+- The append-only UPDATE/DELETE/TRUNCATE triggers are not tamper-proof against privileged database administrators, who may disable triggers or alter the table.
 - Audit events are not automatically generated for all table changes; application transaction discipline or separately reviewed audit triggers are required.
 - The lifecycle and approval triggers do not replace human review or an external approval workflow.
 - The schema does not yet implement tenant isolation, soft-delete policy, data-retention automation, signed evidence, or cryptographic audit chaining.
