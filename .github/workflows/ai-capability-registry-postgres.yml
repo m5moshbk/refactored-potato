@@ -97,6 +97,29 @@ jobs:
           test "$remaining" = "0"
           echo "PASS: Phase B audit fixtures were rolled back"
 
+      - name: Apply Phase C integration approval coupling migration
+        run: |
+          psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 \
+            -f M5mOsH_AI_CAPABILITY_REGISTRY/migrations/phase_c_integration_approval_coupling.sql
+
+      - name: Run Phase C integration approval coupling regression tests
+        run: |
+          psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 \
+            -f M5mOsH_AI_CAPABILITY_REGISTRY/tests/phase_c_integration_approval_coupling.sql
+
+      - name: Verify Phase C fixtures were rolled back
+        run: |
+          technologies="$(psql "$TEST_DATABASE_URL" -X -A -t -v ON_ERROR_STOP=1 \
+            -c "SELECT count(*) FROM technologies;")"
+          integrations="$(psql "$TEST_DATABASE_URL" -X -A -t -v ON_ERROR_STOP=1 \
+            -c "SELECT count(*) FROM integrations;")"
+          snapshots="$(psql "$TEST_DATABASE_URL" -X -A -t -v ON_ERROR_STOP=1 \
+            -c "SELECT count(*) FROM approval_evidence_snapshots;")"
+          test "$technologies" = "0"
+          test "$integrations" = "0"
+          test "$snapshots" = "0"
+          echo "PASS: Phase C fixtures and approval snapshots were rolled back"
+
       - name: Run security discovery probes
         run: |
           psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 \
