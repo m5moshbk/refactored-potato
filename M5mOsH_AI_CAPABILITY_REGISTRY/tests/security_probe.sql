@@ -149,24 +149,55 @@ BEGIN
 END;
 $probe$;
 
--- Probe 5: does the technology remain approved after its evidence chain is invalidated?
+-- Probe 5: confirm that the approved lifecycle is backed by the unchanged snapshot chain.
 DO $probe$
 DECLARE
     still_approved BOOLEAN;
+    snapshot_present BOOLEAN;
+    source_verified BOOLEAN;
+    evaluation_passed BOOLEAN;
+    version_active BOOLEAN;
+    approval_decision_present BOOLEAN;
 BEGIN
     SELECT lifecycle_status = 'approved' INTO still_approved
     FROM technologies
     WHERE id = '91000000-0000-4000-8000-000000000001';
 
-    IF still_approved THEN
+    SELECT EXISTS (
+        SELECT 1 FROM approval_evidence_snapshots
+        WHERE technology_id = '91000000-0000-4000-8000-000000000001'
+          AND version_id = '92000000-0000-4000-8000-000000000001'
+          AND source_id = '93000000-0000-4000-8000-000000000001'
+          AND evaluation_id = '94000000-0000-4000-8000-000000000001'
+          AND decision_id = '95000000-0000-4000-8000-000000000001'
+    ) INTO snapshot_present;
+
+    SELECT verification_status = 'verified' INTO source_verified
+    FROM sources WHERE id = '93000000-0000-4000-8000-000000000001';
+
+    SELECT test_status = 'passed' AND critical_findings_count = 0
+    INTO evaluation_passed
+    FROM evaluations WHERE id = '94000000-0000-4000-8000-000000000001';
+
+    SELECT support_status = 'active' INTO version_active
+    FROM technology_versions WHERE id = '92000000-0000-4000-8000-000000000001';
+
+    SELECT EXISTS (
+        SELECT 1 FROM decisions
+        WHERE id = '95000000-0000-4000-8000-000000000001'
+          AND decision = 'approve'
+    ) INTO approval_decision_present;
+
+    IF still_approved AND snapshot_present AND source_verified
+       AND evaluation_passed AND version_active AND approval_decision_present THEN
         PERFORM pg_temp.record_probe(
-            'HIGH', 'approval-evidence-drift', 'FINDING',
-            'Lifecycle remains approved although decision/source/evaluation/version evidence was altered.'
+            'INFO', 'approval-evidence-drift', 'BLOCKED',
+            'Approval snapshot exists and every selected evidence row remains unchanged after rejected mutation attempts.'
         );
     ELSE
         PERFORM pg_temp.record_probe(
-            'INFO', 'approval-evidence-drift', 'BLOCKED',
-            'Lifecycle approval was revoked or changed after evidence alteration.'
+            'HIGH', 'approval-evidence-drift', 'FINDING',
+            'Approval snapshot or one of its selected evidence records is missing or no longer matches the approved state.'
         );
     END IF;
 END;
