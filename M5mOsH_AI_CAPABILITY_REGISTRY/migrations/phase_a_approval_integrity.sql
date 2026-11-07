@@ -23,6 +23,9 @@ BEGIN;
 ALTER TABLE decisions
     ADD CONSTRAINT uq_decisions_technology_id UNIQUE (technology_id, id);
 
+ALTER TABLE evaluations
+    ADD CONSTRAINT uq_evaluations_technology_id UNIQUE (technology_id, id);
+
 CREATE TABLE approval_evidence_snapshots (
     technology_id UUID PRIMARY KEY
         REFERENCES technologies(id) ON DELETE RESTRICT,
