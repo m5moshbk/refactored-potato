@@ -1,0 +1,20 @@
+M5mOsH Nexus Google Drive Connector — MOCK test instructions
+
+Prerequisite: Python 3.10+.
+
+From this directory:
+
+1. python -m pip install -e ".[test]"
+2. python -m pytest -q
+
+Expected scope:
+- metadata validation
+- MOCK-only policy allow-list
+- atomic batch indexing
+- strict and non-strict input handling
+- generation-aware pagination
+- parent-folder validation and cycle detection
+
+No Google credentials are needed. The test suite does not call Google, Render, GitHub, or any external network service.
+
+A successful test run is not evidence of live Google Drive connectivity.
