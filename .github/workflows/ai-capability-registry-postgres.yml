@@ -120,6 +120,26 @@ jobs:
           test "$snapshots" = "0"
           echo "PASS: Phase C fixtures and approval snapshots were rolled back"
 
+      - name: Apply Phase D tenant row-level security migration
+        run: |
+          psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 \
+            -f M5mOsH_AI_CAPABILITY_REGISTRY/migrations/phase_d_tenant_row_level_security.sql
+
+      - name: Run Phase D tenant isolation regression tests
+        run: |
+          psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 \
+            -f M5mOsH_AI_CAPABILITY_REGISTRY/tests/phase_d_tenant_row_level_security.sql
+
+      - name: Verify Phase D fixtures were rolled back
+        run: |
+          tenants="$(psql "$TEST_DATABASE_URL" -X -A -t -v ON_ERROR_STOP=1 -c "SELECT count(*) FROM tenants;")"
+          technologies="$(psql "$TEST_DATABASE_URL" -X -A -t -v ON_ERROR_STOP=1 -c "SELECT count(*) FROM technologies;")"
+          snapshots="$(psql "$TEST_DATABASE_URL" -X -A -t -v ON_ERROR_STOP=1 -c "SELECT count(*) FROM approval_evidence_snapshots;")"
+          test "$tenants" = "0"
+          test "$technologies" = "0"
+          test "$snapshots" = "0"
+          echo "PASS: Phase D tenant fixtures and approval snapshots were rolled back"
+
       - name: Run security discovery probes
         run: |
           psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 \
