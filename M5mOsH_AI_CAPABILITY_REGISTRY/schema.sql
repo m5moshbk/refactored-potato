@@ -217,7 +217,7 @@ CREATE TABLE audit_events (
 CREATE OR REPLACE FUNCTION enforce_technology_lifecycle_transition()
 RETURNS TRIGGER
 LANGUAGE plpgsql
-AS $
+AS $$
 BEGIN
     IF TG_OP = 'INSERT' THEN
         IF NEW.lifecycle_status <> 'discovered' THEN
@@ -252,7 +252,7 @@ BEGIN
 
     RETURN NEW;
 END;
-$;
+$$;
 
 CREATE TRIGGER trg_technology_lifecycle_transition
 BEFORE INSERT OR UPDATE OF lifecycle_status ON technologies
@@ -322,7 +322,7 @@ EXECUTE FUNCTION enforce_technology_approval_gate();
 CREATE OR REPLACE FUNCTION enforce_integration_status_transition()
 RETURNS TRIGGER
 LANGUAGE plpgsql
-AS $
+AS $$
 BEGIN
     IF TG_OP = 'INSERT' THEN
         IF NEW.integration_status <> 'proposed' THEN
@@ -357,7 +357,7 @@ BEGIN
 
     RETURN NEW;
 END;
-$;
+$$;
 
 CREATE TRIGGER trg_integration_status_transition
 BEFORE INSERT OR UPDATE OF integration_status ON integrations
