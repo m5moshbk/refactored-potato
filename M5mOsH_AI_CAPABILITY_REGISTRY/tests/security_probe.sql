@@ -1,0 +1,285 @@
+-- M5mOsH AI Capability Registry
+-- Security discovery probes v1.0
+-- Run ONLY against the disposable PostgreSQL database created by the CI workflow.
+-- This script records observed gaps; expected findings do not fail the workflow.
+-- All fixture changes, including a successful TRUNCATE probe, are rolled back.
+\set ON_ERROR_STOP on
+
+BEGIN;
+
+CREATE TEMP TABLE probe_findings (
+    severity TEXT NOT NULL,
+    probe TEXT NOT NULL,
+    outcome TEXT NOT NULL,
+    evidence TEXT NOT NULL
+) ON COMMIT DROP;
+
+CREATE FUNCTION pg_temp.record_probe(
+    p_severity TEXT,
+    p_probe TEXT,
+    p_outcome TEXT,
+    p_evidence TEXT
+) RETURNS VOID
+LANGUAGE SQL
+AS $fn$
+    INSERT INTO probe_findings(severity, probe, outcome, evidence)
+    VALUES (p_severity, p_probe, p_outcome, p_evidence);
+$fn$;
+
+-- Fixtures: Alpha has a complete evidence chain and is approved.
+INSERT INTO technologies (id, canonical_key, name, category)
+VALUES
+('91000000-0000-4000-8000-000000000001',
+ 'probe.security.alpha', 'Security Probe Alpha', 'probe'),
+('91000000-0000-4000-8000-000000000002',
+ 'probe.security.beta', 'Security Probe Beta', 'probe');
+
+INSERT INTO technology_versions
+    (id, technology_id, version_name, support_status, verified_at)
+VALUES
+('92000000-0000-4000-8000-000000000001',
+ '91000000-0000-4000-8000-000000000001', '1.0', 'active', NOW());
+
+INSERT INTO sources
+    (id, technology_id, version_id, source_type, source_url,
+     verification_status, checked_at)
+VALUES
+('93000000-0000-4000-8000-000000000001',
+ '91000000-0000-4000-8000-000000000001',
+ '92000000-0000-4000-8000-000000000001',
+ 'official_documentation', 'https://example.invalid/probe/alpha',
+ 'verified', NOW());
+
+INSERT INTO evaluations
+    (id, technology_id, version_id, evaluation_type, test_status,
+     critical_findings_count, tested_at)
+VALUES
+('94000000-0000-4000-8000-000000000001',
+ '91000000-0000-4000-8000-000000000001',
+ '92000000-0000-4000-8000-000000000001',
+ 'security-probe', 'passed', 0, NOW());
+
+INSERT INTO decisions (id, technology_id, decision, rationale)
+VALUES
+('95000000-0000-4000-8000-000000000001',
+ '91000000-0000-4000-8000-000000000001',
+ 'approve', 'Disposable security probe fixture');
+
+UPDATE technologies SET lifecycle_status = 'verified'
+WHERE id = '91000000-0000-4000-8000-000000000001';
+UPDATE technologies SET lifecycle_status = 'evaluated'
+WHERE id = '91000000-0000-4000-8000-000000000001';
+UPDATE technologies SET lifecycle_status = 'approved'
+WHERE id = '91000000-0000-4000-8000-000000000001';
+
+-- Probe 1: can the approval decision be deleted after approval?
+DO $probe$
+BEGIN
+    BEGIN
+        DELETE FROM decisions
+        WHERE id = '95000000-0000-4000-8000-000000000001';
+        PERFORM pg_temp.record_probe(
+            'HIGH', 'approval-decision-immutability', 'FINDING',
+            'DELETE succeeded after technology reached approved; no decision immutability guard.'
+        );
+    EXCEPTION WHEN OTHERS THEN
+        PERFORM pg_temp.record_probe(
+            'INFO', 'approval-decision-immutability', 'BLOCKED',
+            'DELETE was rejected: ' || SQLERRM
+        );
+    END;
+END;
+$probe$;
+
+-- Probe 2: can verified evidence be downgraded after approval?
+DO $probe$
+BEGIN
+    BEGIN
+        UPDATE sources SET verification_status = 'unverified'
+        WHERE id = '93000000-0000-4000-8000-000000000001';
+        PERFORM pg_temp.record_probe(
+            'HIGH', 'approved-source-downgrade', 'FINDING',
+            'Verified source was downgraded after approval without revalidation.'
+        );
+    EXCEPTION WHEN OTHERS THEN
+        PERFORM pg_temp.record_probe(
+            'INFO', 'approved-source-downgrade', 'BLOCKED',
+            'Source downgrade was rejected: ' || SQLERRM
+        );
+    END;
+END;
+$probe$;
+
+-- Probe 3: can the passing evaluation be changed after approval?
+DO $probe$
+BEGIN
+    BEGIN
+        UPDATE evaluations SET test_status = 'failed',
+                               critical_findings_count = 1
+        WHERE id = '94000000-0000-4000-8000-000000000001';
+        PERFORM pg_temp.record_probe(
+            'HIGH', 'approved-evaluation-downgrade', 'FINDING',
+            'Passed evaluation was changed to failed with a critical finding after approval.'
+        );
+    EXCEPTION WHEN OTHERS THEN
+        PERFORM pg_temp.record_probe(
+            'INFO', 'approved-evaluation-downgrade', 'BLOCKED',
+            'Evaluation downgrade was rejected: ' || SQLERRM
+        );
+    END;
+END;
+$probe$;
+
+-- Probe 4: can the verified active version be marked unsupported?
+DO $probe$
+BEGIN
+    BEGIN
+        UPDATE technology_versions SET support_status = 'unsupported'
+        WHERE id = '92000000-0000-4000-8000-000000000001';
+        PERFORM pg_temp.record_probe(
+            'HIGH', 'approved-version-downgrade', 'FINDING',
+            'Approved technology version was marked unsupported without approval revalidation.'
+        );
+    EXCEPTION WHEN OTHERS THEN
+        PERFORM pg_temp.record_probe(
+            'INFO', 'approved-version-downgrade', 'BLOCKED',
+            'Version downgrade was rejected: ' || SQLERRM
+        );
+    END;
+END;
+$probe$;
+
+-- Probe 5: does the technology remain approved after its evidence chain is invalidated?
+DO $probe$
+DECLARE
+    still_approved BOOLEAN;
+BEGIN
+    SELECT lifecycle_status = 'approved' INTO still_approved
+    FROM technologies
+    WHERE id = '91000000-0000-4000-8000-000000000001';
+
+    IF still_approved THEN
+        PERFORM pg_temp.record_probe(
+            'HIGH', 'approval-evidence-drift', 'FINDING',
+            'Lifecycle remains approved although decision/source/evaluation/version evidence was altered.'
+        );
+    ELSE
+        PERFORM pg_temp.record_probe(
+            'INFO', 'approval-evidence-drift', 'BLOCKED',
+            'Lifecycle approval was revoked or changed after evidence alteration.'
+        );
+    END IF;
+END;
+$probe$;
+
+-- Probe 6: does the audit trigger also protect against TRUNCATE?
+INSERT INTO audit_events (id, technology_id, event_type, actor)
+VALUES
+('96000000-0000-4000-8000-000000000001',
+ '91000000-0000-4000-8000-000000000001',
+ 'security_probe', 'security_probe');
+
+DO $probe$
+BEGIN
+    BEGIN
+        TRUNCATE TABLE audit_events;
+        PERFORM pg_temp.record_probe(
+            'HIGH', 'audit-truncate-protection', 'FINDING',
+            'TRUNCATE succeeded for the current database role; row-level UPDATE/DELETE trigger does not cover TRUNCATE.'
+        );
+    EXCEPTION WHEN OTHERS THEN
+        PERFORM pg_temp.record_probe(
+            'INFO', 'audit-truncate-protection', 'BLOCKED',
+            'TRUNCATE was rejected: ' || SQLERRM
+        );
+    END;
+END;
+$probe$;
+
+-- Probe 7: can an integration reach integrated while its technology is not approved?
+INSERT INTO integrations (id, technology_id, target_project)
+VALUES
+('97000000-0000-4000-8000-000000000001',
+ '91000000-0000-4000-8000-000000000002',
+ 'security-probe-project');
+
+DO $probe$
+BEGIN
+    BEGIN
+        UPDATE integrations SET integration_status = 'approved'
+        WHERE id = '97000000-0000-4000-8000-000000000001';
+        UPDATE integrations SET integration_status = 'in_progress'
+        WHERE id = '97000000-0000-4000-8000-000000000001';
+        UPDATE integrations SET integration_status = 'integrated'
+        WHERE id = '97000000-0000-4000-8000-000000000001';
+
+        PERFORM pg_temp.record_probe(
+            'HIGH', 'integration-approval-coupling', 'FINDING',
+            'Integration reached integrated while its technology lifecycle remained discovered.'
+        );
+    EXCEPTION WHEN OTHERS THEN
+        PERFORM pg_temp.record_probe(
+            'INFO', 'integration-approval-coupling', 'BLOCKED',
+            'Integration activation was rejected: ' || SQLERRM
+        );
+    END;
+END;
+$probe$;
+
+-- Probe 8: identify whether row-level security is enabled on registry tables.
+DO $probe$
+DECLARE
+    protected_count INTEGER;
+    registry_count INTEGER;
+BEGIN
+    SELECT count(*) FILTER (WHERE c.relrowsecurity),
+           count(*)
+    INTO protected_count, registry_count
+    FROM pg_class c
+    JOIN pg_namespace n ON n.oid = c.relnamespace
+    WHERE n.nspname = current_schema()
+      AND c.relkind = 'r'
+      AND c.relname IN (
+          'technologies', 'technology_versions', 'capabilities',
+          'sources', 'evaluations', 'capability_evidence',
+          'integrations', 'decisions', 'audit_events'
+      );
+
+    IF registry_count > 0 AND protected_count = 0 THEN
+        PERFORM pg_temp.record_probe(
+            'HIGH', 'tenant-row-level-security', 'FINDING',
+            format('RLS is disabled on all %s registry tables in the current schema.', registry_count)
+        );
+    ELSIF protected_count < registry_count THEN
+        PERFORM pg_temp.record_probe(
+            'MEDIUM', 'tenant-row-level-security', 'FINDING',
+            format('RLS is enabled on %s of %s registry tables.', protected_count, registry_count)
+        );
+    ELSE
+        PERFORM pg_temp.record_probe(
+            'INFO', 'tenant-row-level-security', 'PRESENT',
+            format('RLS is enabled on all %s registry tables; policies still require separate validation.', registry_count)
+        );
+    END IF;
+END;
+$probe$;
+
+-- This workflow connects as the disposable schema owner, not as an application role.
+SELECT pg_temp.record_probe(
+    'MEDIUM', 'least-privilege-test-context', 'LIMITATION',
+    format('Probe ran as role %I. Owner/superuser behavior does not prove application-role restrictions.', current_user)
+);
+
+\echo '--- SECURITY PROBE FINDINGS (expected findings do not fail CI) ---'
+SELECT severity, probe, outcome, evidence
+FROM probe_findings
+ORDER BY CASE severity WHEN 'HIGH' THEN 1 WHEN 'MEDIUM' THEN 2 WHEN 'INFO' THEN 3 ELSE 4 END,
+         probe;
+
+SELECT count(*) AS high_findings
+FROM probe_findings
+WHERE severity = 'HIGH' AND outcome = 'FINDING';
+
+ROLLBACK;
+
+\echo 'PASS: security discovery probes completed; all disposable fixtures rolled back.'
