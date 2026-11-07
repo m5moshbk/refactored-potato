@@ -75,10 +75,30 @@ Additional requirements:
 - Do not grant the application role ownership of tables, triggers, or schemas.
 - Do not grant application roles `TRUNCATE`, `ALTER`, `DROP`, or unrestricted delete permissions.
 - Grant writes table-by-table and operation-by-operation.
-- Use row-level security if multiple tenants or security domains are introduced; define and test tenant identity propagation before enabling it.
+- Phase D enables and forces row-level security across all tenant-owned registry tables; tenant identity propagation and application-role grants remain deployment responsibilities.
 - Keep production and test credentials separate.
 - Rotate credentials through the approved secret-management process.
 - Log privileged access and review role membership periodically.
+
+### Phase D tenant isolation
+
+Phase D introduces a tenants table and a required tenant_id on technologies, versions, capabilities, sources, evaluations, capability evidence, integrations, decisions, audit events, and approval evidence snapshots.
+
+Controls implemented:
+- Every tenant-owned table has row-level security enabled and forced, with a policy that filters reads and constrains writes to the active tenant.
+- Composite foreign keys bind each technology-owned row to the same tenant as its parent technology; cross-tenant references are rejected by the database.
+- Technology canonical keys are unique within a tenant.
+- A missing tenant context returns no rows and rejects writes.
+- The migration fails closed when the registry already contains data; existing records require an explicit, reviewed tenant ownership mapping before backfill.
+
+Critical application boundary:
+- The application must authenticate the user and determine the tenant from trusted server-side authorization state.
+- Set app.tenant_id transaction-locally (for example, with SET LOCAL or set_config(..., true)) only after that authorization check.
+- Never accept the tenant UUID directly from an untrusted client as proof of tenant identity. A database session setting is context propagation, not authentication: a client that can execute arbitrary SQL under the application role may be able to set it.
+- Reset or discard tenant context at transaction boundaries when using pooled connections.
+- Superusers and roles with BYPASSRLS can bypass row-level security; do not use them for application traffic. FORCE ROW LEVEL SECURITY does not constrain superusers.
+
+The CI regression test uses a non-owner NOBYPASSRLS role and verifies isolation across all eleven tables, no-context default-deny behavior, and rejection of a cross-tenant write. It does not prove that production authentication middleware sets the correct tenant context.
 
 ## 5. Audit event integrity
 
@@ -154,6 +174,8 @@ No production deployment, database migration, account change, secret creation, o
 - [ ] Test valid and invalid technology and integration lifecycle transitions, including approval coupling.
 - [ ] Test approval gate with missing source, version, evaluation, or decision.
 - [ ] Test cross-technology composite foreign-key rejection.
+- [ ] Test tenant isolation using a non-owner NOBYPASSRLS role and verify trusted transaction-local tenant context.
+- [ ] Confirm existing records have an approved tenant mapping before applying Phase D.
 - [ ] Test audit UPDATE, DELETE, and TRUNCATE rejection using the application role.
 - [ ] Verify application role cannot disable triggers or alter schema.
 - [ ] Verify no role can read secrets because none are stored here.
