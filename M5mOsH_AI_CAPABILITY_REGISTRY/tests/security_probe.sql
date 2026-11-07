@@ -304,11 +304,65 @@ BEGIN
 END;
 $probe$;
 
--- This workflow connects as the disposable schema owner, not as an application role.
-SELECT pg_temp.record_probe(
-    'MEDIUM', 'least-privilege-test-context', 'LIMITATION',
-    format('Probe ran as role %I. Owner/superuser behavior does not prove application-role restrictions.', current_user)
-);
+-- Phase E creates a non-login application role with explicit table grants.
+-- Confirm its attributes, ownership, schema access, and destructive privileges.
+DO $probe$
+DECLARE
+    app_role_oid OID;
+    role_is_restricted BOOLEAN;
+BEGIN
+    SELECT oid INTO app_role_oid
+    FROM pg_roles
+    WHERE rolname = 'registry_app_test';
+
+    IF app_role_oid IS NULL THEN
+        PERFORM pg_temp.record_probe(
+            'MEDIUM', 'least-privilege-test-context', 'LIMITATION',
+            'Phase E application role was not present; application-role restrictions could not be confirmed.'
+        );
+    ELSE
+        SELECT
+            NOT r.rolsuper
+            AND NOT r.rolcreatedb
+            AND NOT r.rolcreaterole
+            AND NOT r.rolbypassrls
+            AND NOT r.rolcanlogin
+            AND NOT r.rolinherit
+            AND NOT has_schema_privilege('registry_app_test', 'public', 'CREATE')
+            AND has_table_privilege('registry_app_test', 'technologies', 'SELECT')
+            AND has_table_privilege('registry_app_test', 'technologies', 'INSERT')
+            AND has_table_privilege('registry_app_test', 'technologies', 'UPDATE')
+            AND NOT has_table_privilege('registry_app_test', 'technologies', 'DELETE')
+            AND NOT has_table_privilege('registry_app_test', 'technologies', 'TRUNCATE')
+            AND has_table_privilege('registry_app_test', 'audit_events', 'INSERT')
+            AND NOT has_table_privilege('registry_app_test', 'audit_events', 'UPDATE')
+            AND NOT has_table_privilege('registry_app_test', 'audit_events', 'DELETE')
+            AND NOT has_table_privilege('registry_app_test', 'audit_events', 'TRUNCATE')
+            AND NOT EXISTS (
+                SELECT 1 FROM pg_class
+                WHERE relkind IN ('r', 'p') AND relowner = r.oid
+            )
+            AND NOT EXISTS (
+                SELECT 1 FROM pg_auth_members WHERE member = r.oid
+            )
+        INTO role_is_restricted
+        FROM pg_roles r
+        WHERE r.oid = app_role_oid;
+
+        IF role_is_restricted THEN
+            PERFORM pg_temp.record_probe(
+                'INFO', 'least-privilege-test-context', 'PRESENT',
+                'registry_app_test is NOLOGIN, NOBYPASSRLS, non-owner, has no elevated role membership or schema CREATE, and lacks DELETE/TRUNCATE and audit mutation privileges.'
+            );
+        ELSE
+            PERFORM pg_temp.record_probe(
+                'MEDIUM', 'least-privilege-test-context', 'FINDING',
+                'registry_app_test exists but one or more least-privilege role, ownership, schema, or table-grant checks failed.'
+            );
+        END IF;
+    END IF;
+END;
+$probe$;
 
 \echo '--- SECURITY PROBE FINDINGS (expected findings do not fail CI) ---'
 SELECT severity, probe, outcome, evidence
