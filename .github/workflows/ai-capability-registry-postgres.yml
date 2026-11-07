@@ -1,0 +1,68 @@
+name: M5mOsH AI Capability Registry PostgreSQL Tests
+
+on:
+  push:
+    branches:
+      - feat/ai-capability-registry-schema-v1
+    paths:
+      - "M5mOsH_AI_CAPABILITY_REGISTRY/**"
+      - ".github/workflows/ai-capability-registry-postgres.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  schema-contract:
+    name: PostgreSQL 16 schema and contract tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: registry_test
+          POSTGRES_USER: registry_test
+          POSTGRES_PASSWORD: registry_test_ephemeral_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U registry_test -d registry_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      TEST_DATABASE_URL: postgresql://registry_test:registry_test_ephemeral_password@localhost:5432/registry_test
+
+    steps:
+      - name: Checkout isolated branch
+        uses: actions/checkout@v4
+
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes postgresql-client
+
+      - name: Confirm PostgreSQL test server
+        run: |
+          psql --version
+          psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 -c "SELECT version();"
+
+      - name: Apply schema to disposable PostgreSQL database
+        run: |
+          psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 \
+            -f M5mOsH_AI_CAPABILITY_REGISTRY/schema.sql
+
+      - name: Run schema contract tests
+        run: |
+          psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 \
+            -f M5mOsH_AI_CAPABILITY_REGISTRY/tests/schema_contract.sql
+
+      - name: Verify test fixtures were rolled back
+        run: |
+          remaining="$(psql "$TEST_DATABASE_URL" -X -A -t -v ON_ERROR_STOP=1 \
+            -c "SELECT count(*) FROM technologies;")"
+          test "$remaining" = "0"
+          echo "PASS: test fixture rows were rolled back"
