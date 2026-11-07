@@ -135,7 +135,7 @@ New integration records must start in `proposed`. Allowed status transitions are
 | rejected | terminal |
 | removed | terminal |
 
-The database trigger enforces these transitions, but an `approved` status is not permission to access an external system. A separate, explicit authorization for the exact integration action is still required.
+The database trigger enforces these transitions and requires the parent technology lifecycle to be `approved` or `integrated` before an integration can enter `approved` or `integrated`. It locks the parent technology row while checking this prerequisite to serialize activation against concurrent lifecycle changes. An `approved` status is not permission to access an external system. A separate, explicit authorization for the exact integration action is still required.
 
 Before any real integration:
 1. Define exact target system, data flows, permissions, and rollback plan.
@@ -151,7 +151,7 @@ No production deployment, database migration, account change, secret creation, o
 
 - [ ] Confirm PostgreSQL version and supported extensions.
 - [ ] Review all DDL and trigger behavior.
-- [ ] Test valid and invalid lifecycle transitions.
+- [ ] Test valid and invalid technology and integration lifecycle transitions, including approval coupling.
 - [ ] Test approval gate with missing source, version, evaluation, or decision.
 - [ ] Test cross-technology composite foreign-key rejection.
 - [ ] Test audit UPDATE, DELETE, and TRUNCATE rejection using the application role.
