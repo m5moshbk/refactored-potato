@@ -6,6 +6,20 @@
 \set ON_ERROR_STOP on
 BEGIN;
 
+
+SELECT pg_temp.assert_true(
+    EXISTS (
+        SELECT 1
+        FROM pg_constraint
+        WHERE conrelid = 'evaluations'::regclass
+          AND conname = 'uq_evaluations_technology_id'
+          AND contype = 'u'
+          AND pg_get_constraintdef(oid) = 'UNIQUE (technology_id, id)'
+    ),
+    'evaluations exposes the composite unique key required by approval evidence references'
+);
+
+
 CREATE FUNCTION pg_temp.assert_true(condition BOOLEAN, assertion_name TEXT)
 RETURNS VOID LANGUAGE plpgsql AS $$
 BEGIN
