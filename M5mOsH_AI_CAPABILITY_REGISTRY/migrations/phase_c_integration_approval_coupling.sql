@@ -65,6 +65,15 @@ BEGIN
 
     RETURN NEW;
 END;
-$$;
+$;
+
+-- Reassignment of an already-approved/integrated record must also re-run
+-- the parent lifecycle check, even when integration_status itself is unchanged.
+DROP TRIGGER trg_integration_status_transition ON integrations;
+
+CREATE TRIGGER trg_integration_status_transition
+BEFORE INSERT OR UPDATE OF integration_status, technology_id ON integrations
+FOR EACH ROW
+EXECUTE FUNCTION enforce_integration_status_transition();
 
 COMMIT;
