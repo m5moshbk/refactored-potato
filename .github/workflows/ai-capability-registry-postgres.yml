@@ -80,6 +80,23 @@ jobs:
           test "$snapshots" = "0"
           echo "PASS: Phase A fixtures and approval snapshots were rolled back"
 
+      - name: Apply Phase B audit TRUNCATE protection migration
+        run: |
+          psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 \
+            -f M5mOsH_AI_CAPABILITY_REGISTRY/migrations/phase_b_audit_truncate_protection.sql
+
+      - name: Run Phase B audit TRUNCATE protection regression tests
+        run: |
+          psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 \
+            -f M5mOsH_AI_CAPABILITY_REGISTRY/tests/phase_b_audit_truncate_protection.sql
+
+      - name: Verify Phase B audit fixtures were rolled back
+        run: |
+          remaining="$(psql "$TEST_DATABASE_URL" -X -A -t -v ON_ERROR_STOP=1 \
+            -c "SELECT count(*) FROM audit_events;")"
+          test "$remaining" = "0"
+          echo "PASS: Phase B audit fixtures were rolled back"
+
       - name: Run security discovery probes
         run: |
           psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 \
