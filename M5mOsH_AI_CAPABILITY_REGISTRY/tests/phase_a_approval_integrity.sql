@@ -7,6 +7,17 @@
 BEGIN;
 
 
+CREATE FUNCTION pg_temp.assert_true(condition BOOLEAN, assertion_name TEXT)
+RETURNS VOID LANGUAGE plpgsql AS $$
+BEGIN
+    IF condition IS DISTINCT FROM TRUE THEN
+        RAISE EXCEPTION 'ASSERTION FAILED: %', assertion_name;
+    END IF;
+END;
+$$;
+
+
+-- Verify the composite key exists before exercising the approval foreign key.
 SELECT pg_temp.assert_true(
     EXISTS (
         SELECT 1
@@ -19,15 +30,6 @@ SELECT pg_temp.assert_true(
     'evaluations exposes the composite unique key required by approval evidence references'
 );
 
-
-CREATE FUNCTION pg_temp.assert_true(condition BOOLEAN, assertion_name TEXT)
-RETURNS VOID LANGUAGE plpgsql AS $$
-BEGIN
-    IF condition IS DISTINCT FROM TRUE THEN
-        RAISE EXCEPTION 'ASSERTION FAILED: %', assertion_name;
-    END IF;
-END;
-$$;
 
 CREATE FUNCTION pg_temp.assert_raises(command_text TEXT, expected_message TEXT)
 RETURNS VOID LANGUAGE plpgsql AS $$
