@@ -3,6 +3,21 @@
 -- PostgreSQL 14+; apply after schema.sql in a disposable/test database first.
 -- This migration does not configure roles or tenant isolation.
 
+-- Fail closed when upgrading a populated registry: prior approvals require
+-- an explicit evidence review/backfill before Phase A can protect them.
+DO $phase_a_preflight$
+BEGIN
+    IF EXISTS (
+        SELECT 1
+        FROM technologies
+        WHERE lifecycle_status = 'approved'
+    ) THEN
+        RAISE EXCEPTION
+            'Phase A migration blocked: existing approved technologies require an explicit evidence snapshot backfill review';
+    END IF;
+END;
+$phase_a_preflight$;
+
 BEGIN;
 
 ALTER TABLE decisions
@@ -203,7 +218,7 @@ FOR EACH ROW EXECUTE FUNCTION prevent_approved_evidence_mutation();
 CREATE OR REPLACE FUNCTION enforce_approval_snapshot_insert_origin()
 RETURNS TRIGGER
 LANGUAGE plpgsql
-AS $
+AS $$
 DECLARE
     current_lifecycle_status TEXT;
 BEGIN
@@ -224,7 +239,7 @@ BEGIN
 
     RETURN NEW;
 END;
-$;
+$$;
 
 CREATE TRIGGER trg_approval_snapshot_insert_origin
 BEFORE INSERT ON approval_evidence_snapshots
@@ -233,11 +248,11 @@ FOR EACH ROW EXECUTE FUNCTION enforce_approval_snapshot_insert_origin();
 CREATE OR REPLACE FUNCTION prevent_approval_snapshot_mutation()
 RETURNS TRIGGER
 LANGUAGE plpgsql
-AS $
+AS $$
 BEGIN
     RAISE EXCEPTION 'approval_evidence_snapshots is append-only';
 END;
-$;
+$$;
 
 CREATE TRIGGER trg_approval_snapshot_no_update_delete
 BEFORE UPDATE OR DELETE ON approval_evidence_snapshots
