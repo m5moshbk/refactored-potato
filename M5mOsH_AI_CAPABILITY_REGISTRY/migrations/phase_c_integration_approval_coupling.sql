@@ -8,7 +8,7 @@ BEGIN;
 CREATE OR REPLACE FUNCTION enforce_integration_status_transition()
 RETURNS TRIGGER
 LANGUAGE plpgsql
-AS $$
+AS $phase_c$
 DECLARE
     technology_lifecycle TEXT;
 BEGIN
@@ -65,7 +65,7 @@ BEGIN
 
     RETURN NEW;
 END;
-$;
+$phase_c$;
 
 -- Reassignment of an already-approved/integrated record must also re-run
 -- the parent lifecycle check, even when integration_status itself is unchanged.
