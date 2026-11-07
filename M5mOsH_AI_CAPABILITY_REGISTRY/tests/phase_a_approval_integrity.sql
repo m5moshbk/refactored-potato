@@ -128,6 +128,22 @@ SELECT pg_temp.assert_raises(
        WHERE technology_id = 'a1000000-0000-4000-8000-000000000001'$q$,
     'approval_evidence_snapshots is append-only'
 );
+SELECT pg_temp.assert_raises(
+    $q$TRUNCATE TABLE approval_evidence_snapshots$q$,
+    'approval_evidence_snapshots is append-only'
+);
+SELECT pg_temp.assert_raises(
+    $q$INSERT INTO approval_evidence_snapshots
+       (technology_id, version_id, source_id, evaluation_id, decision_id, evidence_snapshot)
+       VALUES
+       ('a1000000-0000-4000-8000-000000000001',
+        'a2000000-0000-4000-8000-000000000001',
+        'a3000000-0000-4000-8000-000000000001',
+        'a4000000-0000-4000-8000-000000000001',
+        'a5000000-0000-4000-8000-000000000001',
+        '{}'::jsonb)$q$,
+    'approval snapshots may only be created by the approval lifecycle transition'
+);
 
 SELECT pg_temp.assert_true(
     (SELECT lifecycle_status = 'approved'
