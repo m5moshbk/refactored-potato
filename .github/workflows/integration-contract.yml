@@ -35,7 +35,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r sada-voice/backend/requirements.txt
-          pip install "jsonschema>=4.23,<5"
+          pip install "jsonschema[format]>=4.23,<5"
 
       - name: Run root integration contract tests
         run: python -m unittest discover -s tests -p "test_*integration_contract*.py" -v
