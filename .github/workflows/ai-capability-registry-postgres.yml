@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   schema-contract:
-    name: PostgreSQL 16 schema and contract tests
+    name: PostgreSQL 16 schema and security tests
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -50,22 +50,35 @@ jobs:
           psql --version
           psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 -c "SELECT version();"
 
-      - name: Apply schema to disposable PostgreSQL database
+      - name: Apply base schema to disposable PostgreSQL database
         run: |
           psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 \
             -f M5mOsH_AI_CAPABILITY_REGISTRY/schema.sql
 
-      - name: Run schema contract tests
+      - name: Run base schema contract tests
         run: |
           psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 \
             -f M5mOsH_AI_CAPABILITY_REGISTRY/tests/schema_contract.sql
 
-      - name: Verify test fixtures were rolled back
+      - name: Apply Phase A approval integrity migration
+        run: |
+          psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 \
+            -f M5mOsH_AI_CAPABILITY_REGISTRY/migrations/phase_a_approval_integrity.sql
+
+      - name: Run Phase A approval integrity regression tests
+        run: |
+          psql "$TEST_DATABASE_URL" -X -v ON_ERROR_STOP=1 \
+            -f M5mOsH_AI_CAPABILITY_REGISTRY/tests/phase_a_approval_integrity.sql
+
+      - name: Verify Phase A fixtures were rolled back
         run: |
           remaining="$(psql "$TEST_DATABASE_URL" -X -A -t -v ON_ERROR_STOP=1 \
             -c "SELECT count(*) FROM technologies;")"
+          snapshots="$(psql "$TEST_DATABASE_URL" -X -A -t -v ON_ERROR_STOP=1 \
+            -c "SELECT count(*) FROM approval_evidence_snapshots;")"
           test "$remaining" = "0"
-          echo "PASS: test fixture rows were rolled back"
+          test "$snapshots" = "0"
+          echo "PASS: Phase A fixtures and approval snapshots were rolled back"
 
       - name: Run security discovery probes
         run: |
@@ -76,5 +89,8 @@ jobs:
         run: |
           remaining="$(psql "$TEST_DATABASE_URL" -X -A -t -v ON_ERROR_STOP=1 \
             -c "SELECT count(*) FROM technologies;")"
+          snapshots="$(psql "$TEST_DATABASE_URL" -X -A -t -v ON_ERROR_STOP=1 \
+            -c "SELECT count(*) FROM approval_evidence_snapshots;")"
           test "$remaining" = "0"
-          echo "PASS: security probe fixtures were rolled back"
+          test "$snapshots" = "0"
+          echo "PASS: security probe fixtures and approval snapshots were rolled back"
