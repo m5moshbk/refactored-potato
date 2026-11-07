@@ -123,6 +123,20 @@ Scores are optional summary fields, not substitutes for evidence. Do not compare
 
 An integration record in this registry is a record of status, not an authorization token.
 
+New integration records must start in `proposed`. Allowed status transitions are:
+
+| Current state | Allowed next state |
+|---|---|
+| proposed | approved, blocked, rejected |
+| approved | in_progress, blocked, rejected |
+| in_progress | integrated, blocked |
+| blocked | proposed, in_progress, rejected |
+| integrated | removed |
+| rejected | terminal |
+| removed | terminal |
+
+The database trigger enforces these transitions, but an `approved` status is not permission to access an external system. A separate, explicit authorization for the exact integration action is still required.
+
 Before any real integration:
 1. Define exact target system, data flows, permissions, and rollback plan.
 2. Review privacy, security, licensing, and operational impact.
