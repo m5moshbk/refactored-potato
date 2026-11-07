@@ -212,12 +212,20 @@ CREATE TABLE audit_events (
     CONSTRAINT audit_actor_nonempty CHECK (length(trim(actor)) > 0)
 );
 
--- Prevent lifecycle shortcuts. Same-state updates are allowed.
+-- Enforce the initial state as well as valid lifecycle transitions.
+-- Direct INSERT into approved/integrated states is not permitted.
 CREATE OR REPLACE FUNCTION enforce_technology_lifecycle_transition()
 RETURNS TRIGGER
 LANGUAGE plpgsql
-AS $$
+AS $
 BEGIN
+    IF TG_OP = 'INSERT' THEN
+        IF NEW.lifecycle_status <> 'discovered' THEN
+            RAISE EXCEPTION 'New technologies must start in discovered state';
+        END IF;
+        RETURN NEW;
+    END IF;
+
     IF NEW.lifecycle_status = OLD.lifecycle_status THEN
         RETURN NEW;
     END IF;
@@ -244,10 +252,10 @@ BEGIN
 
     RETURN NEW;
 END;
-$$;
+$;
 
 CREATE TRIGGER trg_technology_lifecycle_transition
-BEFORE UPDATE OF lifecycle_status ON technologies
+BEFORE INSERT OR UPDATE OF lifecycle_status ON technologies
 FOR EACH ROW
 EXECUTE FUNCTION enforce_technology_lifecycle_transition();
 
@@ -309,6 +317,52 @@ CREATE TRIGGER trg_technology_approval_gate
 BEFORE UPDATE OF lifecycle_status ON technologies
 FOR EACH ROW
 EXECUTE FUNCTION enforce_technology_approval_gate();
+
+-- An integration record starts as proposed; status changes are explicit.
+CREATE OR REPLACE FUNCTION enforce_integration_status_transition()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $
+BEGIN
+    IF TG_OP = 'INSERT' THEN
+        IF NEW.integration_status <> 'proposed' THEN
+            RAISE EXCEPTION 'New integrations must start in proposed state';
+        END IF;
+        RETURN NEW;
+    END IF;
+
+    IF NEW.integration_status = OLD.integration_status THEN
+        RETURN NEW;
+    END IF;
+
+    IF NOT (
+        (OLD.integration_status = 'proposed'
+            AND NEW.integration_status IN ('approved', 'blocked', 'rejected'))
+        OR
+        (OLD.integration_status = 'approved'
+            AND NEW.integration_status IN ('in_progress', 'blocked', 'rejected'))
+        OR
+        (OLD.integration_status = 'in_progress'
+            AND NEW.integration_status IN ('integrated', 'blocked'))
+        OR
+        (OLD.integration_status = 'blocked'
+            AND NEW.integration_status IN ('proposed', 'in_progress', 'rejected'))
+        OR
+        (OLD.integration_status = 'integrated'
+            AND NEW.integration_status = 'removed')
+    ) THEN
+        RAISE EXCEPTION 'Invalid integration transition: % -> %',
+            OLD.integration_status, NEW.integration_status;
+    END IF;
+
+    RETURN NEW;
+END;
+$;
+
+CREATE TRIGGER trg_integration_status_transition
+BEFORE INSERT OR UPDATE OF integration_status ON integrations
+FOR EACH ROW
+EXECUTE FUNCTION enforce_integration_status_transition();
 
 -- Audit events are append-only for ordinary database roles.
 CREATE OR REPLACE FUNCTION prevent_audit_mutation()
