@@ -80,6 +80,19 @@ Additional requirements:
 - Rotate credentials through the approved secret-management process.
 - Log privileged access and review role membership periodically.
 
+### Phase E least-privilege application role
+
+Phase E does not create a production login or store credentials. Its disposable CI role (registry_app_test) is NOLOGIN, NOSUPERUSER, NOCREATEDB, NOCREATEROLE, NOINHERIT, and NOBYPASSRLS.
+
+The tested grant model is:
+- SELECT on the registry tables needed by the application.
+- INSERT and UPDATE only on explicitly listed operational tables.
+- INSERT/SELECT on audit_events; no UPDATE, DELETE, or TRUNCATE.
+- Snapshot INSERT is granted only because the approval lifecycle trigger runs with invoker privileges; the snapshot-origin trigger rejects direct application inserts.
+- No DELETE or TRUNCATE on registry tables, no schema CREATE, no table ownership, and no elevated role membership.
+
+The CI test exercises permitted tenant-scoped writes and approval snapshot creation, then verifies that destructive DML, audit mutation, TRUNCATE, ALTER TABLE, and schema CREATE are denied. The security probe independently inspects the resulting test role. Production role creation and grants remain a separate deployment task; no production credentials or role settings are changed by this repository migration series.
+
 ### Phase D tenant isolation
 
 Phase D introduces a tenants table and a required tenant_id on technologies, versions, capabilities, sources, evaluations, capability evidence, integrations, decisions, audit events, and approval evidence snapshots.
@@ -177,7 +190,7 @@ No production deployment, database migration, account change, secret creation, o
 - [ ] Test tenant isolation using a non-owner NOBYPASSRLS role and verify trusted transaction-local tenant context.
 - [ ] Confirm existing records have an approved tenant mapping before applying Phase D.
 - [ ] Test audit UPDATE, DELETE, and TRUNCATE rejection using the application role.
-- [ ] Verify application role cannot disable triggers or alter schema.
+- [ ] Run Phase E least-privilege role tests and verify application role cannot disable triggers, alter schema, or perform destructive DML.
 - [ ] Verify no role can read secrets because none are stored here.
 - [ ] Test transaction rollback when audit insertion fails.
 - [ ] Review query plans and index usefulness with representative data.
