@@ -570,7 +570,7 @@ if(manifesto&&!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
  populate();
 })();
 
-search.addEventListener('input',update);filters.forEach(b=>b.addEventListener('click',()=>{category=b.dataset.filter;filters.forEach(x=>x.classList.toggle('active',x===b));update()}));
+search.addEventListener('input',update);filters.forEach(b=>b.addEventListener('click',()=>{category=b.dataset.filter;filters.forEach(x=>x.classList.toggle('active',x===b));update()}));update();
 
 /* Side-by-side workbench and click journal; storage remains local to this browser. */
 (()=> {
