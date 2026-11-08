@@ -63,7 +63,17 @@
 .modal-heading{min-width:0;flex:1}.modal-heading strong{display:block;font-size:15px}.modal-heading small{display:block;color:var(--muted);font-size:12px;overflow-wrap:anywhere}
 .modal-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.modal-action,.modal-close{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--line);border-radius:10px;padding:9px 11px;color:var(--text);background:#172236;cursor:pointer;font:inherit;font-size:12px;text-decoration:none}
 .modal-close{font-size:20px;width:40px;height:40px;padding:0}.modal-action:hover,.modal-close:hover{border-color:var(--cyan)}
-.modal-content{position:relative;flex:1;min-height:0;background:#080b13}.preview-frame{display:block;width:100%;height:100%;border:0;background:#fff}.preview-fallback{display:none;position:absolute;inset:auto 16px 16px 16px;padding:12px 14px;background:#111a2b;border:1px solid var(--line);border-radius:12px;color:var(--text);font-size:13px;line-height:1.7;box-shadow:0 8px 30px #0008}
+.modal-content{position:relative;display:flex;flex:1;flex-direction:column;min-height:0;overflow-y:auto;overscroll-behavior:contain;background:#080b13}
+.preview-frame{display:block;flex:0 0 auto;width:100%;height:min(58vh,650px);min-height:220px;border:0;background:#fff}
+.preview-fallback{display:flex;position:static;flex:0 0 auto;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:9px;margin:8px;padding:11px 13px;background:#111a2b;border:1px solid var(--line);border-radius:12px;color:var(--text);font-size:12px;line-height:1.7;box-shadow:0 8px 30px #0005}
+.preview-fallback p{margin:0;flex:1;min-width:180px}
+.preview-fallback-actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.preview-fallback a,.preview-fallback button{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:8px 11px;border:1px solid #61e4df70;border-radius:9px;background:#17243a;color:#eefcff;font:inherit;font-size:12px;font-weight:750;text-decoration:none;cursor:pointer}
+.preview-fallback a{background:#61e4df;color:#071219}
+.project-modal .project-edit-dock{position:static;inset:auto;flex:0 0 auto;width:auto;max-width:none;margin:8px;border-radius:13px;max-height:none;overflow:visible}
+.project-modal #projectEditForm.open{max-height:34vh;overflow-y:auto}
+@media(max-width:600px){.preview-frame{height:52vh;min-height:200px}.preview-fallback{align-items:stretch;margin:7px;padding:9px;font-size:11px}.preview-fallback p{min-width:100%}.preview-fallback-actions{width:100%}.preview-fallback-actions a,.preview-fallback-actions button{flex:1;min-height:44px}.project-modal .project-edit-dock{margin:7px}.project-modal #projectEditForm.open{max-height:32vh}}
+
 .modal-foot{padding:9px 15px;border-top:1px solid var(--line);color:var(--muted);font-size:12px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
 @keyframes modalFade{from{opacity:0}to{opacity:1}}@keyframes modalRise{from{opacity:0;transform:translateY(12px) scale(.99)}to{opacity:1;transform:translateY(0) scale(1)}}
 @media(max-width:600px){.modal-backdrop{padding:0}.project-modal{height:100dvh;border-radius:0;border:0}.modal-head{padding:10px;gap:8px}.modal-actions{gap:5px}.modal-action{padding:8px;font-size:11px}.modal-heading small{max-width:48vw}.modal-foot{font-size:11px}}
@@ -369,7 +379,7 @@ input,select,textarea{accent-color:var(--cyan)}
    </div>
    <div id="projectEditStatus" role="status" aria-live="polite">وضع المالك: اكتب فكرتك لتتحول إلى طلب تعديل قابل للمراجعة. لا يجري تعديل الموقع الخارجي تلقائيًا من داخل المعاينة.</div>
   </aside>
-<div class="preview-fallback" id="previewFallback">إذا لم تظهر الواجهة، فقد يمنع الموقع عرض نفسه داخل نافذة مضمّنة. استخدم «فتح مستقل» للوصول إليه مباشرة.</div></div>
+<div class="preview-fallback" id="previewFallback" role="region" aria-label="خيارات عرض بديلة"><p id="previewHelpText">إذا بقيت مساحة المعاينة فارغة، فقد يمنع الموقع تضمينه داخل Nexus. لا يمكن تأكيد نجاح العرض من إطار خارجي بسبب قيود المتصفح.</p><div class="preview-fallback-actions"><a id="previewFallbackExternal" href="#" target="_blank" rel="noopener noreferrer">فتح الموقع مستقلاً ↗</a><button id="previewRetry" type="button">إعادة تحميل المعاينة ↻</button></div></div></div>
   <footer class="modal-foot"><span>معاينة مباشرة داخل Nexus</span><span>Esc للإغلاق · يبقى مركز المشاريع مفتوحًا</span></footer>
  </section>
 </div>
@@ -437,6 +447,7 @@ function update(){const q=search.value.trim().toLowerCase();let count=0;cards.fo
 
 const projectModal=document.getElementById('projectModal'),projectFrame=document.getElementById('projectFrame'),modalTitle=document.getElementById('modalTitle'),modalUrl=document.getElementById('modalUrl'),modalExternal=document.getElementById('modalExternal'),modalClose=document.getElementById('modalClose'),previewFallback=document.getElementById('previewFallback');
 let previousFocus=null;
+let previousBodyOverflow='';
 
 function syncOwnerProject(card){
  const name=card.querySelector('h3')?.textContent?.trim()||'المشروع';
@@ -451,10 +462,19 @@ function syncOwnerProject(card){
  if(st)st.textContent='المشروع الحالي: '+name+' · اكتب فكرتك أو جهّز مهمة. الرجوع يعيدك إلى المكتبة.';
 }
 
+function reloadProjectPreview(){
+ const url=modalExternal.href;
+ if(!url||url==='#')return;
+ projectFrame.src='about:blank';
+ requestAnimationFrame(()=>{projectFrame.src=url});
+ const help=document.getElementById('previewHelpText');
+ if(help)help.textContent='أُعيد طلب تحميل المعاينة. إذا بقيت فارغة، فقد يمنع الموقع التضمين؛ استخدم فتح الموقع مستقلاً.';
+}
 function openProjectPreview(card){
  const link=card.querySelector('.project-foot a.open');
  if(!link)return;
  previousFocus=document.activeElement;
+ previousBodyOverflow=document.body.style.overflow;
  const url=link.href;
  syncOwnerProject(card);
  const ideaBox=document.getElementById('projectEditIdea');if(ideaBox)ideaBox.value='';
@@ -462,7 +482,10 @@ function openProjectPreview(card){
  modalTitle.textContent=card.querySelector('h3')?.textContent?.trim()||'معاينة المشروع';
  modalUrl.textContent=url;
  modalExternal.href=url;
- previewFallback.style.display='none';
+ const fallbackExternal=document.getElementById('previewFallbackExternal');
+ if(fallbackExternal)fallbackExternal.href=url;
+ const help=document.getElementById('previewHelpText');
+ if(help)help.textContent='إذا بقيت مساحة المعاينة فارغة، فقد يمنع الموقع تضمينه داخل Nexus. لا يمكن تأكيد نجاح العرض من إطار خارجي بسبب قيود المتصفح.';
  projectFrame.src='about:blank';
  projectModal.classList.add('open');
  projectModal.setAttribute('aria-hidden','false');
@@ -472,7 +495,7 @@ function openProjectPreview(card){
 function closeProjectPreview(){
  projectModal.classList.remove('open');
  projectModal.setAttribute('aria-hidden','true');
- document.body.style.overflow='';
+ document.body.style.overflow=previousBodyOverflow;
  projectFrame.src='about:blank';
  if(previousFocus&&typeof previousFocus.focus==='function')previousFocus.focus();
 }
@@ -501,7 +524,8 @@ function saveProjectEditRequest(){
  const name=document.getElementById('modalTitle').textContent;
  const url=document.getElementById('modalUrl').textContent;
  const request={id:'REQ-'+Date.now(),createdAt:new Date().toISOString(),project:name,url,idea,status:'draft_for_review',note:'طلب تعديل محلي؛ لم يُغيّر كود المشروع أو الموقع المنشور.'};
- try{const key='m5mosh-nexus-edit-requests-v1';const list=JSON.parse(localStorage.getItem(key)||'[]');list.unshift(request);localStorage.setItem(key,JSON.stringify(list.slice(0,100)));}catch(_){}
+ try{const key='m5mosh-nexus-edit-requests-v1';const list=JSON.parse(localStorage.getItem(key)||'[]');list.unshift(request);localStorage.setItem(key,JSON.stringify(list.slice(0,100)));}
+ catch(_){document.getElementById('projectEditStatus').textContent='تعذر حفظ الطلب محليًا في هذا المتصفح. لم يتم تسجيله؛ تحقق من مساحة التخزين أو إعدادات الخصوصية ثم أعد المحاولة.';return}
  const taskNote=document.getElementById('operatorTaskNote');if(taskNote)taskNote.value=idea;
  const taskType=document.getElementById('operatorTaskType');if(taskType)taskType.value='ui';
  const opProject=document.getElementById('operatorProject');
@@ -519,9 +543,18 @@ document.getElementById('projectOwnerPanel').addEventListener('click',()=>{close
 document.getElementById('projectBack').addEventListener('click',closeProjectPreview);
 
 modalClose.addEventListener('click',closeProjectPreview);
+document.getElementById('previewRetry').addEventListener('click',reloadProjectPreview);
 projectModal.addEventListener('click',e=>{if(e.target===projectModal)closeProjectPreview()});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'&&projectModal.classList.contains('open'))closeProjectPreview()});
-projectFrame.addEventListener('load',()=>{if(projectModal.classList.contains('open'))setTimeout(()=>{try{const doc=projectFrame.contentDocument;if(doc&&doc.location.href==='about:blank')previewFallback.style.display='block'}catch(_){/* Cross-origin is expected for external projects. */}},900)});
+document.addEventListener('keydown',e=>{
+ if(!projectModal.classList.contains('open'))return;
+ if(e.key==='Escape'){e.preventDefault();closeProjectPreview();return}
+ if(e.key!=='Tab')return;
+ const items=[...projectModal.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),textarea:not([disabled]),select:not([disabled]),[tabindex]:not([tabindex="-1"])')].filter(el=>el.getClientRects().length>0);
+ if(!items.length){e.preventDefault();modalClose.focus();return}
+ const first=items[0],last=items[items.length-1];
+ if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}
+ else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}
+});
 
 
 const manifesto=document.getElementById('manifestoText');
