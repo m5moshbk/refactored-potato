@@ -19,8 +19,8 @@ NEXUS_MONITOR_CHANNELS = {
     for item in os.getenv("NEXUS_MONITOR_CHANNELS", "").split(",")
     if item.strip()
 }
-# Public chat mode lets non-admin users chat with the AI while keeping admin callbacks locked.
-PUBLIC_BOT_MODE = os.getenv("NEXUS_PUBLIC_MODE", "1").strip().lower() in ("1", "true", "yes", "on")
+# Public chat mode is opt-in; keep AI access private unless explicitly enabled.
+PUBLIC_BOT_MODE = os.getenv("NEXUS_PUBLIC_MODE", "0").strip().lower() in ("1", "true", "yes", "on")
 PUBLIC_DAILY_LIMIT = max(1, min(100, int(os.getenv("NEXUS_PUBLIC_DAILY_LIMIT", "20"))))
 PUBLIC_USAGE = {}
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "").strip()
