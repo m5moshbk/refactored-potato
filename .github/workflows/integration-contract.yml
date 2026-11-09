@@ -1,0 +1,46 @@
+name: Integration contract checks
+
+on:
+  push:
+    branches:
+      - "integration/**"
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nexus-integration-contract-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  contract-tests:
+    name: Validate integration contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: sada-voice/backend/requirements.txt
+
+      - name: Install backend and test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r sada-voice/backend/requirements.txt
+          pip install "jsonschema[format]>=4.23,<5"
+
+      - name: Run root integration contract tests
+        run: python -m unittest discover -s tests -p "test_*integration_contract*.py" -v
+
+      - name: Run Voice Nexus health contract tests
+        env:
+          PYTHONPATH: sada-voice/backend
+        run: python -m unittest discover -s sada-voice/backend/tests -p "test_integration_contract.py" -v
