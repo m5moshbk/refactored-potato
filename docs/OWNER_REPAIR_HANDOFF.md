@@ -21,6 +21,8 @@ The Nexus Owner Repair Environment prepares a structured repair request and open
 
 ## Important limitation
 
+A copy-text fallback is available if the browser blocks the new tab or clipboard access; copying still does not create a GitHub issue.
+
 The static Nexus page cannot send a message into an existing ChatGPT conversation. This handoff is therefore explicit, not a background push: the GitHub issue becomes the durable request record, and the owner supplies its link or number to the assistant.
 
 The current Task Orchestrator is a proposal-only foundation. It has no trusted authentication, durable task store, worker, scheduler, or execution endpoint. Do not describe it as an autonomous repair executor until those components are implemented, threat-modeled, tested, and deployed with owner approval.
