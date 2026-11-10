@@ -37,6 +37,6 @@ The current Task Orchestrator is a proposal-only foundation. It has no trusted a
 
 ## Evidence and status language
 
-The browser event `handoff_opened_not_submitted` means only that the handoff action was invoked. It does not prove GitHub saved the issue, that ChatGPT received it, or that repair work began.
+The browser event `handoff_open_requested_not_submitted` means only that the page requested a new browser window for the prefilled GitHub form; it does not prove that the browser opened it. It does not prove GitHub saved the issue, that ChatGPT received it, or that repair work began.
 
 © M5mOsH All Rights Reserved
