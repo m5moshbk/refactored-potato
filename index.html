@@ -681,6 +681,8 @@ status.textContent='تم فتح مساحة التحكم تلقائيًا. اخت
   <button class="nx-repair-btn" id="nxRepairRender" type="button">فتح Render ↗</button>
   <button class="nx-repair-btn" id="nxRepairRepo" type="button">فتح GitHub ↗</button>
  </div>
+ <label class="operator-label" for="nxRepairOwnerDetails">وصف العطل وخطوات إعادة الإنتاج (اختياري)</label>
+ <textarea class="operator-textarea" id="nxRepairOwnerDetails" rows="4" maxlength="600" placeholder="اكتب ما حدث، وخطوات إعادة الإنتاج، والنتيجة المتوقعة والفعلية. لا تضع أسراراً أو بيانات عملاء. الحد الأقصى 600 حرف."></textarea>
  <label class="operator-label" for="nxRepairTicketPreview">معاينة تذكرة الإصلاح قبل الإرسال</label>
  <textarea class="operator-textarea" id="nxRepairTicketPreview" rows="7" readonly placeholder="جهّز الإصلاح أولاً حتى تظهر مسودة التذكرة هنا."></textarea>
  <p class="nx-repair-handoff-note">الصندوق خاص بالمستودع <code>m5moshbk/M5mOsH-Task-Orchestrator</code>. فتح النموذج لا ينشئ التذكرة ولا يشغّل إصلاحًا. لا تضع كلمات مرور أو مفاتيح API أو رموز وصول أو DSN أو بيانات عملاء في الوصف.</p>
@@ -711,7 +713,7 @@ status.textContent='تم فتح مساحة التحكم تلقائيًا. اخت
  let preparedTicket=null;
  const secretLike=/(?:\b(?:gh[pousr]_[A-Za-z0-9_]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-[A-Za-z0-9_-]{16,})\b|\bBearer\s+\S+|\bAuthorization\s*[:=]\s*(?:Basic|Bearer)\s+\S+|\b[A-Z0-9_]*(?:API[_-]?KEY|SECRET(?:_ACCESS_KEY)?|TOKEN|PASSWORD|PASSWD|DATABASE_URL|DSN)[A-Z0-9_]*\s*[:=]\s*\S+|postgres(?:ql)?:\/\/[^\s]+|-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----)/i;
  function buildRepairTicket(d){
-  const rawNote=String($('operatorTaskNote')?.value||'').trim();
+  const rawNote=String($('nxRepairOwnerDetails')?.value||$('operatorTaskNote')?.value||'').trim();
   if(secretLike.test(rawNote))return {error:'يبدو أن الوصف يحتوي على سر أو بيانات اتصال. أزلها من الوصف ثم أعد تجهيز المسودة؛ لا تُرسل أسرارًا إلى التذكرة.'};
   if(rawNote.length>600)return {error:'الوصف أطول من الحد الآمن (600 حرف). اختصره مع الاحتفاظ بخطوات إعادة الإنتاج والأثر فقط؛ لن يتم اقتطاع النص بصمت.'};
   const note=rawNote;
@@ -775,9 +777,8 @@ status.textContent='تم فتح مساحة التحكم تلقائيًا. اخت
   const op=[...document.querySelectorAll('#operatorProject option')].find(o=>o.textContent.trim()===d.name);
   if(op){$('operatorProject').value=op.value;$('operatorProject').dispatchEvent(new Event('change'))}
   $('operatorTaskType').value='bug';
-  $('operatorTaskNote').value='إصلاح المشروع: '+d.name+'\n1) أعد إنتاج العطل وحدد السبب الجذري بالأدلة.\n2) حدّد الملف أو المورد المتأثر.\n3) اقترح إصلاحًا محدود النطاق في فرع مستقل.\n4) اختبر الحالة الأصلية والحالات المجاورة.\n5) راجع الفرق والنتائج قبل أي دمج أو نشر.\nرابط الخدمة: '+d.url+'\nالمستودع: '+d.repo;
   if(!refreshRepairTicket(d))return;
-  setStatus('تم تجهيز مسودة إصلاح لـ '+d.name+'. راجع نص التذكرة، ثم وجّهها إلى صندوق GitHub الخاص. لم يُحفظ الطلب بعد ولم يبدأ أي تغيير على الخادم.');
+  setStatus('تم تجهيز مسودة إصلاح لـ '+d.name+'. وصفك لم يُستبدل. راجع المعاينة، ثم وجّه التذكرة إلى صندوق GitHub الخاص. لم يُحفظ الطلب بعد ولم يبدأ أي تغيير على الخادم.');
   logRepair(d,'prepared_not_executed');
   if($('operatorStatus')?.lastElementChild)$('operatorStatus').lastElementChild.textContent='تم تجهيز خطة إصلاح: '+d.name+' — لم تُنفذ تغييرات على الخادم.';
  }
