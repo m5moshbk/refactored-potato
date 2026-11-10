@@ -89,7 +89,7 @@ class NexusIndexTests(unittest.TestCase):
         self.assertIn('id="nxRepairRoute"', self.source)
         self.assertIn('id="nxRepairTicketPreview"', self.source)
         self.assertIn("Create new issue", self.source)
-        self.assertIn("handoff_opened_not_submitted", self.source)
+        self.assertIn("handoff_open_requested_not_submitted", self.source)
         self.assertIn("لم تُحفظ التذكرة ولم يبدأ التنفيذ بعد", self.source)
 
     def test_owner_repair_handoff_blocks_common_secret_patterns(self) -> None:
