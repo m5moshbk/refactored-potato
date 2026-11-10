@@ -11,6 +11,16 @@ on:
       - "scripts-catalog.json"
       - "tests/test_nexus_ui.py"
       - ".github/workflows/nexus-ui-smoke.yml"
+  pull_request:
+    branches:
+      - feat/nexus-ui-comprehensive-20261110
+    paths:
+      - "index.html"
+      - "design-system.html"
+      - "project-catalog.json"
+      - "scripts-catalog.json"
+      - "tests/test_nexus_ui.py"
+      - ".github/workflows/nexus-ui-smoke.yml"
   workflow_dispatch:
 
 permissions:
@@ -24,7 +34,7 @@ jobs:
       - name: Check out branch
         uses: actions/checkout@v4
         with:
-          ref: feat/nexus-ui-comprehensive-20261110
+          ref: ${{ github.event.pull_request.head.sha || github.ref }}
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
