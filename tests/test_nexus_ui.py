@@ -105,6 +105,7 @@ class NexusIndexTests(unittest.TestCase):
         self.assertIn("لن يتم اقتطاع النص بصمت", self.source)
         self.assertIn('id="nxRepairOwnerDetails"', self.source)
         self.assertIn("nxRepairOwnerDetails", self.source)
+        self.assertIn("M5mOsH-Task-Orchestrator/issues\" target=", self.source)
         prepare_block = self.source[self.source.index("function prepare(d)"):self.source.index("select.addEventListener('change'")]
         self.assertNotIn("$('operatorTaskNote').value=", prepare_block)
         self.assertIn("لا تُرسل أسرارًا إلى التذكرة", self.source)
