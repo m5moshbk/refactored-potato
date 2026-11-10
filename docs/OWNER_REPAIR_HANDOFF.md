@@ -33,6 +33,7 @@ The current Task Orchestrator is a proposal-only foundation. It has no trusted a
 - A GitHub issue is not authorization to change production.
 - Separate explicit owner approval remains required for merges, deployments, restarts, database changes, secret rotation, account/permission changes, or deletion.
 - The UI applies a conservative pattern check for common secret-like strings, but this is not a complete data-loss-prevention system. The owner must still review the ticket preview.
+- The owner description is limited to 600 characters to keep the prefilled GitHub URL bounded. Overlong text is rejected rather than silently truncated; secret-pattern checks run on the full description before any handoff.
 
 ## Evidence and status language
 
