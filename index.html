@@ -664,21 +664,26 @@ status.textContent='تم فتح مساحة التحكم تلقائيًا. اخت
 #nxRepairCenter{margin:22px 0;border:1px solid #f4c87555;border-radius:18px;padding:18px;background:linear-gradient(130deg,#201b16ee,#111725ee);color:var(--text)}
 #nxRepairCenter h2{margin:0 0 7px;font-size:22px}#nxRepairCenter p{line-height:1.8;color:#b8c5d9;font-size:13px}
 .nx-repair-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.nx-repair-btn{border:1px solid #ffffff26;border-radius:10px;padding:10px 13px;background:#ffffff08;color:var(--text);font:inherit;font-size:12px;font-weight:800;cursor:pointer}.nx-repair-btn.primary{background:linear-gradient(110deg,#f4c875,#ffe5a6);color:#1b1509;border:0}.nx-repair-state{margin-top:12px;padding:11px;border-radius:10px;border:1px solid #f4c87530;background:#f4c87509;font-size:12px;line-height:1.8;white-space:pre-line}
+#nxRepairTicketPreview{display:block;width:100%;min-height:150px;margin:8px 0;border:1px solid #ffffff25;border-radius:10px;background:#0b1220;color:#eaf2ff;padding:11px;font:inherit;font-size:11px;line-height:1.7;resize:vertical}#nxRepairTicketPreview:focus{outline:2px solid #61e4df;outline-offset:2px}.nx-repair-handoff-note{margin:8px 0;color:#f4dba7;font-size:11px;line-height:1.8}.nx-repair-btn:disabled{opacity:.48;cursor:not-allowed}
 .project .nx-card-repair{display:inline-flex;align-items:center;justify-content:center;margin:7px 0 0;padding:8px 10px;border-radius:9px;border:1px solid #f4c87566;background:#f4c8750b;color:#ffe0a0;font:inherit;font-size:11px;font-weight:800;cursor:pointer}
 @media(max-width:600px){#nxRepairCenter{padding:14px}}
 </style>
 <section id="nxRepairCenter" aria-labelledby="nxRepairTitle">
  <div class="eyebrow">REPAIR WORKFLOW · EXPLICIT ACTIONS</div>
  <h2 id="nxRepairTitle">مركز إصلاح المشاريع</h2>
- <p>اختر «إصلاح المشروع» من بطاقة أي مشروع. يجهّز المركز سياق العطل، ويفتح أدوات الاستضافة والمصدر، ويسجّل الإجراء محليًا. هذه النسخة من Nexus ثابتة؛ لذلك لا تستطيع وحدها إعادة تشغيل خادم أو تعديل قاعدة بيانات أو إصلاح كل عطل تلقائيًا. التفعيل الكامل يحتاج خادمًا آمنًا مربوطًا بـ Render/GitHub وصلاحيات محفوظة خارج المتصفح.</p>
+ <p>اختر المشروع وجهّز سياق العطل، ثم راجع مسودة الطلب قبل توجيهها إلى صندوق الإصلاح الخاص في GitHub. لن يُحفظ الطلب حتى تضغط «Create new issue» بنفسك في GitHub. بعد حفظه أرسل رقم التذكرة أو رابطها في محادثة ChatGPT الحالية كي أقرأ الأدلة وأبدأ الفحص والإصلاح ضمن النطاق المصرّح. لا توجد هنا قناة دفع تلقائي إلى المحادثة، ولا تُنفّذ هذه الصفحة تغييرات على الخادم.</p>
  <label class="operator-label" for="nxRepairProject">المشروع المراد إصلاحه</label>
  <select class="operator-select" id="nxRepairProject"><option value="">اختر مشروعًا من المكتبة…</option></select>
  <div class="nx-repair-actions">
   <button class="nx-repair-btn primary" id="nxRepairStart" type="button">⚙ تجهيز الإصلاح</button>
+  <button class="nx-repair-btn" id="nxRepairRoute" type="button" disabled>↗ توجيه الطلب إلى صندوق المساعد</button>
   <button class="nx-repair-btn" id="nxRepairSite" type="button">فتح الموقع ↗</button>
   <button class="nx-repair-btn" id="nxRepairRender" type="button">فتح Render ↗</button>
   <button class="nx-repair-btn" id="nxRepairRepo" type="button">فتح GitHub ↗</button>
  </div>
+ <label class="operator-label" for="nxRepairTicketPreview">معاينة تذكرة الإصلاح قبل الإرسال</label>
+ <textarea class="operator-textarea" id="nxRepairTicketPreview" rows="7" readonly placeholder="جهّز الإصلاح أولاً حتى تظهر مسودة التذكرة هنا."></textarea>
+ <p class="nx-repair-handoff-note">الصندوق خاص بالمستودع <code>m5moshbk/M5mOsH-Task-Orchestrator</code>. فتح النموذج لا ينشئ التذكرة ولا يشغّل إصلاحًا. لا تضع كلمات مرور أو مفاتيح API أو رموز وصول أو DSN أو بيانات عملاء في الوصف.</p>
  <div class="nx-repair-state" id="nxRepairState" role="status" aria-live="polite">لم يبدأ الفحص بعد. اختر المشروع ثم اضغط «تجهيز الإصلاح».</div>
 </section>
 <script>
@@ -701,6 +706,61 @@ status.textContent='تم فتح مساحة التحكم تلقائيًا. اخت
  }
  function chosen(){return details(cards[Number(select.value)])}
  function setStatus(text){state.textContent=text}
+ const routeButton=$('nxRepairRoute'), ticketPreview=$('nxRepairTicketPreview');
+ const repairInboxUrl='https://github.com/m5moshbk/M5mOsH-Task-Orchestrator/issues/new';
+ let preparedTicket=null;
+ const secretLike=/(?:\b(?:gh[pousr]_[A-Za-z0-9_]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-[A-Za-z0-9_-]{16,})\b|\bBearer\s+\S+|(?:api[_-]?key|password|passwd|secret|token|database_url|dsn)\s*[:=]\s*\S+|postgres(?:ql)?:\/\/[^\s]+)/i;
+ function buildRepairTicket(d){
+  const note=String($('operatorTaskNote')?.value||'').trim().slice(0,4000);
+  if(secretLike.test(note))return {error:'يبدو أن الوصف يحتوي على سر أو بيانات اتصال. أزلها من الوصف ثم أعد تجهيز المسودة؛ لا تُرسل أسرارًا إلى التذكرة.'};
+  const createdAt=new Date().toISOString();
+  const title=('M5mOsH Repair Request — '+d.name).slice(0,120);
+  const body=[
+   '## طلب إصلاح من بيئة المالك التنفيذية',
+   '',
+   '- Project: '+d.name,
+   '- Preview URL: '+(d.url||'غير مسجل'),
+   '- Repository: '+d.repo,
+   '- Created at (UTC): '+createdAt,
+   '- Request origin: M5mOsH Nexus / Owner Repair Environment',
+   '- Requested assistant: ChatGPT assistant in the owner conversation',
+   '',
+   '## وصف المالك والسياق',
+   note||'لم يضف المالك وصفًا إضافيًا؛ اجمع أدلة القراءة فقط أولًا.',
+   '',
+   '## خطوات التعامل المطلوبة',
+   '1. أعد إنتاج العطل وسجّل خطواته والأدلة.',
+   '2. حدّد الملف أو المورد والسبب الجذري قبل اقتراح أي تغيير.',
+   '3. أنشئ إصلاحًا محدود النطاق في فرع تطوير مستقل.',
+   '4. اختبر الحالة الأصلية والحالات المجاورة، ثم راجع الفرق والنتائج.',
+   '5. أبلغ المالك بما تم وما لم يتم، مع الأدلة والملفات المتأثرة.',
+   '',
+   '## حدود الموافقة',
+   '- ابدأ بالفحص للقراءة فقط.',
+   '- لا تدمج ولا تنشر ولا تعِد تشغيل خدمة ولا تغيّر قاعدة بيانات أو أسرارًا أو صلاحيات دون موافقة صريحة منفصلة.',
+   '- لا تعتبر إنشاء هذه التذكرة إذنًا بتغيير إنتاجي.',
+   '',
+   '## الخصوصية',
+   'لا تضع أو تطلب كلمات مرور أو API keys أو tokens أو DSN أو بيانات شخصية للعملاء داخل التذكرة.',
+   '',
+   'بعد إنشاء التذكرة، يرسل المالك رقمها أو رابطها إلى محادثة ChatGPT الحالية حتى يتمكن المساعد من استرجاعها والبدء.',
+   '',
+   '© M5mOsH All Rights Reserved'
+  ].join('\n');
+  return {title,body,url:repairInboxUrl+'?title='+encodeURIComponent(title)+'&body='+encodeURIComponent(body),createdAt};
+ }
+ function refreshRepairTicket(d){
+  preparedTicket=buildRepairTicket(d);
+  if(preparedTicket.error){
+   ticketPreview.value=preparedTicket.error;
+   routeButton.disabled=true;
+   setStatus(preparedTicket.error);
+   return false;
+  }
+  ticketPreview.value='TITLE: '+preparedTicket.title+'\n\n'+preparedTicket.body;
+  routeButton.disabled=false;
+  return true;
+ }
  function logRepair(d,stage){
   try{
    const k='m5mosh-nexus-repair-log-v1', list=JSON.parse(localStorage.getItem(k)||'[]');
@@ -713,13 +773,20 @@ status.textContent='تم فتح مساحة التحكم تلقائيًا. اخت
   const op=[...document.querySelectorAll('#operatorProject option')].find(o=>o.textContent.trim()===d.name);
   if(op){$('operatorProject').value=op.value;$('operatorProject').dispatchEvent(new Event('change'))}
   $('operatorTaskType').value='bug';
-  $('operatorTaskNote').value='إصلاح المشروع: '+d.name+'\n1) فحص حالة الخدمة وآخر نشر في Render.\n2) مراجعة سجل البناء والتشغيل لتحديد السبب.\n3) إصلاح السبب المحدد في المصدر أو الإعدادات.\n4) إعادة النشر/التشغيل بعد تأكيد الإجراء.\n5) التحقق من الصحة وتوثيق النتيجة.\nرابط الخدمة: '+d.url+'\nالمستودع: '+d.repo;
-  setStatus('تم تجهيز خطة إصلاح لـ '+d.name+'.\nالخطوة التالية: افتح Render وراجع حالة الخدمة وآخر نشر/السجلات. لا تعتبر تعذّر المعاينة وحده دليلًا على توقف الموقع؛ قد يمنع المتصفح التضمين أو طلبات الفحص.\nلم تُنفّذ إعادة تشغيل أو تغييرات على الخادم من هذه الصفحة الثابتة.');
+  $('operatorTaskNote').value='إصلاح المشروع: '+d.name+'\n1) أعد إنتاج العطل وحدد السبب الجذري بالأدلة.\n2) حدّد الملف أو المورد المتأثر.\n3) اقترح إصلاحًا محدود النطاق في فرع مستقل.\n4) اختبر الحالة الأصلية والحالات المجاورة.\n5) راجع الفرق والنتائج قبل أي دمج أو نشر.\nرابط الخدمة: '+d.url+'\nالمستودع: '+d.repo;
+  if(!refreshRepairTicket(d))return;
+  setStatus('تم تجهيز مسودة إصلاح لـ '+d.name+'. راجع نص التذكرة، ثم وجّهها إلى صندوق GitHub الخاص. لم يُحفظ الطلب بعد ولم يبدأ أي تغيير على الخادم.');
   logRepair(d,'prepared_not_executed');
   if($('operatorStatus')?.lastElementChild)$('operatorStatus').lastElementChild.textContent='تم تجهيز خطة إصلاح: '+d.name+' — لم تُنفذ تغييرات على الخادم.';
  }
- select.addEventListener('change',()=>{const d=chosen();if(d)setStatus('المحدد: '+d.name+'\n'+d.url+'\nاضغط «تجهيز الإصلاح» لإعداد قائمة خطوات مخصصة.')});
+ select.addEventListener('change',()=>{const d=chosen();preparedTicket=null;routeButton.disabled=true;ticketPreview.value='';if(d)setStatus('المحدد: '+d.name+'\n'+d.url+'\nاضغط «تجهيز الإصلاح» لإعداد مسودة تذكرة قابلة للمراجعة.')});
  $('nxRepairStart').addEventListener('click',()=>prepare(chosen()));
+ routeButton.addEventListener('click',()=>{
+  if(!preparedTicket||routeButton.disabled){setStatus('جهّز الطلب وراجعه أولاً.');return}
+  logRepair(chosen(),'handoff_opened_not_submitted');
+  window.open(preparedTicket.url,'_blank','noopener,noreferrer');
+  setStatus('تم طلب فتح نموذج GitHub الخاص. لم تُحفظ التذكرة ولم يبدأ التنفيذ بعد: راجع المسودة واضغط Create new issue في GitHub، ثم أرسل رقم التذكرة أو رابطها في محادثة ChatGPT الحالية.');
+ });
  $('nxRepairSite').addEventListener('click',()=>{const d=chosen();if(!d||!d.url){setStatus('هذا المشروع لا يحتوي على رابط معاينة مسجل.');return}window.open(d.url,'_blank','noopener,noreferrer')});
  $('nxRepairRender').addEventListener('click',()=>{const d=chosen();if(!d){setStatus('اختر مشروعًا أولًا.');return}logRepair(d,'opened_render_dashboard');window.open(d.render,'_blank','noopener,noreferrer');setStatus('فُتحت لوحة Render. اختر الخدمة المطابقة للمشروع، ثم راجع الحالة وآخر نشر والسجلات. لم يُنفذ restart تلقائيًا.')});
  $('nxRepairRepo').addEventListener('click',()=>{const d=chosen();if(!d){setStatus('اختر مشروعًا أولًا.');return}window.open(d.repo,'_blank','noopener,noreferrer')});
