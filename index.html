@@ -785,9 +785,9 @@ status.textContent='تم فتح مساحة التحكم تلقائيًا. اخت
  $('nxRepairStart').addEventListener('click',()=>prepare(chosen()));
  routeButton.addEventListener('click',()=>{
   if(!preparedTicket||routeButton.disabled){setStatus('جهّز الطلب وراجعه أولاً.');return}
-  logRepair(chosen(),'handoff_opened_not_submitted');
+  logRepair(chosen(),'handoff_open_requested_not_submitted');
   window.open(preparedTicket.url,'_blank','noopener,noreferrer');
-  setStatus('تم طلب فتح نموذج GitHub الخاص. لم تُحفظ التذكرة ولم يبدأ التنفيذ بعد: راجع المسودة واضغط Create new issue في GitHub، ثم أرسل رقم التذكرة أو رابطها في محادثة ChatGPT الحالية.');
+  setStatus('طلبت الصفحة فتح نموذج GitHub في نافذة جديدة. تحقق من ظهورها؛ إذا منع المتصفح النافذة المنبثقة فاسمح بفتحها أو افتح صندوق الإصلاح يدوياً. لم تُحفظ التذكرة ولم يبدأ التنفيذ بعد: اضغط Create new issue في GitHub، ثم أرسل رقم التذكرة أو رابطها في محادثة ChatGPT الحالية.');
  });
  $('nxRepairSite').addEventListener('click',()=>{const d=chosen();if(!d||!d.url){setStatus('هذا المشروع لا يحتوي على رابط معاينة مسجل.');return}window.open(d.url,'_blank','noopener,noreferrer')});
  $('nxRepairRender').addEventListener('click',()=>{const d=chosen();if(!d){setStatus('اختر مشروعًا أولًا.');return}logRepair(d,'opened_render_dashboard');window.open(d.render,'_blank','noopener,noreferrer');setStatus('فُتحت لوحة Render. اختر الخدمة المطابقة للمشروع، ثم راجع الحالة وآخر نشر والسجلات. لم يُنفذ restart تلقائيًا.')});
