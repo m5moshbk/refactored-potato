@@ -96,6 +96,9 @@ class NexusIndexTests(unittest.TestCase):
         self.assertIn("const secretLike=", self.source)
         self.assertIn("github_pat_", self.source)
         self.assertIn("Bearer", self.source)
+        self.assertIn("SECRET(?:_ACCESS_KEY)?", self.source)
+        self.assertIn("DATABASE_URL", self.source)
+        self.assertIn("PRIVATE KEY", self.source)
         self.assertIn("لا تُرسل أسرارًا إلى التذكرة", self.source)
 
 
