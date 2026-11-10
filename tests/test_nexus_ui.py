@@ -99,6 +99,10 @@ class NexusIndexTests(unittest.TestCase):
         self.assertIn("SECRET(?:_ACCESS_KEY)?", self.source)
         self.assertIn("DATABASE_URL", self.source)
         self.assertIn("PRIVATE KEY", self.source)
+        self.assertIn("const rawNote=", self.source)
+        self.assertIn("secretLike.test(rawNote)", self.source)
+        self.assertIn("rawNote.length>600", self.source)
+        self.assertIn("لن يتم اقتطاع النص بصمت", self.source)
         self.assertIn("لا تُرسل أسرارًا إلى التذكرة", self.source)
 
 
