@@ -35,7 +35,7 @@ jobs:
         run: |
           mkdir -p build/nexus-ui-preview
           cp index.html design-system.html project-catalog.json scripts-catalog.json build/nexus-ui-preview/
-          printf '%s\n' 'M5mOsH Nexus branch preview' '' 'Open index.html locally. Keep the JSON catalog files beside both HTML pages so the browser can load the read-only directory data.' 'This is a local preview bundle from the development branch; it is not a deployment.' '© M5mOsH All Rights Reserved' > build/nexus-ui-preview/README.txt
+          printf '%s\n' 'M5mOsH Nexus branch preview' '' 'Extract this folder, open a terminal inside it, then run: python -m http.server 8000' 'Open http://127.0.0.1:8000/index.html for the Nexus home page.' 'Open http://127.0.0.1:8000/design-system.html for the design studio.' 'Keep project-catalog.json and scripts-catalog.json beside the HTML files; the page loads them with fetch, so use HTTP instead of double-clicking a file:// URL.' 'Stop the local preview with Ctrl+C. This is a local preview bundle from the development branch; it is not a deployment.' '© M5mOsH All Rights Reserved' > build/nexus-ui-preview/README.txt
       - name: Upload branch preview bundle
         uses: actions/upload-artifact@v4
         with:
