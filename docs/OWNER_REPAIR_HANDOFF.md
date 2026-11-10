@@ -34,6 +34,7 @@ The current Task Orchestrator is a proposal-only foundation. It has no trusted a
 - Separate explicit owner approval remains required for merges, deployments, restarts, database changes, secret rotation, account/permission changes, or deletion.
 - The UI applies a conservative pattern check for common secret-like strings, but this is not a complete data-loss-prevention system. The owner must still review the ticket preview.
 - The owner description is limited to 600 characters to keep the prefilled GitHub URL bounded. Overlong text is rejected rather than silently truncated; secret-pattern checks run on the full description before any handoff.
+- The repair center provides a dedicated optional owner-description field. Preparing a ticket does not overwrite the existing owner task-note field; the dedicated description is used first, with the existing task note as a compatibility fallback.
 
 ## Evidence and status language
 
