@@ -103,6 +103,10 @@ class NexusIndexTests(unittest.TestCase):
         self.assertIn("secretLike.test(rawNote)", self.source)
         self.assertIn("rawNote.length>600", self.source)
         self.assertIn("لن يتم اقتطاع النص بصمت", self.source)
+        self.assertIn('id="nxRepairOwnerDetails"', self.source)
+        self.assertIn("nxRepairOwnerDetails", self.source)
+        prepare_block = self.source[self.source.index("function prepare(d)"):self.source.index("select.addEventListener('change'")]
+        self.assertNotIn("$('operatorTaskNote').value=", prepare_block)
         self.assertIn("لا تُرسل أسرارًا إلى التذكرة", self.source)
 
 
