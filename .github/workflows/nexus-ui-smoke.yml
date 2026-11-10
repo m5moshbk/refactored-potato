@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - feat/nexus-ui-comprehensive-20261110
+      - feat/nexus-owner-repair-inbox-20261110
     paths:
       - "index.html"
       - "design-system.html"
@@ -24,7 +25,7 @@ jobs:
       - name: Check out branch
         uses: actions/checkout@v4
         with:
-          ref: feat/nexus-ui-comprehensive-20261110
+          ref: ${{ github.ref }}
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
