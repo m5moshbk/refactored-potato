@@ -709,7 +709,7 @@ status.textContent='تم فتح مساحة التحكم تلقائيًا. اخت
  const routeButton=$('nxRepairRoute'), ticketPreview=$('nxRepairTicketPreview');
  const repairInboxUrl='https://github.com/m5moshbk/M5mOsH-Task-Orchestrator/issues/new';
  let preparedTicket=null;
- const secretLike=/(?:\b(?:gh[pousr]_[A-Za-z0-9_]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-[A-Za-z0-9_-]{16,})\b|\bBearer\s+\S+|(?:api[_-]?key|password|passwd|secret|token|database_url|dsn)\s*[:=]\s*\S+|postgres(?:ql)?:\/\/[^\s]+)/i;
+ const secretLike=/(?:\b(?:gh[pousr]_[A-Za-z0-9_]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-[A-Za-z0-9_-]{16,})\b|\bBearer\s+\S+|\bAuthorization\s*[:=]\s*(?:Basic|Bearer)\s+\S+|\b[A-Z0-9_]*(?:API[_-]?KEY|SECRET(?:_ACCESS_KEY)?|TOKEN|PASSWORD|PASSWD|DATABASE_URL|DSN)[A-Z0-9_]*\s*[:=]\s*\S+|postgres(?:ql)?:\/\/[^\s]+|-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----)/i;
  function buildRepairTicket(d){
   const note=String($('operatorTaskNote')?.value||'').trim().slice(0,4000);
   if(secretLike.test(note))return {error:'يبدو أن الوصف يحتوي على سر أو بيانات اتصال. أزلها من الوصف ثم أعد تجهيز المسودة؛ لا تُرسل أسرارًا إلى التذكرة.'};
