@@ -106,6 +106,9 @@ class NexusIndexTests(unittest.TestCase):
         self.assertIn('id="nxRepairOwnerDetails"', self.source)
         self.assertIn("nxRepairOwnerDetails", self.source)
         self.assertIn("M5mOsH-Task-Orchestrator/issues\" target=", self.source)
+        self.assertIn('id="nxRepairCopy"', self.source)
+        self.assertIn("handoff_text_copied_not_submitted", self.source)
+        self.assertIn("handoff_text_selected_for_manual_copy", self.source)
         prepare_block = self.source[self.source.index("function prepare(d)"):self.source.index("select.addEventListener('change'")]
         self.assertNotIn("$('operatorTaskNote').value=", prepare_block)
         self.assertIn("لا تُرسل أسرارًا إلى التذكرة", self.source)
