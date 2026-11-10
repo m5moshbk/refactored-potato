@@ -677,6 +677,7 @@ status.textContent='تم فتح مساحة التحكم تلقائيًا. اخت
  <div class="nx-repair-actions">
   <button class="nx-repair-btn primary" id="nxRepairStart" type="button">⚙ تجهيز الإصلاح</button>
   <button class="nx-repair-btn" id="nxRepairRoute" type="button" disabled>↗ توجيه الطلب إلى صندوق المساعد</button>
+  <button class="nx-repair-btn" id="nxRepairCopy" type="button" disabled>نسخ نص الطلب</button>
   <button class="nx-repair-btn" id="nxRepairSite" type="button">فتح الموقع ↗</button>
   <button class="nx-repair-btn" id="nxRepairRender" type="button">فتح Render ↗</button>
   <button class="nx-repair-btn" id="nxRepairRepo" type="button">فتح GitHub ↗</button>
@@ -708,7 +709,7 @@ status.textContent='تم فتح مساحة التحكم تلقائيًا. اخت
  }
  function chosen(){return details(cards[Number(select.value)])}
  function setStatus(text){state.textContent=text}
- const routeButton=$('nxRepairRoute'), ticketPreview=$('nxRepairTicketPreview');
+ const routeButton=$('nxRepairRoute'), copyButton=$('nxRepairCopy'), ticketPreview=$('nxRepairTicketPreview');
  const repairInboxUrl='https://github.com/m5moshbk/M5mOsH-Task-Orchestrator/issues/new';
  let preparedTicket=null;
  const secretLike=/(?:\b(?:gh[pousr]_[A-Za-z0-9_]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-[A-Za-z0-9_-]{16,})\b|\bBearer\s+\S+|\bAuthorization\s*[:=]\s*(?:Basic|Bearer)\s+\S+|\b[A-Z0-9_]*(?:API[_-]?KEY|SECRET(?:_ACCESS_KEY)?|TOKEN|PASSWORD|PASSWD|DATABASE_URL|DSN)[A-Z0-9_]*\s*[:=]\s*\S+|postgres(?:ql)?:\/\/[^\s]+|-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----)/i;
@@ -758,11 +759,13 @@ status.textContent='تم فتح مساحة التحكم تلقائيًا. اخت
   if(preparedTicket.error){
    ticketPreview.value=preparedTicket.error;
    routeButton.disabled=true;
+   copyButton.disabled=true;
    setStatus(preparedTicket.error);
    return false;
   }
   ticketPreview.value='TITLE: '+preparedTicket.title+'\n\n'+preparedTicket.body;
   routeButton.disabled=false;
+  copyButton.disabled=false;
   return true;
  }
  function logRepair(d,stage){
@@ -782,8 +785,23 @@ status.textContent='تم فتح مساحة التحكم تلقائيًا. اخت
   logRepair(d,'prepared_not_executed');
   if($('operatorStatus')?.lastElementChild)$('operatorStatus').lastElementChild.textContent='تم تجهيز خطة إصلاح: '+d.name+' — لم تُنفذ تغييرات على الخادم.';
  }
- select.addEventListener('change',()=>{const d=chosen();preparedTicket=null;routeButton.disabled=true;ticketPreview.value='';if(d)setStatus('المحدد: '+d.name+'\n'+d.url+'\nاضغط «تجهيز الإصلاح» لإعداد مسودة تذكرة قابلة للمراجعة.')});
+ select.addEventListener('change',()=>{const d=chosen();preparedTicket=null;routeButton.disabled=true;copyButton.disabled=true;ticketPreview.value='';if(d)setStatus('المحدد: '+d.name+'\n'+d.url+'\nاضغط «تجهيز الإصلاح» لإعداد مسودة تذكرة قابلة للمراجعة.')});
  $('nxRepairStart').addEventListener('click',()=>prepare(chosen()));
+ copyButton.addEventListener('click',async()=>{
+  if(!preparedTicket||copyButton.disabled){setStatus('جهّز الطلب وراجعه أولاً.');return}
+  const textToCopy=preparedTicket.title+'\n\n'+preparedTicket.body;
+  try{
+   if(!navigator.clipboard?.writeText)throw new Error('Clipboard API unavailable');
+   await navigator.clipboard.writeText(textToCopy);
+   logRepair(chosen(),'handoff_text_copied_not_submitted');
+   setStatus('تم نسخ نص الطلب. لم تُنشأ التذكرة ولم يبدأ التنفيذ؛ افتح صندوق الإصلاح والصق النص في نموذج GitHub ثم احفظه بنفسك.');
+  }catch(_){
+   ticketPreview.focus();
+   ticketPreview.select();
+   logRepair(chosen(),'handoff_text_selected_for_manual_copy');
+   setStatus('تعذر النسخ الآلي. تم تحديد نص الطلب في المعاينة؛ انسخه يدوياً ثم الصقه في نموذج GitHub. لم تُنشأ التذكرة ولم يبدأ التنفيذ.');
+  }
+ });
  routeButton.addEventListener('click',()=>{
   if(!preparedTicket||routeButton.disabled){setStatus('جهّز الطلب وراجعه أولاً.');return}
   logRepair(chosen(),'handoff_open_requested_not_submitted');
