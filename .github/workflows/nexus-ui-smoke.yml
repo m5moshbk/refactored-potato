@@ -7,6 +7,8 @@ on:
     paths:
       - "index.html"
       - "design-system.html"
+      - "project-catalog.json"
+      - "scripts-catalog.json"
       - "tests/test_nexus_ui.py"
       - ".github/workflows/nexus-ui-smoke.yml"
   workflow_dispatch:
@@ -29,3 +31,15 @@ jobs:
           python-version: "3.12"
       - name: Run Nexus UI checks
         run: python -m unittest discover -s tests -p "test_nexus_ui.py" -v
+      - name: Prepare branch preview bundle
+        run: |
+          mkdir -p build/nexus-ui-preview
+          cp index.html design-system.html project-catalog.json scripts-catalog.json build/nexus-ui-preview/
+          printf '%s\n' 'M5mOsH Nexus branch preview' '' 'Open index.html locally. Keep the JSON catalog files beside both HTML pages so the browser can load the read-only directory data.' 'This is a local preview bundle from the development branch; it is not a deployment.' '© M5mOsH All Rights Reserved' > build/nexus-ui-preview/README.txt
+      - name: Upload branch preview bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: m5mosh-nexus-ui-preview
+          path: build/nexus-ui-preview/
+          if-no-files-found: error
+          retention-days: 7
