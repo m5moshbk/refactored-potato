@@ -336,7 +336,7 @@ def receive_salla_webhook():
                 (payload_sha256, event_name, received_at),
             )
         is_duplicate = cursor.rowcount == 0
-    except sqlite3.Error:
+    except (sqlite3.Error, OSError):
         app.logger.exception("Salla webhook receipt persistence failed")
         return jsonify({"error": "receipt_storage_unavailable"}), 503
 
