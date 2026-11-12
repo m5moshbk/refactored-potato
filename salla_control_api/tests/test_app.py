@@ -25,11 +25,11 @@ def signed_headers(raw):
     }
 
 
-def authorize_payload(merchant=1234509876):
+def authorize_payload(merchant=1234509876, created_at="2026-11-12 05:00:00"):
     return {
         "event": "app.store.authorize",
         "merchant": merchant,
-        "created_at": "2026-11-12 05:00:00",
+        "created_at": created_at,
         "data": {
             "access_token": "test-access-token-never-store-plain",
             "expires": 2000000000,
@@ -186,3 +186,81 @@ def test_invalid_json_with_valid_signature_is_rejected(tmp_path, monkeypatch):
     )
     assert response.status_code == 400
     assert response.get_json()["error"] == "invalid_json"
+
+
+def test_stale_authorize_after_uninstall_does_not_restore_credentials(tmp_path, monkeypatch):
+    module = load_module(tmp_path, monkeypatch)
+    client = module.app.test_client()
+    assert post_signed(client, authorize_payload(created_at="2026-11-12 05:00:00")).status_code == 202
+    uninstall = {
+        "event": "app.uninstalled",
+        "merchant": 1234509876,
+        "created_at": "2026-11-12 05:05:00",
+        "data": {"app_name": "M5mOsH"},
+    }
+    assert post_signed(client, uninstall).status_code == 202
+
+    stale = authorize_payload(created_at="2026-11-12 05:02:00")
+    response = post_signed(client, stale)
+    assert response.status_code == 202
+    assert response.get_json()["ignored"] == "stale_or_ambiguous_event"
+    with sqlite3.connect(tmp_path / "salla-tokens.sqlite3") as con:
+        row = con.execute(
+            "SELECT token_ciphertext, revoked_at FROM salla_merchant_credentials"
+        ).fetchone()
+    assert row[0] is None
+    assert row[1]
+
+
+def test_newer_authorize_after_uninstall_reconnects_merchant(tmp_path, monkeypatch):
+    module = load_module(tmp_path, monkeypatch)
+    client = module.app.test_client()
+    assert post_signed(client, authorize_payload(created_at="2026-11-12 05:00:00")).status_code == 202
+    assert post_signed(client, {
+        "event": "app.uninstalled",
+        "merchant": 1234509876,
+        "created_at": "2026-11-12 05:05:00",
+        "data": {"app_name": "M5mOsH"},
+    }).status_code == 202
+    response = post_signed(
+        client,
+        authorize_payload(created_at="2026-11-12 05:06:00"),
+    )
+    assert response.status_code == 202
+    assert response.get_json()["credentials_updated"] is True
+    with sqlite3.connect(tmp_path / "salla-tokens.sqlite3") as con:
+        row = con.execute(
+            "SELECT token_ciphertext, revoked_at FROM salla_merchant_credentials"
+        ).fetchone()
+    assert row[0] is not None
+    assert row[1] is None
+
+
+def test_equal_timestamp_lifecycle_event_is_ignored_as_ambiguous(tmp_path, monkeypatch):
+    module = load_module(tmp_path, monkeypatch)
+    client = module.app.test_client()
+    timestamp = "2026-11-12 05:00:00"
+    assert post_signed(client, authorize_payload(created_at=timestamp)).status_code == 202
+    response = post_signed(client, {
+        "event": "app.uninstalled",
+        "merchant": 1234509876,
+        "created_at": timestamp,
+        "data": {"app_name": "M5mOsH"},
+    })
+    assert response.status_code == 202
+    assert response.get_json()["ignored"] == "stale_or_ambiguous_event"
+    with sqlite3.connect(tmp_path / "salla-tokens.sqlite3") as con:
+        row = con.execute(
+            "SELECT token_ciphertext, revoked_at FROM salla_merchant_credentials"
+        ).fetchone()
+    assert row[0] is not None
+    assert row[1] is None
+
+
+@pytest.mark.parametrize("created_at", [None, "", "not-a-timestamp", 123])
+def test_lifecycle_event_requires_valid_created_at(tmp_path, monkeypatch, created_at):
+    module = load_module(tmp_path, monkeypatch)
+    payload = authorize_payload(created_at=created_at)
+    response = post_signed(module.app.test_client(), payload)
+    assert response.status_code == 400
+    assert response.get_json()["error"] == "invalid_event_timestamp"
