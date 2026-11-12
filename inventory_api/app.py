@@ -1,6 +1,7 @@
 import os
 import json
 import hmac
+import hashlib
 import sqlite3
 from datetime import datetime, timezone
 from collections import Counter
@@ -225,6 +226,132 @@ def receive_inventory():
         "stored_source_contents": False,
         "received_at": summary[1]
     }), 202
+
+
+SALLA_WEBHOOK_DB_PATH = os.environ.get(
+    "SALLA_WEBHOOK_DB_PATH", "/tmp/salla_webhooks.sqlite3"
+)
+SALLA_WEBHOOK_TOKEN_HEADER = "X-M5mOsH-Webhook-Token"
+SALLA_WEBHOOK_MAX_BYTES = 512 * 1024
+
+
+def connect_salla_webhooks():
+    con = sqlite3.connect(SALLA_WEBHOOK_DB_PATH, timeout=10)
+    return con
+
+
+def init_salla_webhooks_db():
+    parent = os.path.dirname(SALLA_WEBHOOK_DB_PATH)
+    if parent:
+        os.makedirs(parent, exist_ok=True)
+    with connect_salla_webhooks() as con:
+        con.execute("""
+            CREATE TABLE IF NOT EXISTS salla_webhook_receipts (
+                payload_sha256 TEXT PRIMARY KEY,
+                event_name TEXT NOT NULL,
+                received_at TEXT NOT NULL
+            )
+        """)
+
+
+def verify_salla_webhook(raw_body):
+    mode = os.environ.get("SALLA_WEBHOOK_AUTH_MODE", "token").strip().lower()
+
+    if mode == "token":
+        configured_token = os.environ.get("SALLA_WEBHOOK_TOKEN", "")
+        supplied_token = request.headers.get(SALLA_WEBHOOK_TOKEN_HEADER, "")
+        if not configured_token:
+            return False, "not_configured"
+        return (
+            hmac.compare_digest(supplied_token, configured_token),
+            "unauthorized",
+        )
+
+    if mode == "signature":
+        secret = os.environ.get("SALLA_WEBHOOK_SECRET", "")
+        strategy = request.headers.get("X-Salla-Security-Strategy", "").strip()
+        supplied_signature = request.headers.get("X-Salla-Signature", "").strip()
+
+        if not secret:
+            return False, "not_configured"
+        if strategy.lower() != "signature":
+            return False, "unauthorized"
+        if len(supplied_signature) != 64:
+            return False, "unauthorized"
+        try:
+            int(supplied_signature, 16)
+        except ValueError:
+            return False, "unauthorized"
+
+        expected_signature = hmac.new(
+            secret.encode("utf-8"), raw_body, hashlib.sha256
+        ).hexdigest()
+        return (
+            hmac.compare_digest(supplied_signature.lower(), expected_signature),
+            "unauthorized",
+        )
+
+    return False, "not_configured"
+
+
+@app.route("/webhooks/salla", methods=["POST"])
+def receive_salla_webhook():
+    if not request.is_json:
+        return jsonify({"error": "json_required"}), 415
+
+    raw_body = request.get_data(cache=True, as_text=False)
+    if len(raw_body) > SALLA_WEBHOOK_MAX_BYTES:
+        return jsonify({"error": "payload_too_large"}), 413
+
+    authenticated, auth_error = verify_salla_webhook(raw_body)
+    if not authenticated:
+        status_code = 503 if auth_error == "not_configured" else 401
+        return jsonify({"error": auth_error}), status_code
+
+    try:
+        payload = json.loads(raw_body.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError):
+        return jsonify({"error": "invalid_json"}), 400
+
+    if not isinstance(payload, dict):
+        return jsonify({"error": "json_object_required"}), 400
+
+    event_name = payload.get("event", "unknown")
+    if not isinstance(event_name, str) or not event_name.strip():
+        event_name = "unknown"
+    event_name = event_name.strip()[:120]
+
+    payload_sha256 = hashlib.sha256(raw_body).hexdigest()
+    received_at = utc_now()
+
+    try:
+        init_salla_webhooks_db()
+        with connect_salla_webhooks() as con:
+            cursor = con.execute(
+                """
+                INSERT OR IGNORE INTO salla_webhook_receipts
+                (payload_sha256, event_name, received_at)
+                VALUES (?, ?, ?)
+                """,
+                (payload_sha256, event_name, received_at),
+            )
+        is_duplicate = cursor.rowcount == 0
+    except (sqlite3.Error, OSError):
+        app.logger.exception("Salla webhook receipt persistence failed")
+        return jsonify({"error": "receipt_storage_unavailable"}), 503
+
+    if is_duplicate:
+        return jsonify({"accepted": True, "duplicate": True}), 200
+
+    # Privacy boundary: the raw payload and customer/order details are never persisted.
+    return jsonify({
+        "accepted": True,
+        "duplicate": False,
+        "event": event_name,
+        "payload_sha256": payload_sha256,
+        "stored_payload": False
+    }), 202
+
 
 init_db()
 
