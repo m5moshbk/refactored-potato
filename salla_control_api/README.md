@@ -18,6 +18,7 @@ Salla's documented Easy Mode flow sends the authorization result through the app
 - Accepts `app.store.authorize` only when merchant ID, access token, refresh token, expiry, bearer type, and `offline_access` scope are valid.
 - Encrypts access and refresh tokens using AES-256-GCM before persistence. The encryption key is supplied separately from the database.
 - Records exact-body delivery fingerprints for retry suppression.
+- Tracks the latest lifecycle-event timestamp per merchant and ignores older or equal-timestamp `app.store.authorize` / `app.uninstalled` events to reduce stale-event replay risk.
 - Handles `app.uninstalled` by clearing encrypted token material and marking the merchant disconnected.
 - Does not return or log token values.
 
@@ -40,7 +41,7 @@ The service fails closed if a required secret or durable database path is absent
 2. No access-token refresh worker exists. Salla refresh tokens are single-use; a serialized refresh lock and atomic rotation must be implemented before the first access token expires.
 3. No authenticated operator session, RBAC, dashboard API, Salla Merchant API client, or action-approval service exists yet.
 4. No managed PostgreSQL integration, backup/restore, queue, dead-letter handling, or operational alerting exists yet.
-5. Exact-body hashing suppresses exact retries only. The public event contract documents `created_at` and `merchant` but does not establish a universal delivery ID. A stale signed authorization event replay after a later uninstall is not fully prevented yet; add and test monotonic event sequencing/replay policy before production.
+5. Exact-body hashing suppresses exact retries. A per-merchant timestamp guard additionally rejects older and equal-timestamp lifecycle events. Equal timestamps are deliberately treated as ambiguous because the public event contract does not establish a universal delivery ID or sequence number. Naive timestamps are interpreted as UTC. This reduces stale-event replay risk but is not a substitute for a documented provider sequence ID or a complete replay-security review.
 6. The service has not been deployed, connected to a demo store, or tested against a live Salla Partner App.
 7. The SQLite path must be replaced with managed PostgreSQL or a verified durable encrypted volume before production.
 
@@ -52,6 +53,8 @@ The isolated tests use synthetic credentials only. They must prove:
 - exact retry is idempotent;
 - refresh token and `offline_access` are required;
 - `app.uninstalled` clears stored credentials;
+- older and equal-timestamp lifecycle events cannot overwrite newer merchant state;
+- malformed or missing lifecycle timestamps are rejected;
 - missing encryption key fails closed.
 
 GitHub Actions runs these tests separately from the Inventory API test suite.
