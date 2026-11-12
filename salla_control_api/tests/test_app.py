@@ -144,14 +144,14 @@ def test_bad_signature_does_not_create_database(tmp_path, monkeypatch):
     assert not (tmp_path / "salla-tokens.sqlite3").exists()
 
 
-@pytest.mark.parametrize("bad_payload", [
-    {"event": "app.store.authorize", "merchant": 0, "data": {}},
-    {"event": "app.store.authorize", "merchant": 123, "data": {"access_token": "x"}},
+@pytest.mark.parametrize("bad_payload, expected_status", [
+    ({"event": "app.store.authorize", "merchant": 0, "data": {}}, 400),
+    ({"event": "app.store.authorize", "merchant": 123, "data": {"access_token": "x"}}, 422),
 ])
-def test_invalid_authorize_payload_is_rejected(tmp_path, monkeypatch, bad_payload):
+def test_invalid_authorize_payload_is_rejected(tmp_path, monkeypatch, bad_payload, expected_status):
     module = load_module(tmp_path, monkeypatch)
     response = post_signed(module.app.test_client(), bad_payload)
-    assert response.status_code == 422
+    assert response.status_code == expected_status
 
 
 def test_token_storage_fails_closed_without_encryption_key(tmp_path, monkeypatch):
