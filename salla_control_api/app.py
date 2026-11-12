@@ -42,8 +42,8 @@ def _encryption_key():
 
 def _database_path():
     path = _required_env("SALLA_TOKEN_DB_PATH")
-    if path == ":memory:":
-        return path
+    if path == ":memory:" or not os.path.isabs(path):
+        raise RuntimeError("durable_absolute_database_path_required")
     parent = os.path.dirname(path)
     if parent:
         os.makedirs(parent, exist_ok=True)
