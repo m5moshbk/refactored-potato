@@ -139,7 +139,9 @@ Do not attach this project to the existing `m5mosh-nexus-inventory-api` Render s
 - Its current gateway implementation has receipt-only behavior and exact-body fingerprint deduplication.
 - The PR description records 23 passing tests on head `d994ce9d65a22335be07fa91c31f9905bae9fc12`; no live Salla delivery or HTTP test was performed.
 - The Render service `m5mosh-nexus-inventory-api` is configured to deploy from `feature/nexus-code-inventory-sync` with auto-deploy enabled. Do not merge PR #33 without evaluating this deployment coupling.
-- OAuth, the dashboard UI, a durable queue, API resource synchronization, and controlled write actions are not implemented by PR #33.
+- PR #33 now includes an isolated `salla_control_api/` foundation for the documented Easy Mode `app.store.authorize` event. It verifies the Salla Signature strategy, encrypts access/refresh tokens with AES-256-GCM, and marks credentials revoked on `app.uninstalled`.
+- The Partner Event service still uses SQLite as a prototype, has no serialized refresh worker, admin authentication/RBAC, merchant API client, dashboard API, durable queue, or production replay policy. The UI remains a disconnected preview.
+- Candidate read-only scopes and endpoint evidence are recorded in `salla_control_api/API_SCOPE_MATRIX.md`; they are not configured or granted in Salla Partners.
 - No target-store webhook has been saved or activated and no production service has been deployed for this integration.
 
 ## 9. Official references
