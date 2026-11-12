@@ -162,3 +162,27 @@ def test_token_storage_fails_closed_without_encryption_key(tmp_path, monkeypatch
     importlib.reload(module)
     response = post_signed(module.app.test_client(), authorize_payload())
     assert response.status_code == 503
+
+
+def test_token_storage_rejects_relative_database_path(tmp_path, monkeypatch):
+    monkeypatch.setenv("SALLA_WEBHOOK_SECRET", "test-webhook-secret")
+    monkeypatch.setenv("SALLA_TOKEN_ENCRYPTION_KEY", base64.b64encode(b"K" * 32).decode())
+    monkeypatch.setenv("SALLA_TOKEN_DB_PATH", "relative/salla.sqlite3")
+    import salla_control_api.app as module
+    importlib.reload(module)
+    response = post_signed(module.app.test_client(), authorize_payload())
+    assert response.status_code == 503
+    assert response.get_json()["error"] == "secure_storage_unavailable"
+
+
+def test_invalid_json_with_valid_signature_is_rejected(tmp_path, monkeypatch):
+    module = load_module(tmp_path, monkeypatch)
+    raw = b'{"event":'
+    response = module.app.test_client().post(
+        "/webhooks/salla/partner-app",
+        data=raw,
+        content_type="application/json",
+        headers=signed_headers(raw),
+    )
+    assert response.status_code == 400
+    assert response.get_json()["error"] == "invalid_json"
