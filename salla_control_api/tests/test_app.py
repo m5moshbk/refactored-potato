@@ -145,8 +145,8 @@ def test_bad_signature_does_not_create_database(tmp_path, monkeypatch):
 
 
 @pytest.mark.parametrize("bad_payload, expected_status", [
-    ({"event": "app.store.authorize", "merchant": 0, "data": {}}, 400),
-    ({"event": "app.store.authorize", "merchant": 123, "data": {"access_token": "x"}}, 422),
+    ({"event": "app.store.authorize", "merchant": 0, "created_at": "2026-11-12 05:00:00", "data": {}}, 400),
+    ({"event": "app.store.authorize", "merchant": 123, "created_at": "2026-11-12 05:00:00", "data": {"access_token": "x"}}, 422),
 ])
 def test_invalid_authorize_payload_is_rejected(tmp_path, monkeypatch, bad_payload, expected_status):
     module = load_module(tmp_path, monkeypatch)
