@@ -19,14 +19,14 @@ The control center is a separate product surface from the existing Nexus Invento
 A merchant-facing control center that reads or writes store resources must be registered as a Salla Partner App and obtain merchant consent through OAuth 2.0. Never ask for or store the merchant's Salla password.
 
 Required implementation stages:
-1. Create a Private Salla Partner App for the M5mOsH-controlled store integration, subject to the Partner account's eligibility and Salla's app rules.
-2. Register a stable HTTPS callback URL and the selected OAuth mode.
-3. Request only the minimum scopes needed for the first usable release; expand only when a feature is approved and justified.
-4. Use OAuth `state` with cryptographically random, single-use, short-lived server-side state to prevent CSRF and replay.
-5. Exchange the authorization code server-side only. Never expose client secret, access token, or refresh token to browser JavaScript.
-6. Encrypt tokens at rest with a managed secret/key. Redact tokens from logs and error reports.
-7. Refresh tokens server-side, handle revoked/expired authorization, and provide a disconnect/revoke path.
-8. Bind every stored credential to the verified Salla merchant/store identity returned by the authorized flow; do not trust a browser-supplied store identifier.
+1. Register the M5mOsH application in Salla Partners; app visibility/type and eligibility must follow the current Partner Portal rules.
+2. **Production default: Easy Mode.** Salla's current docs mark Easy Mode as recommended and state that it is the only mode allowed for published App Store apps. Subscribe to the `app.store.authorize` lifecycle event and receive the authorization/token payload through the app webhook. The event receiver must validate Salla's signature before processing any credential-bearing payload.
+3. **Custom Mode is development/test-only for a published app.** If used in a controlled demo, register a stable HTTPS callback and validate cryptographically random, single-use, short-lived OAuth `state`; exchange the code server-side only.
+4. Request only the minimum scopes required for the first usable release; derive exact scope names from the individual API endpoint docs and remove unused scopes.
+5. Never expose client secret, access token, or refresh token to browser JavaScript, URLs, source control, or logs.
+6. Encrypt tokens at rest with a managed key; bind credentials to the verified merchant identity received from Salla, not a browser-supplied store identifier.
+7. Access tokens last 14 days. Refresh tokens last one month and are single-use: serialize refresh with a database-backed lock/lease, atomically persist the replacement refresh token, and prevent concurrent refresh attempts.
+8. Handle revoked/expired authorization, refresh failure, app uninstall/update lifecycle events, and provide a disconnect/revoke path.
 
 OAuth endpoints documented by Salla:
 - Authorization: `https://accounts.salla.sa/oauth2/auth`
@@ -34,18 +34,18 @@ OAuth endpoints documented by Salla:
 - User info: `https://accounts.salla.sa/oauth2/user/info`
 - Merchant API base: `https://api.salla.dev/admin/v2`
 
-Salla documents OAuth scopes as the boundary for merchant data access. The exact scope strings must be copied from the current endpoint documentation for each implemented operation; do not guess scope names or request a blanket set.
+Salla documents OAuth scopes as the boundary for merchant data access. The exact scope strings must be copied from the current endpoint documentation for each implemented operation; do not guess scope names or request a blanket set. Salla also warns that reusing a refresh token invalidates the refresh token and associated access tokens; refresh must be serialized, never retried concurrently.
 
 ### 2.2 Webhook receiver (event notifications, not an API credential)
 
 The existing PR #33 adds a separate `POST /webhooks/salla` receiver. A webhook is a notification channel; it does not grant the dashboard permission to list or mutate merchant resources. Keep webhook authentication separate from OAuth.
 
 Salla documents:
-- Signature headers: `X-Salla-Security-Strategy` and `X-Salla-Signature`.
-- Custom Token strategy is also supported.
-- Signature verification must be performed before trusting/parsing the event.
-- Acknowledge quickly, enqueue verified events, and process asynchronously/idempotently.
-- Salla may retry unsuccessful deliveries; duplicate handling is required.
+- Signature headers: `X-Salla-Security-Strategy` and `X-Salla-Signature`; Partner Apps default to the Signature strategy.
+- Signature verification uses HMAC-SHA256 with the configured webhook secret and a timing-safe comparison. Verify the raw request bytes before trusting the event.
+- Token strategy and custom request headers are also supported, but the selected strategy must match the Partner Portal configuration.
+- Salla waits about 30 seconds and retries unsuccessful deliveries three times at roughly five-minute intervals.
+- Persist and enqueue verified events before returning success; process asynchronously and idempotently. The current receiver only records a receipt and is not yet a production queue.
 
 The current PR is an initial receipt-only gateway. It does not yet provide a durable queue, event processing, API synchronization, or a live merchant connection. Do not configure the store webhook to point at this endpoint until the PR has been reviewed, separately deployed, supplied with a durable database path, and verified with a controlled test delivery.
 
@@ -84,7 +84,7 @@ All actions must be allow-listed server-side. The browser must not be able to se
 - Redact phone, email, address, access tokens, refresh tokens, signatures, and webhook secrets from logs.
 - Webhook handler: authenticate raw bytes, validate schema/size, persist receipt and enqueue atomically, return a fast 2xx only after durable acceptance.
 - Queue workers: retry transient errors with bounded exponential backoff; dead-letter terminal failures; preserve event ordering where the operation requires it.
-- Idempotency: prefer Salla event/delivery identifiers when documented and present. Do not use body hash as the sole business-event identity; retain it only as a payload fingerprint/fallback.
+- Idempotency: the reviewed public webhook docs do not expose a universal delivery/event ID contract. Before processing business effects, inspect the actual version-2 payload contract and use a documented stable identifier where present. Until verified, body SHA-256 is only an exact-retry fingerprint, not proof of unique business-event identity; distinct logically separate events with identical bodies remain a known ambiguity.
 - Reconcile missed events through scoped API reads and incremental sync; webhooks alone are not a complete source of truth.
 - Respect Salla rate limits and pagination requirements. Use bounded concurrency and backoff.
 
@@ -145,8 +145,8 @@ Do not attach this project to the existing `m5mosh-nexus-inventory-api` Render s
 ## 9. Official references
 
 - Salla Platform Docs — Get Started: https://docs.salla.dev/
-- Salla Platform Docs — Authorization: https://docs.salla.dev/421118m0
-- Salla Platform Docs — Webhooks and security headers: https://docs.salla.dev/421119m0
+- Salla Platform Docs — Authorization (Easy Mode, lifecycle event, token expiry and single-use refresh): https://docs.salla.dev/421118m0
+- Salla Platform Docs — Webhooks, signature/token strategies, timeout and retry behavior: https://docs.salla.dev/421119m0
 - Salla Playbook — Core Development and reliable webhook handling: https://docs.salla.dev/2316085m0
 - Salla Merchant API — List Orders: https://docs.salla.dev/orders/list
 
