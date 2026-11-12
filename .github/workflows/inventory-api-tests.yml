@@ -4,9 +4,11 @@ on:
   push:
     branches:
       - fix/nexus-inventory-api-validation
+      - feat/salla-webhook-gateway-20261112
   pull_request:
     paths:
       - "inventory_api/**"
+      - "salla-control-center/**"
       - ".github/workflows/inventory-api-tests.yml"
   workflow_dispatch:
 
