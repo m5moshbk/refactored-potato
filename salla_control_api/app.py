@@ -54,6 +54,23 @@ def _connect():
     return sqlite3.connect(_database_path(), timeout=10)
 
 
+def _event_created_at(payload):
+    """Parse Salla's event timestamp and normalize it to UTC microseconds."""
+    value = payload.get("created_at")
+    if not isinstance(value, str) or not value.strip() or len(value) > 64:
+        raise ValueError("invalid_event_timestamp")
+    normalized = value.strip()
+    if normalized.endswith("Z"):
+        normalized = normalized[:-1] + "+00:00"
+    try:
+        parsed = datetime.fromisoformat(normalized)
+    except ValueError as exc:
+        raise ValueError("invalid_event_timestamp") from exc
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return int(parsed.astimezone(timezone.utc).timestamp() * 1_000_000)
+
+
 def init_db():
     with _connect() as con:
         con.execute("""
@@ -66,6 +83,14 @@ def init_db():
                 connected_at TEXT NOT NULL,
                 updated_at TEXT NOT NULL,
                 revoked_at TEXT
+            )
+        """)
+        con.execute("""
+            CREATE TABLE IF NOT EXISTS salla_merchant_event_state (
+                merchant_id TEXT PRIMARY KEY,
+                last_event_at INTEGER NOT NULL,
+                last_event_name TEXT NOT NULL,
+                updated_at TEXT NOT NULL
             )
         """)
         con.execute("""
@@ -177,6 +202,13 @@ def receive_partner_event():
         return jsonify({"error": "invalid_merchant"}), 400
 
     event_name = event_name.strip()
+    if event_name in {"app.store.authorize", "app.uninstalled"}:
+        try:
+            event_time = _event_created_at(payload)
+        except ValueError as exc:
+            return jsonify({"error": str(exc)}), 400
+    else:
+        event_time = None
     payload_hash = hashlib.sha256(raw_body).hexdigest()
     received_at = utc_now()
 
@@ -202,6 +234,31 @@ def receive_partner_event():
 
             if not inserted:
                 return jsonify({"accepted": True, "duplicate": True}), 200
+
+            # Salla lifecycle events can arrive late or be replayed. Apply only
+            # strictly newer events for each merchant; equal timestamps are
+            # ambiguous because the public payload has no universal sequence ID.
+            if event_time is not None:
+                previous = con.execute(
+                    "SELECT last_event_at FROM salla_merchant_event_state WHERE merchant_id=?",
+                    (merchant_id,),
+                ).fetchone()
+                if previous is not None and event_time <= previous[0]:
+                    return jsonify({
+                        "accepted": True,
+                        "duplicate": False,
+                        "ignored": "stale_or_ambiguous_event",
+                    }), 202
+                con.execute(
+                    """INSERT INTO salla_merchant_event_state
+                       (merchant_id, last_event_at, last_event_name, updated_at)
+                       VALUES (?, ?, ?, ?)
+                       ON CONFLICT(merchant_id) DO UPDATE SET
+                         last_event_at=excluded.last_event_at,
+                         last_event_name=excluded.last_event_name,
+                         updated_at=excluded.updated_at""",
+                    (merchant_id, event_time, event_name, received_at),
+                )
 
             if event_name == "app.store.authorize":
                 con.execute(
