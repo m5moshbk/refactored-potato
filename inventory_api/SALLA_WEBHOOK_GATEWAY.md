@@ -73,7 +73,7 @@ The default SQLite path under `/tmp` is ephemeral. A Render persistent disk and 
 ## References
 
 - Salla Webhooks: https://docs.salla.dev/421119m0
-- Salla Merchant help: https://help.salla.sa/article/إرسال-الإشعارات-لخدمات-أخرى-عبر-الويب-هوك-webhooks-1/fzsikgjw2m8dfm8j5ep2ez4e
+- Salla Merchant help: https://help.salla.sa/article/%D8%A5%D8%B1%D8%B3%D8%A7%D9%84-%D8%A7%D9%84%D8%A5%D8%B4%D8%B9%D8%A7%D8%B1%D8%A7%D8%AA-%D9%84%D9%84%D8%AE%D8%AF%D9%85%D8%A7%D8%AA-%D8%A3%D8%AE%D8%B1%D9%89-%D8%B9%D8%A8%D8%B1-%D8%A7%D9%84%D9%88%D9%8A%D8%A8-%D9%87%D9%88%D9%83-webhooks-1/fzsikgjw2m8dfm8j5ep2ez4e
 
 ## الحقوق | Rights
 
