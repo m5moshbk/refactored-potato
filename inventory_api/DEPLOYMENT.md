@@ -13,6 +13,15 @@
 7. تحقق من `/healthz` و`/api/v1/status`، ثم اختبر إدخال بيانات وصفية بمفتاح تجريبي فقط.
 8. لا تدمج هذا الفرع ولا تنشره على الخدمة الحية حتى تنجح الاختبارات وتُراجع إعدادات الأسرار والتخزين.
 
+## استقبال أحداث سلة — بوابة منفصلة
+
+- المسار: `POST /webhooks/salla`.
+- راجع `SALLA_WEBHOOK_GATEWAY.md` لاختيار وضع المصادقة وإعداد Request Headers.
+- في وضع الترويسة المخصصة، اضبط `SALLA_WEBHOOK_AUTH_MODE=token` و`SALLA_WEBHOOK_TOKEN` في Render، واستخدم `X-M5mOsH-Webhook-Token` في سلة.
+- لا تفعّل Webhook قبل ضبط `SALLA_WEBHOOK_DB_PATH` على قرص دائم. المسار الافتراضي تحت `/tmp` غير دائم.
+- المستقبل يسجّل بيانات إيصال محدودة فقط ولا يحفظ جسم الحدث أو بيانات العميل ولا ينفذ تغييرات في المتجر.
+- لا تغيّر أمر التشغيل أو إعدادات Render أو أسرارها ضمن هذا الـ PR.
+
 ## English — Release approval gate
 
 This API is intentionally separate from the existing static Nexus site. Do not attach a custom domain or modify the current Nexus service without a separate review.
