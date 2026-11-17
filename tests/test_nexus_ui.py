@@ -84,6 +84,35 @@ class NexusIndexTests(unittest.TestCase):
         self.assertNotRegex(self.source, r"fetch\s*\([^)]*/(?:deploy|restart|database|production)")
         self.assertNotRegex(self.source, r"axios\.(?:post|put|patch|delete)\s*\([^)]*/(?:deploy|restart|database|production)")
 
+    def test_owner_repair_request_routes_to_private_reviewable_inbox(self) -> None:
+        self.assertIn("m5moshbk/M5mOsH-Task-Orchestrator/issues/new", self.source)
+        self.assertIn('id="nxRepairRoute"', self.source)
+        self.assertIn('id="nxRepairTicketPreview"', self.source)
+        self.assertIn("Create new issue", self.source)
+        self.assertIn("handoff_open_requested_not_submitted", self.source)
+        self.assertIn("لم تُحفظ التذكرة ولم يبدأ التنفيذ بعد", self.source)
+
+    def test_owner_repair_handoff_blocks_common_secret_patterns(self) -> None:
+        self.assertIn("const secretLike=", self.source)
+        self.assertIn("github_pat_", self.source)
+        self.assertIn("Bearer", self.source)
+        self.assertIn("SECRET(?:_ACCESS_KEY)?", self.source)
+        self.assertIn("DATABASE_URL", self.source)
+        self.assertIn("PRIVATE KEY", self.source)
+        self.assertIn("const rawNote=", self.source)
+        self.assertIn("secretLike.test(rawNote)", self.source)
+        self.assertIn("rawNote.length>600", self.source)
+        self.assertIn("لن يتم اقتطاع النص بصمت", self.source)
+        self.assertIn('id="nxRepairOwnerDetails"', self.source)
+        self.assertIn("nxRepairOwnerDetails", self.source)
+        self.assertIn("M5mOsH-Task-Orchestrator/issues\" target=", self.source)
+        self.assertIn('id="nxRepairCopy"', self.source)
+        self.assertIn("handoff_text_copied_not_submitted", self.source)
+        self.assertIn("handoff_text_selected_for_manual_copy", self.source)
+        prepare_block = self.source[self.source.index("function prepare(d)"):self.source.index("select.addEventListener('change'")]
+        self.assertNotIn("$('operatorTaskNote').value=", prepare_block)
+        self.assertIn("لا تُرسل أسرارًا إلى التذكرة", self.source)
+
 
 class DesignSystemTests(unittest.TestCase):
     @classmethod
